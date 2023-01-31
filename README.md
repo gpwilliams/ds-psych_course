@@ -10,6 +10,8 @@ To engage in workshops, either clone this repository to your computer or manuall
 
 Exercises are organised by each chapter and contain the Quarto documents and rendered HTML files for the slides and exercises for each workshop. I will release answers to the exercises each week via Microsoft Teams.
 
+**Course Schedule**
+
 | Week | Meeting Date          | Topic                                                                                                                         | Recording |
 |------------------|------------------|------------------|------------------|
 | 1    | Thursday 2<sup>nd</sup> March  | [Getting Started](http://glennwilliams.me/ds-psych/01_getting-started.html#some-final-tips)                                   |           |
@@ -22,7 +24,5 @@ Exercises are organised by each chapter and contain the Quarto documents and ren
 | 8    | Tuesday 9<sup>th</sup> May     | [Data Simulation and Power](http://glennwilliams.me/ds-psych/08_data-simulation-and-power.html)                               |           |
 | 9    | Tuesday 16<sup>th</sup> May    | [Bayesian Estimation and Model Comparison](http://glennwilliams.me/ds-psych/09_bayesian-estimation-and-model-comparison.html) |           |
 | 10   | Tuesday 23<sup>rd</sup> May    | [Understanding Null Results](http://glennwilliams.me/ds-psych/10_understanding-null-results.html)                             |           |
-
-: Course schedule
 
 This repository will be updated weekly with the content ahead of the workshop sessions.
