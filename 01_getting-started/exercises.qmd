@@ -1,0 +1,182 @@
+---
+title: "Getting Started"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2022-01-30"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "An introduction to using R, RStudio, and Quarto"
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Now you know how to download and install R and RStudio, how to set up RStudio Projects, and how to create and use Quarto documents, you're ready to get started working within a notebook in RStudio.
+
+Complete the following exercises. The basics will get you used to working with R and Quarto documents. The advanced exercises are a little more involved and can be completed either in the session or in your own time.
+
+# Basics
+
+Please complete the following exercises within this file (questions.Rmd).
+
+## Exercise 1
+
+Make a code chunk. In this, add together the numbers 1, 5, 999, and 67819.
+
+:::{.callout-note}
+
+It's good practice to name your code chunks. This way, if errors occur in your code, R will flag this up with the code chunk that contains problems. To add any options to code chunks, such as the title, we use the **hash pipe** operator and pass it the variable name for what we'd like to change along with our input.
+
+For names, this looks like: `#| label: our label here.`
+
+:::
+
+## Exercise 2
+
+Make a code chunk. In this, divide 1825031 by 534.
+
+## Exercise 3
+
+Make a code chunk. Perform a boolean operation to check whether "Dog" is equal to "Cat".
+
+## Exercise 4
+
+Make a code chunk. Concatenate the string "I'm using R" with the number 7. What output do you get? Can you explain why it is presented in this way?
+
+**Answer**:
+
+## Exercise 5
+
+Make a code chunk. In this, calculate the mean of the numbers 1 through to 10 (using `mean()`). Also in this chunk, calculate the median of the numbers 1 through to 10 (using `median()`). Also in this chunk, calculate the standard deviation of the numbers 1 through to 10 (using `sd()`).
+
+### A
+
+### B
+
+Can you simplify your code to cut down on repetition?
+
+::: callout-tip
+If you don't get the numbers you'd expect from e.g. `mean()`, make sure you're concatenating your values with `c()`. If you don't, it will just return the mean of the first value.
+:::
+
+## Exercise 6
+
+### A
+
+Make a code chunk. Create an object called "numbers" that has the numbers 1, 5, 10, and 267 in it. Access the final number.
+
+### B
+
+Replace the final number with 3.
+
+## Exercise 7
+
+Replace the text in your Quarto file to explain what you did with your data. It's usually best to explain what you did at each step before each code chunk.
+
+**Answer**:
+
+# Advanced
+
+These questions are designed to test your knowledge further in R. Please try to tackle these once you're done with the baiscs.
+
+## Exercise 8
+
+What's wrong with the following code? Fix it in the second block below.
+
+::: callout-important
+When code chunks contain invalid code, you are unable to render the Quarto document. When this happens you'll get an error message stating the line(s) and code chunk label where the error(s) occur. If you'd like to intentionally include broken code, as I have here, or otherwise skip a code chunk, include the `#| eval: false` option in the chunk, as I have below.
+:::
+
+```{r}
+#| label: exercise-8-question
+#| eval: false
+sequence < - c(1, 2, 3, 4, 5)
+```
+
+Can you explain why the code above does not work? Fix the code.
+
+**Answer**:
+
+## Exercise 9
+
+This code generates 10 random numbers between 0 and 1 from a uniform distribution.
+
+```{r}
+#| label: exercise-9-question
+#| eval: false
+my_object <- runif(n = 10, min = 0, max = 1)
+my_obejct
+```
+
+Can you explain why the code above does not work? Fix the code.
+
+**Answer**:
+
+## Exercise 10
+
+Create an object with names of 5 of your closest friends, family members, or favourite musicians. Name this object "people".
+
+::: callout-tip
+You will need to concatenate 5 strings with the `c()` function.
+:::
+
+## Exercise 11
+
+Create an object called `scores` that will store the scores of your 5 people on some test. Give them some random numbers. You can do this by hand, or learn how to use the `rnorm()` function by typing `?rnorm()` into the console.
+
+## Exercise 12
+
+Finally, create some ages for your people and store them in the object `ages`. Feel free to make up their ages. If you want to learn a new function, look into how `sample()` works. This is a function that draws numbers randomly from a set of numbers. Again, type `?sample()` in the console and press enter to figure this out.
+
+## Exercise 13
+
+Create a `tibble` called `my_data` consisting of your people, their ages, and test scores. Remember to use the `tibble` function here. Again, if you'd like some help on how this works, type `?tibble` into the console and press enter.
+
+::: callout-tip
+If the function doesn't work, be sure to load the tidyverse package first.
+:::
+
+## Exercise 14
+
+Change the name of the first person in `my_data` to someone else. Don't worry about changing their other values.
+
+::: callout-tip
+You will need to index that particular value in your `tibble` and assign it a new value.
+:::
+
+## Exercise 15
+
+Access the 3^rd^ row and 2^nd^ column of `my_data`.
+
+## Exercise 16
+
+Access the 2^nd^ column and all rows of `my_data`.
+
+## Exercise 17
+
+Calculate the mean age of the people in your sample. To do this, use the function `mean()`.
+
+## Exercise 18
+
+Calculate the standard deviation for the age of the people in your sample. To do this, use the function `sd()`.
+
+## Exercise 19
+
+You can chain together functions in R.
+
+One function we can use is `unique()`, which returns a vector or data frame based on what we give it, only with duplicates removed. Another function is `length()` which tells us how many things there are in a vector.
+
+Combine these two functions to get the number of unique names in your `people` column in `my_data`.
+
+::: callout-tip
+Pass your column to your functions. One function will be around the other one, e.g. `x(y(...))`.
+:::
+
+That's it for the introductory section. Well done on completing your first class in R!

@@ -1,0 +1,682 @@
+---
+title: "Getting Started"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+editor: visual
+---
+
+## Overview
+
+By the end, you'll understand:
+
+-   How **RStudio** works.
+
+-   How to create and use **Quarto** files.
+
+-   How to install and load **packages** in R.
+
+-   Best practices for working on **projects**.
+
+-   The basics of **data** types, data structures, and functions.
+
+::: callout-important
+Ensure you have R, RStudio, and Quarto installed before we start the exercises. See the appendices at [http://glennwilliams.me/ds-psych](http://glennwilliams.me/ds-psych/99a_installing-r.html) for instructions.
+:::
+
+# Understanding the Systems
+
+# RStudio
+
+## RStudio
+
+-   R is the programming language but it comes with an IDE.
+
+-   RStudio is a nicer IDE you can use to program in R.
+
+![](http://glennwilliams.me/ds-psych/img/rstudio-gui.png){fig-align="center"}
+
+## Changing Your Defaults
+
+-   RStudio has a few defaults that make **reproducible workflows** more difficult.
+
+-   Remove these defaults by going to:
+
+    -   `Tools, Global Options` and deselecting `Restore .RData into workspace at startup`
+
+    -   From the drop-down menu on `Save workspace to .RData on exit` to `Never`.
+
+-   You want a fresh start every time you use RStudio.
+
+-   Anything saved should be explicit.
+
+# Project Management
+
+## Project Management
+
+**Working directories** define where R looks on your computer when reading/writing data.
+
+-   ~~Opening RStudio sets it to the install location.~~ (Varies by computer.)
+
+-   ~~Opening a file to open RStudio sets it to the file location.~~ (Varies by startup method.)
+
+-   Opening or having an RStudio Project sets it to the project location.
+
+**Consistent behaviour benefits reproducibility.**
+
+## Project Management
+
+Make an RStudio Project by going to `File > New Project`
+
+![](http://glennwilliams.me/ds-psych/img/rstudio-project.png){fig-align="center"}
+
+Open the Project by double clicking the project file or setting the project in the top-right corner of RStudio.
+
+## File Paths
+
+We want R to read in `inputs/my_data.csv`.
+
+1.  R can read it from `/Users/glenn/Desktop/analysis/inputs/my_data.csv` or...
+
+2.  R can read it from `/inputs/my_data.csv`.
+
+The first is an **absolute path** and will only work on the computer you code it on.
+
+The second is a **relative path** and works if `/inputs/` is a sub-folder in the working directory. RStudio Projects make this working directory consistent.
+
+## Naming Conventions
+
+Jenny Bryan establishes 3 rules for good naming:
+
+-   **Machine readable**: File names should be easily read by computers.
+
+-   **Human readable**: File names should be easily read by humans. Include a **slug** to define what a file is or does (e.g. `01_read-files.R)`.
+
+-   **Play well with default ordering**: Numerics come first. Left pad numbers to ensure proper numeric ordering.
+
+## Naming Conventions
+
+| Poor Naming Conventions | Good Naming Conventions                    |
+|-------------------------|--------------------------------------------|
+| 26012022_rp1.csv        | 2022-01-26_reading-data_participant-01.csv |
+| 26012023_wp1.csv        | 2023-01-27_writing-data_participant-02.csv |
+| 10.R                    | 01_read-data.R                             |
+| 1.R                     | 02_plot-data.R                             |
+| 2.R                     | 10_fit-models.R                            |
+
+: Examples of poor and good file naming conventions
+
+## Writing Scripts
+
+-   R has the benefit over GUIs in that you document your methods and can **easily edit and rerun analyses**.
+
+-   You can make an R script by going to `File > New File > R Script`.
+
+-   Having one big script is **hard to manage**, so you should often break it into sub scripts, e.g. reading data, cleaning data, plotting, analysis, etc. This can be difficult to manage as a beginner.
+
+-   Your goal is often to **produce an output**, e.g. manuscript for publication. Writing scripts still means you have a lot of manual copying and pasting to do.
+
+# Quarto
+
+## Quarto Documents
+
+Quarto is an open-source scientific and technical publishing system that allows you to create dynamic documents with content using R, Python, Julia, or Observable code.
+
+-   You can create documents that embed your code within them to produce outputs (e.g. stats, plots)
+
+-   If anything changes, your changes cascade to the whole paper. This reduces human error.
+
+-   Make a Quarto document using `File > New File > Quarto Document`
+
+## Quarto Core Concepts
+
+![Quarto Documents: Understand YAML headers, Markdown, and Code Chunks](http://glennwilliams.me/ds-psych/img/quarto-editor.png){fig-align="center"}
+
+## Rendering Quarto Documents
+
+::: {#fig-quarto-rendering layout="[[1,1]]" layout-valign="bottom"}
+![Quarto source code](http://glennwilliams.me/ds-psych/img/quarto-code.png){#fig-quarto-code}
+
+![Quarto rendered html output](http://glennwilliams.me/ds-psych/img/quarto-rendered.png){#fig-quarto-rendered}
+
+Rendering Quarto documents
+:::
+
+# Using R
+
+## Packages
+
+R has a lot of functionality out of the box, but packages give us much more.
+
+These are just functions written by R developers to make working with R easier or to introduce new techniques.
+
+-   To install packages, use this once per machine:
+
+```{r}
+#| eval: false
+install.packages("tidyverse")
+```
+
+-   Every time you open R, load your packages by using this:
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+# Objects and Functions
+
+# Objects
+
+## Simple Operations
+
+You can use R like a calculator, e.g.
+
+```{r}
+1 + 4
+```
+
+Either type this in the console or make a code chunk.
+
+::: callout-tip
+## Top Tip
+
+Use the up and down arrow keys to cycle commands.
+:::
+
+## Finishing Expressions
+
+### `+` at the End of a Line
+
+R will wait for you to finish an expression if you end a line with a `+`
+
+```{r}
+1 + 2 + 3 + 4 + 5 + 6 + 7 +
+  8 + 9
+```
+
+## Finishing Expressions
+
+### Parsing Text (Quotes)
+
+It'll also wait for you to close a quotation for strings.
+
+```{r}
+"Hello, world!"
+"Hello world, isn't this book taking longer to write than Glenn expected
+despite Glenn having alredy done this before and 
+swearing he learned to not ovedo it?"
+```
+
+Notice that R outputs this as one string, with `\n` used to indicate a new line.
+
+## Creating and Returning Objects
+
+### Creating Objects
+
+To create an object, give it a name and assign it (`<-`) a value.
+
+```{r}
+summed_numbers <- 4 + 2
+```
+
+This adds the object, `summed_numbers` to the global environment, allowing you to access or use it later.
+
+::: callout-warning
+You can't start objects with a number, you can't use special characters (e.g. %!\*), and you can't include spaces in your object name.
+
+Capitalisation matters!
+:::
+
+## Creating and Returning Objects
+
+### Returning Objects
+
+By default, R will not return the result of this operation from `summed_numbers` unless you ask it to do so. To get the result, simply type the name of the object.
+
+```{r}
+summed_numbers
+```
+
+## Performing Operations on Objects
+
+R can work with your objects to perform functions. Here, multiplying `summed_numbers` by 5 is the same as multiplying (4 + 2) by 5.
+
+```{r}
+summed_numbers*5
+```
+
+## Operations
+
+R has the simple arithmetic operations, e.g.:
+
+-   add `x + y`
+-   subtract `x - y`
+-   multiply `x * y`
+-   divide `x/y`
+
+## Operations
+
+R also has some logical operations built in. For example:
+
+-   less than or equal to `x <= y`
+-   exactly equal to `x == y`
+-   not equal to `x != y`
+-   x OR y `x | y`
+-   x AND y `x & y`
+
+# Functions
+
+## Functions
+
+-   Functions are essentially verbs in R. They tell R to do something to the input.
+-   One important function is `c()`, this concatenates values.
+
+```{r}
+my_values <- c(1, 10, 4, 5)
+my_values
+```
+
+::: callout-note
+Functions are always followed by parentheses (e.g. `sum(), mean()`)
+:::
+
+## Functions
+
+### Inbuilt Functions
+
+R has a number of inbuilt functions, which can be expanded by loading new packages.
+
+Some basic arithmetic can be seen below:
+
+```{r}
+sum(my_values)
+```
+
+```{r}
+mean(my_values)
+```
+
+## Vectorisation
+
+R is a **vectorised** language, meaning R can perform operations on every value in an object without you needing to specify this for each object.
+
+```{r}
+my_values + 1
+```
+
+Notice how every value has been incremented by 1? In some languages we need to specify this more verbosely.
+
+## Namespace Conflicts
+
+As a quick aside, if you ever find a function isn't working as you expect, and you're **sure** you're using it correctly, you might have a **namespace conflict**.
+
+-   When two packages export a function with the same name, R gives preference to the **most recently loaded package.**
+
+-   You can specify the function from a package by using `::` notation. For example, `dplyr::filter()` or `MASS::filter()`.
+
+# Data Types and Data Structures
+
+## Data Types
+
+There are 4 main data types you'll use:
+
+-   Characters: Text, e.g. `"My cats, Bear and Penny"`
+
+-   Numeric: Floats (decimals), e.g. `1`, `1.5`, `1.576`.
+
+-   Integer: Whole numbers using `L` notation, e.g. `1L`, `2L`
+
+-   Logical: Boolean operators, i.e. `TRUE` and `FALSE`. (Avoid `T` and `F` as these can be overwritten.)
+
+**You can't mix data types**. If you do, R will coerce them to a single type.
+
+```{r}
+c(2, "Cat")
+```
+
+# Vectors
+
+## Vectors
+
+Vectors are 1-dimensional arrays of values.
+
+Let's create a vector made up of the values 3---7.
+
+```{r}
+my_numbers <- 3:7 # values are: 3, 4, 5, 6, 7
+```
+
+R is a 1-indexed language meaning we count starting from 1. If we want to access the third value, we use `[]` to define the position of the value we want.
+
+```{r}
+my_numbers[3]
+```
+
+## Vectors
+
+What if we want to change the value in position 2 to 189? We use indexing to access this value, `[2]`, and assignment to make the value at that position 189, `<- 189`.
+
+```{r}
+my_numbers[2] <- 189
+my_numbers
+```
+
+We can also create objects from a range of complex in-built functions.
+
+```{r}
+participant_id <- seq(from = 1, to = 100, by = 1)
+participant_id
+```
+
+## Sampling
+
+-   We can use R to do **pseudorandom** **number** **generation**, e.g. in simulating data.
+
+-   Nothing is actually random in a computer. These generators need a **seed** which defines which values will be sampled. For reproducibility we can set this explicitly.
+
+```{r}
+set.seed(1892)
+```
+
+Let's "randomly" assign people as being cat or dog owners.
+
+```{r}
+pets <- c("cat", "dog")
+pet_owned <- sample(pets, size = 100, replace = TRUE)
+pet_owned
+```
+
+## Sampling
+
+Make IQs for the owners, sampling from the normal distribution.
+
+```{r}
+iq_score <- rnorm(n = 100, mean = 100, sd = 15)
+iq_score
+```
+::: {style="font-size: 50%;"}
+How many values did we create? Use `length(iq_score)`
+:::
+
+# Lists
+
+## Lists
+
+Lists allow you to store multiple vectors of **different** **lengths** and **data** **types** together. Nesting vectors within vectors!
+
+Make them from existing objects.
+
+```{r}
+simulated_data <- list(
+  participant = participant_id,
+  pet = pet_owned,
+  iq = iq_score
+)
+```
+
+## Lists
+
+Or define objects when you define the list.
+
+```{r}
+person_quality <- list(
+  glenn = c("handsome", "smart", "modest"),
+  not_glenn = c("less_handsome", "less_smart", "less_modest")
+)
+person_quality
+```
+
+## Indexing Vectors
+
+If we want just Glenn (which most people do, I\'m sure) index the position of the vector you want.
+
+```{r}
+person_quality[1]
+```
+
+Or by name:
+
+```{r}
+person_quality["glenn"]
+```
+
+If you just want values, without the vector name, use `[[]]`.
+
+```{r}
+person_quality[["glenn"]]
+```
+## Indexing Vectors
+
+If you want to get values at a specific position in the vector values, combine both indexing methods.
+
+Let's add some **crushing reality** to affairs.
+
+```{r}
+person_quality[["glenn"]][4] <- "liar"
+person_quality[["glenn"]]
+```
+::: callout-note
+
+Notice that data needn't be square. (i.e. with every vector the same length)
+
+:::
+
+# Data Frames
+
+## Data Frames
+
+-   Often you'll work with tabular data, maybe loading that data into R. One of the most common data structures is a data frame.
+
+-   Since we use the `tidyverse` we have access to data frames that are a little stricter and more predictable, called `tibbles`.
+
+## Data Frames
+
+:::: {.columns}
+
+::: {.column width="35%"}
+
+- Let's make a tibble from the objects we defined earlier. 
+
+- Notice that by default `tibbles` limit the number of values printed to the console.
+
+:::
+
+::: {.column width="65%"}
+```{r}
+iq_data <- tibble(
+  participant = participant_id[1:100],
+  pet = pet_owned,
+  iq = iq_score
+)
+iq_data
+```
+:::
+
+::::
+
+## Tibbles
+
+We'll mainly use `tibbles` here, but some functions don't work well with them. So we can convert them back to the base-R `data.frames`.
+
+```{r}
+iq_data_df <- as.data.frame(iq_data)
+head(iq_data_df) # this limits printing to 6 rows
+```
+
+## Working with Columns
+
+Index a column either by name or by position in the tibble.
+
+```{r}
+#| eval: false
+iq_data$iq
+iq_data[["iq"]]
+iq_data[[3]]
+```
+
+```{r}
+#| echo: false
+iq_data[[3]]
+```
+
+Each method does the same thing.
+
+## Adding and Removing Columns
+
+:::: {.columns}
+
+::: {.column width="50%"}
+1. Let's create a new vector sampling from values with different probabilities.
+
+```{r}
+# set a random seed
+set.seed(1892)
+
+operating_system <- sample(
+  c("windows", "mac", "linux"), 
+  size = 100, 
+  replace = TRUE,
+  prob = c(0.5, 0.3, 0.2)
+)
+```
+:::
+
+::: {.column width="50%"}
+2. Use the usual assignment to add this to the `tibble`.
+
+```{r}
+iq_data$operating_system <- 
+  operating_system
+iq_data
+```
+:::
+
+::::
+
+## Adding and Removing Columns
+
+Define the column as being `NULL`, or non-existent, to remove it.
+
+```{r}
+iq_data$operating_system <- NULL # remove the column
+iq_data
+```
+
+## Working with Rows
+
+- We can access rows using similar indexing that we use for vectors. But, since `tibbles` have **two** **dimensions**, we need two values: one for the **rows** and one for the **columns**.
+
+- Rows always require a position, while columns can be defined as names or positions.
+
+```{r}
+#| eval: false
+iq_data[1:2, "pet"]
+iq_data[c(1, 2), "pet"]
+iq_data[1:2, 2]
+```
+
+```{r}
+#| echo: false
+iq_data[1:2, 2]
+```
+
+## Working with Rows
+
+Tibbles always return themselves as a tibble unless we do further **list-style subsetting** to access the vector itself.
+
+```{r}
+#| eval: false
+iq_data[1:2, "pet"]$pet
+iq_data[1:2, "pet"][["pet"]]
+iq_data[1:2, "pet"][[1]]
+```
+
+```{r}
+#| echo: false
+iq_data[1:2, "pet"][[1]]
+```
+
+## Working with Rows
+
+You can access multiple columns when subsetting with rows.
+
+```{r}
+iq_data[1:2, c("pet", "iq")]
+```
+
+Once you know how to index these values, assigning new values to them is just as easy as before. Simply use the assignment operator `<-`.
+
+## Adding or Removing Rows
+
+:::: {.columns}
+
+::: {.column width="60%"}
+- Since `tibbles` must be square (i.e. have similar length vectors in each column), if you want to add a row of data to a `tibble` you must specify values for each column. If no value is present, just give it an `NA`.
+
+- To add a row to our `tibble`, we need to know where to place it. Let's put some data in the 101^st^ row of our `iq_data`
+
+:::
+
+::: {.column width="40%"}
+```{r}
+iq_data[101, ] <- list(
+  participant = 101, 
+  pet = "dog",
+  iq = NA
+)
+iq_data
+```
+:::
+
+::::
+
+## Adding or Removing Rows
+
+If we just have the one value we want to put in a single column, we can do so and R will fill in the remaining columns with `NA`.
+
+```{r}
+iq_data[102, "participant"] <- 102
+
+iq_data
+```
+
+## Matrices
+
+:::: {.columns}
+
+::: {.column width="50%"}
+-   Matrices are even stricter than data frames and tibbles.
+
+-   They can only contain a single data type throughout.
+
+-   Often only used under the hood in advanced stats packages.
+:::
+
+::: {.column width="50%"}
+-   Here's an example anyway...
+
+```{r}
+matrix_example <- matrix(
+  rep(1:25),
+  nrow = 5,
+  ncol = 5
+)
+matrix_example
+```
+:::
+
+::::
+
+## Exercises
+
+- Check out <http://glennwilliams.me/ds-psych/01_getting-started.html> for tips and style guides.
+
+- Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
