@@ -30,12 +30,10 @@ Please complete the following exercises within this file (questions.Rmd).
 
 Make a code chunk. In this, add together the numbers 1, 5, 999, and 67819.
 
-:::{.callout-note}
-
+::: callout-note
 It's good practice to name your code chunks. This way, if errors occur in your code, R will flag this up with the code chunk that contains problems. To add any options to code chunks, such as the title, we use the **hash pipe** operator and pass it the variable name for what we'd like to change along with our input.
 
 For names, this looks like: `#| label: our label here.`
-
 :::
 
 ## Exercise 2
