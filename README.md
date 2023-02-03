@@ -12,9 +12,9 @@ Exercises are organised by each chapter and contain the Quarto documents and ren
 
 **Course Schedule**
 
-| Week | Meeting Date          | Topic                                                                                                                         | Recording |
+| Week | Meeting Date                   | Topic                                                                                                                         | Recording |
 |------------------|------------------|------------------|------------------|
-| 1    | Thursday 2<sup>nd</sup> March  | [Getting Started](http://glennwilliams.me/ds-psych/01_getting-started.html#some-final-tips)                                   |           |
+| 1    | Friday 3<sup>rd</sup> March    | [Getting Started](http://glennwilliams.me/ds-psych/01_getting-started.html#some-final-tips)                                   |           |
 | 2    | Tuesday 7<sup>th</sup> March   | [Creating Graphs](http://glennwilliams.me/ds-psych/02_creating-graphs.html)                                                   |           |
 | 3    | Tuesday 14<sup>th</sup> March  | [Transforming Data](http://glennwilliams.me/ds-psych/03_transforming-data.html)                                               |           |
 | 4    | Thursday 23<sup>rd</sup> March | [Tidying and Merging Data](http://glennwilliams.me/ds-psych/04_tidying-and-merging-data.html)                                 |           |
