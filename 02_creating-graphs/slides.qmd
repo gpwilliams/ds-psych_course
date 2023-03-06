@@ -1,0 +1,695 @@
+---
+title: "Creating Graphs"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+editor: visual
+---
+
+## Overview
+
+Creating publication-ready data visualisations is a particular strength of R/`ggplot2`. We'll cover today:
+
+-   The grammar of graphics.
+
+-   How to create a series of faceted sub--plots.
+
+-   How to customise your plots with various themes, scales, labels, and other additional content.
+
+-   How to combine plots quickly and easily using the `patchwork` package.
+
+-   How to save your plots to file.
+
+## The Grammar of Graphics
+
+In R, options were traditionally too low or too high level. `ggplot2` is a good mix, with a consistent interface.
+
+1.  Define a data set and map it to the canvas.
+2.  Build up your plot layer by layer.
+
+This relies on:
+
+-   `geoms`: e.g., points on a scatter plot.
+
+-   `aes`: how you map elements of data to aesthetics.
+
+-   `scale`: self explanatory.
+
+-   annotations: Labels, we'll use `labs()`.
+
+## Building a Plot, Layer by Layer
+
+Let's get some data to plot; `starwars` from `dplyr`.
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+Once loaded, we can load up the `starwars` data set from the `dplyr` library (one of the libraries loaded up when using `library(tidyverse)`. Let's take a look at it.
+
+```{r}
+starwars
+```
+
+## Building the Plot
+
+Let's build our plot up, one layer at a time. Every plot made in `ggplot2` must define the dataset within the `ggplot()` function.
+
+```{r}
+ggplot(data = starwars)
+```
+
+## Adding Geoms
+
+We need to add a layer to the plot. We do this with `geoms`, e.g. `geom_point()`.
+
+But, this won't work:
+
+```{r}
+#| eval: false
+ggplot(data = starwars) +
+  geom_point()
+```
+
+Why? We haven't said how to map the data onto the `geom`.
+
+## Adding Geoms
+
+Because we need to set the aesthetics:
+
+```{r}
+ggplot(data = starwars) +
+  geom_point(mapping = aes(x = mass, y = height))
+```
+
+We have a plot, **and** 28 rows in our data with missing values...**and** an outlier!
+
+## Aesthetics
+
+For `geom_point()` we need x and y. But we can add more.
+
+```{r}
+#| warning: false
+ggplot(data = starwars) +
+  geom_point(mapping = aes(x = mass, y = height, colour = gender))
+```
+
+## Coordinates
+
+We can tackle outliers in two ways:
+
+1.  Filter out the outlier prior to plotting the data. We'll cover this in [Transforming Data](03_transforming-data.qmd).
+2.  Change the coordinates of the plot to only include a limited range.
+
+We'll go with the latter option for now.
+
+## Coordinates
+
+`coord_cartesian()` allows us to define limits on the x and y axis, hiding data. This is different to `scale_x_continuous()` which removes it.
+
+```{r}
+#| warning: false
+ggplot(data = starwars) +
+  geom_point(mapping = aes(x = mass, y = height, colour = gender)) +
+  coord_cartesian(xlim = c(0, 180))
+```
+
+## Coordinates
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_point(
+    mapping = 
+      aes(
+        x = mass, 
+        y = height, 
+        colour = gender
+      ),
+    alpha = 0.7, # opacity
+    shape = "triangle", 
+    size = 4
+  ) +
+  coord_cartesian(xlim = c(0, 180))
+```
+
+## Over-writing Aesthetics
+
+if you define colour inside and outside `aes`, the outside one wins. 
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_point(
+    mapping = 
+      aes(
+        x = mass, 
+        y = height, 
+        colour = gender
+      ),
+    alpha = 0.7, # opacity
+    shape = "triangle",
+    size = 4,
+    colour = "red"
+  ) +
+  coord_cartesian(xlim = c(0, 180))
+```
+
+## Fill
+
+Colour and fill are different properties within `ggplot2`:
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_point(
+    mapping = 
+      aes(
+        x = mass, 
+        y = height, 
+        fill = gender
+      ),
+    alpha = 0.7, # opacity
+    shape = "circle filled", # triangles
+    size = 4, # bigger points
+    colour = "red"
+  ) +
+  coord_cartesian(xlim = c(0, 180))
+```
+
+The colour of the circle varies, but the fill of the border is fixed.
+
+## Legends
+
+With continuous values, legends get a gradient. Is that Yoda?
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_point(
+    mapping = 
+      aes(
+        x = mass, 
+        y = height, 
+        colour = birth_year
+      )
+  ) +
+  coord_cartesian(xlim = c(0, 180))
+```
+
+# Geoms
+
+## Exploring Geoms
+
+There are many `geoms` that you can use in `ggplot2`. Some common ones you might use are:
+
+- bars (`geom_bar()`)
+- boxes (`geom_boxplot()`)
+- violins (`geom_violin()`)
+- densities (`geom_density()`)
+- histograms (`geom_histogram()`). 
+
+Let's briefly see how we might use each `geom`.
+
+## Bars
+
+Bars are best used to indicate counts. Used as Means ± SE/95% CI they hide the full information on dispersion and are misleading in terms of estimating magnitude of effects. 
+
+```{r}
+#| output-location: column
+ggplot(data = starwars) +
+  geom_bar(mapping = aes(x = gender))
+```
+
+## Box plots
+
+Box plots are a bit better:
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_boxplot(
+    mapping = 
+      aes(x = gender, y = height)
+  )
+```
+
+*Median, Interquartile range, whiskers are IQR + 1.5 times IQR, dots are outliers.*
+
+## Violins
+
+- Violin plots show you the density of the scores. 
+- We can have trimmed values or not.
+- We can draw quantiles.
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_violin(
+    mapping = 
+      aes(
+        x = gender, 
+        y = height
+      ),
+    trim = FALSE,
+    draw_quantiles = c(
+      0.25, 
+      0.5, 
+      0.75
+    )
+  )
+```
+
+## Histograms
+
+Histograms show densities within bins.
+
+```{r}
+#| message: false
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_histogram(
+    mapping = aes(x = height), 
+    fill = "white",
+    colour = "black"
+  )
+```
+
+## Density Plots
+
+- Density plots work like histograms but apply kernel smoothing to create a density line.
+- A little easier to see general trends.
+- We add transparency with **alpha**.
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  geom_density(
+    mapping = aes(
+      x = height, 
+      fill = gender
+    ), 
+    alpha = 0.5
+  )
+```
+
+## Smooths
+
+We can add lines of best fit to data using a **smooth** with `geom_smooth()`. We have:
+
+- `"lm"`: the linear model fitted using `stats::lm()`.
+
+- `"loess"`: locally estimated scatterplot smoothing fitted using `stats::loess()`, fitting many local regressions within the series of data.
+
+- `"gam"`: generalised additive model fitted using `mgcv::gam()`, using a series of basis splines.
+
+For our purposes, we'll just rely on "lm" to draw a line of best fit through our data.
+
+## Smooths
+
+Why use `scale_x_continuous()`? Cut out the big lad, Jabba the Hutt.
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  scale_x_continuous(
+    limits = c(0, 200)
+  ) +
+  geom_smooth(
+    mapping = 
+      aes(x = mass, y = height),
+    method = "lm"
+  )
+```
+
+`ggplot2` sets a default formula, but we can change it with, e.g. `formula = log(y) ~ x`.
+
+## Combining Geoms
+
+We can easily combine geoms in `ggplot2` by simply adding another layer to our plot.
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(data = starwars) +
+  scale_x_continuous(limits = c(0, 200)) +
+  geom_point(mapping = aes(
+    x = mass, 
+    y = height
+    )
+  ) +
+  geom_smooth(mapping = aes(
+    x = mass, 
+    y = height
+    ), 
+    method = "lm"
+  )
+```
+
+## Cutting Out the Repetition
+
+We can add aesthetics to the initial `ggplot()` call to avoid repetition.
+
+```{r}
+#| warning: false
+#| output-location: column
+ggplot(
+  data = starwars, 
+  mapping = aes(
+    x = mass, 
+    y = height
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(0, 200)
+  ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+# Customisation
+
+Once we've created the elements of the plot using the default settings, we often want to customise it to better present some elements of the plot, or simply to make the plot our own.
+
+## Labels
+
+The most basic way to do this is to first change the labels. To do this, we use the `labs()` function where we can specify various labels such as:
+
+-   `x`: the label for the x-axis.
+
+-   `y`: the label for the y-axis.
+
+-   `title`: the title of the plot.
+
+-   `caption`: a caption in the bottom right of the plot.
+
+-   `colour`: the heading for the legend if picked out by colour.
+
+## Labels
+
+```{r}
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  )
+```
+
+## Scales and Breaks
+
+We can set our own scale, with our own limits.
+
+```{r}
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_y_continuous(breaks = seq(0, 80, by = 10), limits = c(0, 80))
+```
+
+## Colours
+
+Base colours are ugly and not colourblind-friendly. Use e.g. [`MetBrewer`](https://github.com/BlakeRMills/MetBrewer) or [hex codes](https://www.w3schools.com/colors/colors_hexadecimal.asp) to use nicer colours.
+
+```{r}
+#| output-location: column
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_fill_manual(values = c(
+    "#efc86e", 
+    "#97c684", 
+    "#6f9969", 
+    "#808fe1", 
+    "#5c66a8"
+  ))
+```
+
+If we instead used colour to pick out the sexes here, we would have to change the function to `scale_colour_manual()`.
+
+## Themes
+
+The `ggplot2` theme is iconic and easy to recognise. There are [alternatives](https://ggplot2.tidyverse.org/reference/ggtheme.html): `theme_` functions.
+
+```{r}
+#| output-location: column
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_fill_manual(values = c(
+    "#efc86e", 
+    "#97c684", 
+    "#6f9969", 
+    "#808fe1", 
+    "#5c66a8"
+  )) +
+  theme_bw()
+```
+
+## Themes
+
+Use `theme()` to make further edits. `element_blank()` removes stuff.
+
+```{r}
+#| output-location: slide
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_fill_manual(values = c(
+    "#efc86e", 
+    "#97c684", 
+    "#6f9969", 
+    "#808fe1", 
+    "#5c66a8"
+  )) +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.text = element_text(size = 16)
+  )
+```
+
+## Legend Position
+
+Set the legend position manually:
+
+```{r}
+#| output-location: slide
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_fill_manual(values = c(
+    "#efc86e", 
+    "#97c684", 
+    "#6f9969", 
+    "#808fe1", 
+    "#5c66a8"
+  )) +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.text = element_text(size = 16),
+    legend.position = c(.90, .70)
+  )
+```
+
+## Legend Position
+
+Or set it by pre-defined positions:
+
+```{r}
+#| output-location: slide
+ggplot(data = starwars, mapping = aes(x = gender, fill = sex)) +
+  geom_bar(position = "dodge") +
+  labs(
+    x = "Gender",
+    y = "Count",
+    title = "Counts of Each Gender",
+    caption = "A little customisation."
+  ) +
+  scale_fill_manual(values = c(
+    "#efc86e", 
+    "#97c684", 
+    "#6f9969", 
+    "#808fe1", 
+    "#5c66a8"
+  )) +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.text = element_text(size = 16),
+    legend.position = "top"
+  )
+```
+
+# Facets
+
+## Facets
+
+We can make sub-plots:
+
+-   `facet_wrap()`: Let `ggplot` figure it out for you. Maximise use of plotting area.
+
+-   `facet_grid()`: Define the rows and columns manually.
+
+Each have additional options for further control. See `?facet_wrap`.
+
+## Facet Wrap
+
+For `facet_wrap()`, define variables mapped onto columns using `facet_grid(. ~ variable)`: dot is nothing in rows, next bit is variable on columns.
+
+```{r}
+#| output-location: column
+#| warning: false
+ggplot(data = starwars, mapping = aes(x = height)) +
+  geom_histogram(fill = "white", colour = "black") +
+  facet_wrap(. ~ gender)
+```
+
+## Facet Grid
+
+For `facet_grid()`, it's the same: `facet_grid(rows ~ columns).`
+
+```{r}
+#| output-location: column
+#| warning: false
+ggplot(
+  data = starwars, 
+  mapping = aes(x = height)
+  ) +
+  geom_histogram(fill = "white", colour = "black") +
+  facet_grid(eye_color ~ gender)
+```
+
+## Combining Plots
+
+Use `patchwork` for the easiest interface.
+
+```{r}
+library(patchwork)
+```
+
+Make two plots. Assign them to objects:
+
+```{r}
+my_histogram <- ggplot(
+  data = starwars, 
+  mapping = aes(x = height)
+  ) +
+  geom_histogram(fill = "white", colour = "black")
+
+my_dotplot <- ggplot(
+  data = starwars, 
+  mapping = aes(x = height, y = mass)
+  ) +
+  geom_point()
+```
+
+## Patchwork
+
+Add them together to display side by side.
+
+```{r}
+#| message: false
+#| warning: false
+my_histogram + my_dotplot
+```
+
+## Complex layouts
+
+Make another plot. Then we'll plot all 3 together.
+
+```{r}
+my_boxplot <- ggplot(
+    data = starwars, 
+    mapping = aes(x = gender, y = mass, colour = gender)
+  ) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+## Complex layouts
+
+- nesting with `()`
+- new row with `/`
+
+```{r}
+#| message: false
+#| warning: false
+(my_histogram | my_dotplot) / my_boxplot
+```
+
+## Saving Plots
+
+Use `ggsave()`:
+
+- file name goes first, including the file extension.
+- object to save comes next.
+
+```{r}
+#| eval: false
+ggsave(
+  filename = "my_plot.png",
+  plot = my_histogram
+)
+```
+
+## Advanced Functionality
+
+There's a lot more we could look at like:
+
+- `stat_summary()` for calculating statistics (but we'll do it manually later).
+- [raincloud plots](https://www.cedricscherer.com/2021/06/06/visualizing-distributions-with-raincloud-plots-and-how-to-create-them-with-ggplot2/) that show density, mean ± 95% CI, and raw data points.
+- Adjusting placement of elements (jitter, dodge, etc.).
+- Direct labels and annotation.
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.

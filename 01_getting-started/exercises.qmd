@@ -82,7 +82,7 @@ Replace the text in your Quarto file to explain what you did with your data. It'
 
 # Advanced
 
-These questions are designed to test your knowledge further in R. Please try to tackle these once you're done with the baiscs.
+These questions are designed to test your knowledge further in R. Please try to tackle these once you're done with the basics.
 
 ## Exercise 8
 

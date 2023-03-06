@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Glenn Williams">
+<meta name="dcterms.date" content="2022-03-06">
+
+<title>Creating Plots</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="exercises_files/libs/clipboard/clipboard.min.js"></script>
+<script src="exercises_files/libs/quarto-html/quarto.js"></script>
+<script src="exercises_files/libs/quarto-html/popper.min.js"></script>
+<script src="exercises_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="exercises_files/libs/quarto-html/anchor.min.js"></script>
+<link href="exercises_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="exercises_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="exercises_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="exercises_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="exercises_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Creating Plots</h1>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      Glenn Williams 
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Northumbria University
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 6, 2022</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">March 6, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Abstract</div>
+      Understanding the grammar of graphics
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
+  <li><a href="#basics" id="toc-basics" class="nav-link" data-scroll-target="#basics">Basics</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-investigating-the-data" id="toc-exercise-1.-investigating-the-data" class="nav-link" data-scroll-target="#exercise-1.-investigating-the-data">Exercise 1. Investigating the Data</a>
+  <ul class="collapse">
+  <li><a href="#a.-calculate-the-grand-mean-of-the-chick-weights." id="toc-a.-calculate-the-grand-mean-of-the-chick-weights." class="nav-link" data-scroll-target="#a.-calculate-the-grand-mean-of-the-chick-weights.">A. Calculate the grand mean of the chick weights.</a></li>
+  <li><a href="#b.-calculate-the-overall-standard-deviation-of-the-chick-weights." id="toc-b.-calculate-the-overall-standard-deviation-of-the-chick-weights." class="nav-link" data-scroll-target="#b.-calculate-the-overall-standard-deviation-of-the-chick-weights.">B. Calculate the overall standard deviation of the chick weights.</a></li>
+  </ul></li>
+  <li><a href="#exercise-2.-box-plots-of-chick-weights" id="toc-exercise-2.-box-plots-of-chick-weights" class="nav-link" data-scroll-target="#exercise-2.-box-plots-of-chick-weights">Exercise 2. Box plots of chick weights</a></li>
+  <li><a href="#exercise-3.-colouring-the-plot" id="toc-exercise-3.-colouring-the-plot" class="nav-link" data-scroll-target="#exercise-3.-colouring-the-plot">Exercise 3. Colouring the plot</a></li>
+  <li><a href="#exercise-4.-chick-weight-histogram" id="toc-exercise-4.-chick-weight-histogram" class="nav-link" data-scroll-target="#exercise-4.-chick-weight-histogram">Exercise 4. Chick weight histogram</a></li>
+  <li><a href="#exercise-5.-chick-weight-densities" id="toc-exercise-5.-chick-weight-densities" class="nav-link" data-scroll-target="#exercise-5.-chick-weight-densities">Exercise 5. Chick weight densities</a></li>
+  <li><a href="#exercise-6.-bar-plots-of-feeds" id="toc-exercise-6.-bar-plots-of-feeds" class="nav-link" data-scroll-target="#exercise-6.-bar-plots-of-feeds">Exercise 6. Bar plots of feeds</a></li>
+  <li><a href="#exercise-7.-customising-plot-text" id="toc-exercise-7.-customising-plot-text" class="nav-link" data-scroll-target="#exercise-7.-customising-plot-text">Exercise 7. Customising plot text</a></li>
+  </ul></li>
+  <li><a href="#advanced" id="toc-advanced" class="nav-link" data-scroll-target="#advanced">Advanced</a>
+  <ul class="collapse">
+  <li><a href="#exercise-8.-custom-titles" id="toc-exercise-8.-custom-titles" class="nav-link" data-scroll-target="#exercise-8.-custom-titles">Exercise 8. Custom titles</a></li>
+  <li><a href="#exercise-9.-custom-colours" id="toc-exercise-9.-custom-colours" class="nav-link" data-scroll-target="#exercise-9.-custom-colours">Exercise 9. Custom colours</a></li>
+  <li><a href="#exercise-10.-changing-the-theme" id="toc-exercise-10.-changing-the-theme" class="nav-link" data-scroll-target="#exercise-10.-changing-the-theme">Exercise 10. Changing the theme</a></li>
+  <li><a href="#exercise-11.-removing-elements" id="toc-exercise-11.-removing-elements" class="nav-link" data-scroll-target="#exercise-11.-removing-elements">Exercise 11. Removing elements</a></li>
+  <li><a href="#exercise-12.-axis-breaks" id="toc-exercise-12.-axis-breaks" class="nav-link" data-scroll-target="#exercise-12.-axis-breaks">Exercise 12. Axis breaks</a></li>
+  <li><a href="#exercise-13.-legend-position" id="toc-exercise-13.-legend-position" class="nav-link" data-scroll-target="#exercise-13.-legend-position">Exercise 13. Legend position</a></li>
+  <li><a href="#exercise-14.-combining-plots" id="toc-exercise-14.-combining-plots" class="nav-link" data-scroll-target="#exercise-14.-combining-plots">Exercise 14. Combining plots</a>
+  <ul class="collapse">
+  <li><a href="#a.-counting-genders" id="toc-a.-counting-genders" class="nav-link" data-scroll-target="#a.-counting-genders">A. Counting genders</a></li>
+  <li><a href="#b.-combining-the-two" id="toc-b.-combining-the-two" class="nav-link" data-scroll-target="#b.-combining-the-two">B. Combining the two</a></li>
+  </ul></li>
+  <li><a href="#exercise-15.-save-the-plot" id="toc-exercise-15.-save-the-plot" class="nav-link" data-scroll-target="#exercise-15.-save-the-plot">Exercise 15. Save the plot</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="instructions" class="level1">
+<h1>Instructions</h1>
+<p>Complete the following exercises. The basics will get you used to working with ggplot. The advanced exercises are a little more involved and can be completed either in the session or in your own time.</p>
+</section>
+<section id="basics" class="level1">
+<h1>Basics</h1>
+<p>Load the libraries and data necessary to complete the exercises associated with this lesson. We’ll load the inbuilt <code>chickwts</code> data set from R, which looks at chicken weights by different feed types.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># load libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(chickwts) <span class="co"># get the data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>chickwts <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(chickwts) <span class="co"># assign data to a tibble</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-1.-investigating-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1.-investigating-the-data">Exercise 1. Investigating the Data</h2>
+<p>Take a look at the dataset by typing its name into a code chunk and pressing play. How many observations do you have?</p>
+<div class="cell">
+
+</div>
+<p><em>There are 71 rows of data with 2 columns.</em></p>
+<section id="a.-calculate-the-grand-mean-of-the-chick-weights." class="level3">
+<h3 class="anchored" data-anchor-id="a.-calculate-the-grand-mean-of-the-chick-weights.">A. Calculate the grand mean of the chick weights.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="b.-calculate-the-overall-standard-deviation-of-the-chick-weights." class="level3">
+<h3 class="anchored" data-anchor-id="b.-calculate-the-overall-standard-deviation-of-the-chick-weights.">B. Calculate the overall standard deviation of the chick weights.</h3>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-2.-box-plots-of-chick-weights" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2.-box-plots-of-chick-weights">Exercise 2. Box plots of chick weights</h2>
+<p>Make a box plot of the chick weights slit by feed.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-3.-colouring-the-plot" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3.-colouring-the-plot">Exercise 3. Colouring the plot</h2>
+<p>Take the same plot and add colour to it by feed type.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-4.-chick-weight-histogram" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4.-chick-weight-histogram">Exercise 4. Chick weight histogram</h2>
+<p>Make a histogram showing the overall distribution of the chick weights. Set the bin width to 50, and make the bars have a white fill and black border.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-5.-chick-weight-densities" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5.-chick-weight-densities">Exercise 5. Chick weight densities</h2>
+<p>Create a density plot of the chick weights by weight. Set different colours and fills by the feed type. To make all densities visible, set the transparency for all densities to 0.4.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-6.-bar-plots-of-feeds" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.-bar-plots-of-feeds">Exercise 6. Bar plots of feeds</h2>
+<p>Make a bar plot to show the counts of each feed type.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-7.-customising-plot-text" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7.-customising-plot-text">Exercise 7. Customising plot text</h2>
+<p>Take the bar plot from Exercise 6 and add change the x-axis title to “Feed Type”, the y-axis title to “Count”, and a title of “Counts of chicks for each feed type”.</p>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="advanced" class="level1">
+<h1>Advanced</h1>
+<p>For the remaining exercises we’ll use two data sets from <a href="https://github.com/gpwilliams/stroop-language" class="uri">https://github.com/gpwilliams/stroop-language</a>.</p>
+<p>These data sets relate to 3 studies looking at Dutch-English (study 1), Arabic-English (study 2), and Chinese-English (study 3) bilinguals who took part in a Stroop task while alternating between their native language and English.</p>
+<p>In this study, participants read words presented in different colours (e.g.&nbsp;red, blue, pink, etc.) that were Neutral (e.g.&nbsp;“fish”) or Incongruent with respect to the ink colour (e.g.&nbsp;“blue” presented in red ink).</p>
+<p>The first data set has been aggregated so that we have one observation per condition in each study.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stroop <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/gpwilliams/stroop-language/main/01_data/03_filtered/data_rt.csv"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(study, subject_id, language, stroop) <span class="sc">|&gt;</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_rt =</span> <span class="fu">mean</span>(rt)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">language =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      language <span class="sc">==</span> <span class="st">"English"</span> <span class="sc">~</span> <span class="st">"L2"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"L1"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">study =</span> <span class="fu">str_to_title</span>(<span class="fu">str_replace</span>(study, <span class="st">"_stroop"</span>, <span class="st">""</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>demog <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/gpwilliams/stroop-language/main/01_data/03_filtered/demographics.csv"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(study<span class="sc">:</span>gender, spoken_english<span class="sc">:</span>reading_english) <span class="sc">|&gt;</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">study =</span> <span class="fu">str_to_title</span>(<span class="fu">str_replace</span>(study, <span class="st">"_stroop"</span>, <span class="st">""</span>)),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">str_to_title</span>(gender)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-8.-custom-titles" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8.-custom-titles">Exercise 8. Custom titles</h2>
+<p>Plot the reaction times for each condition across each study using which ever plot and method you think is most appropriate. Make the labels for the axis more informative and make the legend title in upper-case.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When changing the labels using <code>labs()</code> you must define your legend based on the aesthetic you mapped it to. For example, if colour is used to present a variable in your study, then write <code>labs(colour = YOUR_VARIABLE)</code></p>
+</div>
+</div>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-9.-custom-colours" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-9.-custom-colours">Exercise 9. Custom colours</h2>
+<p>Taking your previous plot, change the colour of the boxes to two colours using <code>scale_colour_manual()</code>. For every level of your variable mapped to colour, you must pass the same number of named strings or <a href="https://www.w3schools.com/colors/colors_hexadecimal.asp">hex colour values</a> to the function. For the language variable, this is 2 values.</p>
+<p>If you’re unsure how this function works, use <code>?scale_colour_manual()</code>.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-10.-changing-the-theme" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-10.-changing-the-theme">Exercise 10. Changing the theme</h2>
+<p>By default ggplot uses a pretty ugly, grey theme. You can change this to an inbuilt theme or instead/in addition customise single elements of the theme. Look up some plot themes and apply one of them.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-11.-removing-elements" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-11.-removing-elements">Exercise 11. Removing elements</h2>
+<p>Even nice themes sometimes have elements we don’t line, such as major lines on the x-axis for grouped data and minor lines on the y-axis. Remove these if your plot has them.</p>
+<p>Here, you’ll need to set each aesthetic you want to remove to nothing using <code>element_blank()</code>.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-12.-axis-breaks" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-12.-axis-breaks">Exercise 12. Axis breaks</h2>
+<p>Increase the number of axis breaks on the y-axis so that it runs from 800ms to 1800ms with breaks of 200ms. You can use <code>seq()</code> to do this.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-13.-legend-position" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-13.-legend-position">Exercise 13. Legend position</h2>
+<p>Look up how to change the position of the legend. This must be set in the theme function call. Change the legend position to the bottom of the plot. Give it the title “A. Median (IQR) Reaction Times by\nCondition”. Once complete, assign this plot to the object <code>rt_plot</code>.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="exercise-14.-combining-plots" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-14.-combining-plots">Exercise 14. Combining plots</h2>
+<section id="a.-counting-genders" class="level3">
+<h3 class="anchored" data-anchor-id="a.-counting-genders">A. Counting genders</h3>
+<p>Make a plot counting each gender in each study. Make the x-axis and y-axis labels in title case. Give it the title “B”. Apply your theme to this plot. Assign this to the object <code>demog_plot</code>.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="b.-combining-the-two" class="level3">
+<h3 class="anchored" data-anchor-id="b.-combining-the-two">B. Combining the two</h3>
+<p>Load the patchwork package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Combine the two plots, <code>rt_plot</code> and <code>demog_plot</code>, into one, side by side. Assign this to the object <code>combined_plot</code>.</p>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-15.-save-the-plot" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-15.-save-the-plot">Exercise 15. Save the plot</h2>
+<p>Save your plot as “plot.png” in the subfolder “output” within “02_creating-graphs”. Make the width 12 inches and height 8 inches.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the here() function from the library(here) to save files relative to your RStudio Project. Do it as follows:</p>
+<p><code>here("folder", "subfolder", "plot.png")</code></p>
+</div>
+</div>
+<div class="cell">
+
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

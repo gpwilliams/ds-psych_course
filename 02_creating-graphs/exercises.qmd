@@ -1,0 +1,228 @@
+---
+title: "Creating Plots"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2022-03-06"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Understanding the grammar of graphics"
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to working with ggplot. The advanced exercises are a little more involved and can be completed either in the session or in your own time.
+
+# Basics
+
+Load the libraries and data necessary to complete the exercises associated with this lesson. We'll load the inbuilt `chickwts` data set from R, which looks at chicken weights by different feed types.
+
+```{r}
+#| message: false
+library(tidyverse) # load libraries
+library(here)
+data(chickwts) # get the data
+chickwts <- as_tibble(chickwts) # assign data to a tibble
+```
+
+## Exercise 1. Investigating the Data
+
+Take a look at the dataset by typing its name into a code chunk and pressing play. How many observations do you have?
+
+```{r}
+
+```
+
+*There are 71 rows of data with 2 columns.*
+
+### A. Calculate the grand mean of the chick weights.
+
+```{r}
+
+```
+
+### B. Calculate the overall standard deviation of the chick weights.
+
+```{r}
+
+```
+
+## Exercise 2. Box plots of chick weights
+
+Make a box plot of the chick weights slit by feed.
+
+```{r}
+
+```
+
+## Exercise 3. Colouring the plot
+
+Take the same plot and add colour to it by feed type.
+
+```{r}
+
+```
+
+## Exercise 4. Chick weight histogram
+
+Make a histogram showing the overall distribution of the chick weights. Set the bin width to 50, and make the bars have a white fill and black border.
+
+```{r}
+
+```
+
+## Exercise 5. Chick weight densities
+
+Create a density plot of the chick weights by weight. Set different colours and fills by the feed type. To make all densities visible, set the transparency for all densities to 0.4.
+
+```{r}
+
+```
+
+## Exercise 6. Bar plots of feeds
+
+Make a bar plot to show the counts of each feed type.
+
+```{r}
+
+```
+
+## Exercise 7. Customising plot text
+
+Take the bar plot from Exercise 6 and add change the x-axis title to "Feed Type", the y-axis title to "Count", and a title of "Counts of chicks for each feed type".
+
+```{r}
+
+```
+
+# Advanced
+
+For the remaining exercises we'll use two data sets from <https://github.com/gpwilliams/stroop-language>.
+
+These data sets relate to 3 studies looking at Dutch-English (study 1), Arabic-English (study 2), and Chinese-English (study 3) bilinguals who took part in a Stroop task while alternating between their native language and English.
+
+In this study, participants read words presented in different colours (e.g. red, blue, pink, etc.) that were Neutral (e.g. "fish") or Incongruent with respect to the ink colour (e.g. "blue" presented in red ink).
+
+The first data set has been aggregated so that we have one observation per condition in each study.
+
+```{r}
+#| message: false
+stroop <- read_csv("https://raw.githubusercontent.com/gpwilliams/stroop-language/main/01_data/03_filtered/data_rt.csv") |>
+  group_by(study, subject_id, language, stroop) |> 
+  summarise(mean_rt = mean(rt)) |> 
+  mutate(
+    language = case_when(
+      language == "English" ~ "L2",
+      TRUE ~ "L1"
+    ),
+    study = str_to_title(str_replace(study, "_stroop", ""))
+  )
+
+demog <- read_csv("https://raw.githubusercontent.com/gpwilliams/stroop-language/main/01_data/03_filtered/demographics.csv") |> 
+  select(study:gender, spoken_english:reading_english) |> 
+  mutate(
+    study = str_to_title(str_replace(study, "_stroop", "")),
+    gender = str_to_title(gender)
+  )
+```
+
+## Exercise 8. Custom titles
+
+Plot the reaction times for each condition across each study using which ever plot and method you think is most appropriate. Make the labels for the axis more informative and make the legend title in upper-case.
+
+::: callout-note
+When changing the labels using `labs()` you must define your legend based on the aesthetic you mapped it to. For example, if colour is used to present a variable in your study, then write `labs(colour = YOUR_VARIABLE)`
+:::
+
+```{r}
+
+```
+
+## Exercise 9. Custom colours
+
+Taking your previous plot, change the colour of the boxes to two colours using `scale_colour_manual()`. For every level of your variable mapped to colour, you must pass the same number of named strings or [hex colour values](https://www.w3schools.com/colors/colors_hexadecimal.asp) to the function. For the language variable, this is 2 values.
+
+If you're unsure how this function works, use `?scale_colour_manual()`.
+
+```{r}
+
+```
+
+## Exercise 10. Changing the theme
+
+By default ggplot uses a pretty ugly, grey theme. You can change this to an inbuilt theme or instead/in addition customise single elements of the theme. Look up some plot themes and apply one of them.
+
+```{r}
+
+```
+
+## Exercise 11. Removing elements
+
+Even nice themes sometimes have elements we don't line, such as major lines on the x-axis for grouped data and minor lines on the y-axis. Remove these if your plot has them.
+
+Here, you'll need to set each aesthetic you want to remove to nothing using `element_blank()`.
+
+```{r}
+
+```
+
+## Exercise 12. Axis breaks
+
+Increase the number of axis breaks on the y-axis so that it runs from 800ms to 1800ms with breaks of 200ms. You can use `seq()` to do this.
+
+```{r}
+
+```
+
+## Exercise 13. Legend position
+
+Look up how to change the position of the legend. This must be set in the theme function call. Change the legend position to the bottom of the plot. Give it the title "A. Median (IQR) Reaction Times by\\nCondition". Once complete, assign this plot to the object `rt_plot`.
+
+```{r}
+
+```
+
+## Exercise 14. Combining plots
+
+### A. Counting genders
+
+Make a plot counting each gender in each study. Make the x-axis and y-axis labels in title case. Give it the title "B". Apply your theme to this plot. Assign this to the object `demog_plot`.
+
+```{r}
+
+```
+
+### B. Combining the two
+
+Load the patchwork package.
+
+```{r}
+library(patchwork)
+```
+
+Combine the two plots, `rt_plot` and `demog_plot`, into one, side by side. Assign this to the object `combined_plot`.
+
+```{r}
+
+```
+
+## Exercise 15. Save the plot
+
+Save your plot as "plot.png" in the subfolder "output" within "02_creating-graphs". Make the width 12 inches and height 8 inches.
+
+::: callout-note
+Use the here() function from the library(here) to save files relative to your RStudio Project. Do it as follows:
+
+`here("folder", "subfolder", "plot.png")`
+:::
+
+```{r}
+
+```
