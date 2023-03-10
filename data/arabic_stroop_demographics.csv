@@ -1,0 +1,63 @@
+"SubjectID","ParticipantAge","ParticipantGender","Nationality","FirstLanguage","LearningArabic","LearningEnglish","ArabicSchool","EnglishSchool","SpokenArabic","WrittenArabic","ArabicReading","SpokenEnglish","WrittenEnglish","EnglishReading","Current%Arabic","Current%English","Childhood%Arabic","Childhood%English","OtherLanguageKnowledge","OtherLanguages","SpeakingOtherLang","ReadingOtherLang","WritingOtherLang","EnglishLexTale","ArabicLexTale"
+4517644,28,"Male",NA,"Arabic","2","10","16","8",7,7,7,7,7,7,50,50,100,0,"No",NA,NA,NA,NA,93.75,92.5
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+4515647,25,"Female","Syrian","Arabic",NA,"3-4","15","13",7,6,6,6,6,6,90,10,95,5,"Prefer not to say",NA,NA,NA,NA,56.25,62.5
+4515754,21,"Male","Moroccan","Arabic","3","9","12","10",4,4,7,5,5,7,50,50,99,1,"Yes","French",2,7,3,87.5,85
+4515901,27,"Female","Lebanese","Arabic","at birth","3-4 years of age","12","12",7,5,7,6,6,7,50,50,70,30,"Yes","french",4,4,3,87.5,87.5
+4515916,31,"Female","Egyptian","Arabic","since birth","when I was 4 years old","12","12",7,5,7,6,4,7,65,35,90,10,"No",NA,NA,NA,NA,97.5,97.5
+4515896,26,"Male","Tunisian","Arabic","4","6","12","12",6,4,5,5,4,5,40,20,60,5,"Yes","French, Spanish. I answer the following ratings for French",6,6,6,88.75,77.5
+4515908,21,"Female","Moroccan","Arabic","1","12","15","6",4,6,7,6,7,7,40,60,65,21,"Yes","French and Spanish",7,7,7,82.5,85
+4515860,24,"Female","British","English","8","1","0","18",5,6,7,7,7,7,15,100,5,100,"Yes","Spanish",5,4,4,85,85
+4516036,29,"Male","Jordanian","Arabic","Mother tongue","School","Arabic is my mother tongue","school 12 years",7,7,7,6,4,5,100,70,100,41,"Yes","German",4,4,2,65,78.75
+4515875,25,"Male","Moroccan","Arabic","5","13","18","10",5,5,7,5,5,5,5,95,80,0,"Yes","French",4,7,4,87.5,97.5
+4516040,22,"Male","Syrian","Both","1","8","12","12",7,7,7,7,7,7,50,50,75,25,"Yes","Turkish",4,4,2,87.5,95
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+4516820,20,"Non-binary","Moroccan","Both","1","3","17","14",7,6,7,7,7,7,15,85,90,10,"Yes","French and spanish",7,7,7,71.25,65
+4516827,26,"Female","Canadian","Both","Birth","3","none","20",5,3,4,7,7,7,10,90,40,60,"Yes","French",3,6,6,96.25,88.75
+4516812,27,"Female","prefer not to say","Arabic","mother language","at 11","all school years (12 years)","6 years in school",7,7,7,7,6,6,90,85,100,0,"No",NA,NA,NA,NA,73.75,82.5
+4516834,23,"Female","Lebanese","Arabic","Mother language","Since first year of school (kindergarten)","All years","All years",7,7,7,7,7,7,50,50,50,50,"No",NA,NA,NA,NA,72.5,73.75
+4516817,31,"Male","Iraqi-Dutch","Arabic","From birth","Age 4","5","12",5,4,5,7,7,7,33,67,100,50,"Yes","Dutch",7,7,7,100,72.5
+4516889,18,"Female","sudanese","Arabic","1","5","0","12",5,2,2,7,7,7,35,65,50,50,"Yes","French",5,2,2,81.25,51.25
+4516796,23,"Male","Lebanese","Arabic","2","5","13","10",7,6,7,6,7,7,35,40,80,10,"Yes","Francais",4,7,5,NA,NA
+4517105,26,"Female","British","Arabic","5 years","11 years old","6","12",6,4,6,5,5,3,100,80,100,0,"No",NA,NA,NA,NA,61.25,75
+4517117,24,"Male","Tunisian","Arabic","4","7","13","10",6,4,7,6,5,6,47,53,90,10,"Yes","French",5,5,4,68.75,88.75
+4517044,25,"Male","Israeli","Arabic","0","6","12","10",7,7,7,6,6,7,60,40,90,10,"Yes","Hebrew and Spanish",7,6,6,71.25,95
+4517041,25,"Male","lebanese","Arabic","1","4","12","12",7,7,7,7,7,7,51,100,100,56,"Yes","italian",5,6,5,63.75,92.5
+4517204,25,"Male","Moroccan","Arabic","6","9","12","9",4,5,5,6,6,6,20,80,70,30,"Yes","French",6,6,5,96.25,82.5
+4517252,23,"Female",NA,"Arabic","4 years","4 years","12","12",7,NA,7,6,6,NA,51,51,93,7,"Yes","German",7,7,7,68.75,55
+4517275,20,"Female","Yemeni","Arabic","0","16","11","3",7,7,7,5,5,5,50,50,100,0,"No",NA,NA,NA,NA,68.75,88.75
+4517326,21,"Female","Dutch","Arabic","First language I learned","At 10 years old","2 years","6 years",5,2,4,6,6,6,25,25,50,5,"Yes","Dutch",7,7,7,63.75,80
+4517337,19,"Female","Lebanese","Arabic","3","7","7","11",6,7,6,7,7,7,50,50,90,10,"Yes","French",6,7,5,65,81.25
+4517321,23,"Female","israelian","Arabic","0","8","12","10",7,7,7,5,6,7,85,35,95,10,"Yes","Hebrew, French",4,6,5,70,86.25
+4517422,25,"Female","British","Arabic","0","5","4","20",7,1,1,7,7,7,50,50,50,50,"No",NA,NA,NA,NA,90,45
+4517374,19,"Male","Israeli","Arabic","0","6","14","12",7,7,7,6,7,7,90,10,100,0,"Yes","Hebrew (not fluently)",7,7,7,80,77.5
+4517379,26,"Female","Palestinian","Arabic","0","3","12/12","12/12",7,7,7,7,7,7,40,30,60,40,"Yes","Hebrew",7,7,7,95,85
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+4519373,25,"Male","Australian","Arabic","1","7","9","11",5,2,3,6,6,7,30,70,40,60,"No",NA,NA,NA,NA,93.75,90
+4519358,29,"Male","egypt","Arabic","0","4","13","13",7,7,7,7,7,7,25,75,80,20,"No",NA,NA,NA,NA,80,91.25
+4519836,40,"Female","british","Both","5","7","3","10",2,1,1,5,5,6,12,91,81,40,"No",NA,NA,NA,NA,92.5,36.25
+4520236,22,"Female","Kuwaiti","Both","3","5","18","16",5,4,6,6,5,6,40,60,75,25,"No",NA,NA,NA,NA,93.75,86.25
+4522243,19,"Female","middle eastern","Both","0","0","12","12",7,6,6,7,7,7,71,78,93,84,"No",NA,NA,NA,NA,67.5,70
+4527161,25,"Female","canadian","Both","since birth","2","12","16",7,5,5,7,6,7,50,50,50,50,"No",NA,NA,NA,NA,82.5,95
+4522907,23,"Male","moroccan","Arabic","at the age of 7 is started learning it (moroccan is a mix of languages)","9","9","15",6,5,7,5,5,7,20,25,60,15,"Yes",NA,6,7,NA,86.25,83.75
+4522777,24,"Female","American/Belgian","Both","0","0","0","12",5,2,4,6,6,6,30,50,50,50,"Yes","Dutch",7,7,6,73.75,80
+4521586,20,"Female","palestinian","Both","1","1","13","13",7,6,6,7,7,7,65,35,80,20,"No",NA,NA,NA,NA,91.25,77.5
+4520825,19,"Female","British","Arabic","0","3","1","14",4,5,5,6,6,6,25,75,40,60,"Yes","French",5,4,4,85,86.25
+4520770,19,"Male","Egyptian","Both","2","4","10","12",3,1,2,7,5,7,30,70,75,25,"No",NA,NA,NA,NA,76.25,63.75
+4520551,20,"Female","Moroccan","Arabic","Dialectal arabic, since birth. Classical arabic at 5","Around 6","12","12",5,3,4,6,6,7,14,95,50,2,"Yes","French and German",7,7,6,96.25,86.25
+4520392,29,"Female","Egyption","Arabic","0","10","16","16",7,6,6,6,6,6,30,70,80,20,"No",NA,NA,NA,NA,66.25,95
+4520211,28,"Female","British","Arabic","0","13","5","10",7,7,7,7,6,7,50,50,70,30,"No",NA,NA,NA,NA,75,97.5
+4519536,31,"Male","British/Syrian","Both","2","2","7","12",7,7,7,7,7,7,45,55,65,35,"No",NA,NA,NA,NA,87.5,73.75
+4519160,20,"Male","Iraq","Arabic","0","8","6","12",5,2,2,7,7,7,20,80,90,10,"No",NA,NA,NA,NA,87.5,60
+4519141,26,"Female","Lebanese","Arabic","1","3","10","12",7,7,7,7,7,7,50,50,85,15,"No",NA,NA,NA,NA,90,97.5
+4518995,27,"Female","Moroccan-American","Arabic","1","2","0","12",5,3,3,7,7,7,20,80,60,40,"No",NA,NA,NA,NA,80,42.5
+4518945,21,"Female","Libyan","Both","Sincei I was born","7 years old","10","10",7,7,7,7,7,7,50,50,75,33,"No",NA,NA,NA,NA,85,90
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
