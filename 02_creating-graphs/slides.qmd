@@ -144,7 +144,7 @@ ggplot(data = starwars) +
 
 ## Over-writing Aesthetics
 
-if you define colour inside and outside `aes`, the outside one wins. 
+if you define colour inside and outside `aes`, the outside one wins.
 
 ```{r}
 #| warning: false
@@ -215,17 +215,17 @@ ggplot(data = starwars) +
 
 There are many `geoms` that you can use in `ggplot2`. Some common ones you might use are:
 
-- bars (`geom_bar()`)
-- boxes (`geom_boxplot()`)
-- violins (`geom_violin()`)
-- densities (`geom_density()`)
-- histograms (`geom_histogram()`). 
+-   bars (`geom_bar()`)
+-   boxes (`geom_boxplot()`)
+-   violins (`geom_violin()`)
+-   densities (`geom_density()`)
+-   histograms (`geom_histogram()`).
 
 Let's briefly see how we might use each `geom`.
 
 ## Bars
 
-Bars are best used to indicate counts. Used as Means ± SE/95% CI they hide the full information on dispersion and are misleading in terms of estimating magnitude of effects. 
+Bars are best used to indicate counts. Used as Means ± SE/95% CI they hide the full information on dispersion and are misleading in terms of estimating magnitude of effects.
 
 ```{r}
 #| output-location: column
@@ -251,9 +251,9 @@ ggplot(data = starwars) +
 
 ## Violins
 
-- Violin plots show you the density of the scores. 
-- We can have trimmed values or not.
-- We can draw quantiles.
+-   Violin plots show you the density of the scores.
+-   We can have trimmed values or not.
+-   We can draw quantiles.
 
 ```{r}
 #| warning: false
@@ -292,9 +292,9 @@ ggplot(data = starwars) +
 
 ## Density Plots
 
-- Density plots work like histograms but apply kernel smoothing to create a density line.
-- A little easier to see general trends.
-- We add transparency with **alpha**.
+-   Density plots work like histograms but apply kernel smoothing to create a density line.
+-   A little easier to see general trends.
+-   We add transparency with **alpha**.
 
 ```{r}
 #| warning: false
@@ -313,11 +313,11 @@ ggplot(data = starwars) +
 
 We can add lines of best fit to data using a **smooth** with `geom_smooth()`. We have:
 
-- `"lm"`: the linear model fitted using `stats::lm()`.
+-   `"lm"`: the linear model fitted using `stats::lm()`.
 
-- `"loess"`: locally estimated scatterplot smoothing fitted using `stats::loess()`, fitting many local regressions within the series of data.
+-   `"loess"`: locally estimated scatterplot smoothing fitted using `stats::loess()`, fitting many local regressions within the series of data.
 
-- `"gam"`: generalised additive model fitted using `mgcv::gam()`, using a series of basis splines.
+-   `"gam"`: generalised additive model fitted using `mgcv::gam()`, using a series of basis splines.
 
 For our purposes, we'll just rely on "lm" to draw a line of best fit through our data.
 
@@ -657,8 +657,8 @@ my_boxplot <- ggplot(
 
 ## Complex layouts
 
-- nesting with `()`
-- new row with `/`
+-   nesting with `()`
+-   new row with `/`
 
 ```{r}
 #| message: false
@@ -670,8 +670,8 @@ my_boxplot <- ggplot(
 
 Use `ggsave()`:
 
-- file name goes first, including the file extension.
-- object to save comes next.
+-   file name goes first, including the file extension.
+-   object to save comes next.
 
 ```{r}
 #| eval: false
@@ -685,10 +685,10 @@ ggsave(
 
 There's a lot more we could look at like:
 
-- `stat_summary()` for calculating statistics (but we'll do it manually later).
-- [raincloud plots](https://www.cedricscherer.com/2021/06/06/visualizing-distributions-with-raincloud-plots-and-how-to-create-them-with-ggplot2/) that show density, mean ± 95% CI, and raw data points.
-- Adjusting placement of elements (jitter, dodge, etc.).
-- Direct labels and annotation.
+-   `stat_summary()` for calculating statistics (but we'll do it manually later).
+-   [raincloud plots](https://www.cedricscherer.com/2021/06/06/visualizing-distributions-with-raincloud-plots-and-how-to-create-them-with-ggplot2/) that show density, mean ± 95% CI, and raw data points.
+-   Adjusting placement of elements (jitter, dodge, etc.).
+-   Direct labels and annotation.
 
 ## Exercises
 

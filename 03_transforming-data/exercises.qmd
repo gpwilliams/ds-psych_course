@@ -1,0 +1,199 @@
+---
+title: "Transforming Data"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-03-09"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Understanding the grammar of graphics"
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to using individual data transformation functions. The advanced exercises will focus more on chaining together multiple functions to clean a real(ish) data set.
+
+# Basics
+
+First off, load the libraries you'll need for the exercises. As always, load the `tidyverse` library. You'll also be working with files within your working directory, so the `here` package is needed. Our data set has messy and inconsistent column headings, so `janitor` is useful. In addition, it contains a column with date times in it, so load the `lubridate` package which allows you do do relatively complex tasks with date times easily.
+
+```{r}
+#| message: false
+
+```
+
+## Exercise 1. Loading the data
+
+Load the data from the file `bi-loneliness.csv` from within the `data` folder. Assign this to the object `dat`.
+
+```{r}
+#| message: false
+
+```
+
+## Exercise 2. Investigating the data
+
+Use the `glimpse()` function to get an idea of what the data set looks like.
+
+```{r}
+
+```
+
+## Exercise 3. Renaming columns
+
+Use the `clean_names()` function from the `janitor` package to make consistent column names. Assign the result of this to `dat2`.
+
+```{r}
+
+```
+
+## Exercise 4. Separating columns
+
+Separate any columns that contain more than one variable and overwrite the `dat2` object with this result.
+
+```{r}
+
+```
+
+## Exercise 5. Renaming columns
+
+Rename the `pid` column to `participant_id` to make it more informative and overwrite the `dat2` object with this result.
+
+```{r}
+
+```
+
+## Exercise 6. Filtering columns
+
+Filter the data set down to only those who completed the study and overwrite the `dat2` object with this result. Be wary of inconsistent naming patterns here. If you're unsure of what constitutes a completion check out the unique values in `progress`.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Exercise 7. Selecting columns
+
+Keep only the `participant_id`, `start_time`, `end_time`, `gender`, `age` and `brs1` through to `brs6` columns and the `wemwbs_1` through to `wemwbs_14` columns and overwrite the `dat2` object with this result.
+
+```{r}
+
+```
+
+## Exercise 8. Mutating columns
+
+Make the `start_time` and `end_time` columns date times using the `ymd_hms` format and overwrite the `dat2` object with this result.
+
+```{r}
+
+```
+
+# Advanced
+
+## Exercise 9. Conditional mutation
+
+### A.
+
+Make the `gender` labels in the data set consistent. Again, if unsure about the unique values then use the `unique()` function to find these out before you conditionally mutate the `gender` column. When done assign the result to `dat3`.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+### B.
+
+Can you think of a way to cut down on the number of `case_when()` statements? If so, write your code below.
+
+```{r}
+
+```
+
+## Exercise 10. Applying functions across columns
+
+### A.
+
+Look into the `parse_number()` function from the `readr` package. What does it do?
+
+### B.
+
+You can mutate multiple columns by using the `across()` function within the `mutate()` call, e.g. `mutate(across())`. Use this to mutate across all columns containing the keyword "wemwbs" and apply the `parse_number()` function to them. Assign the result to `dat4`.
+
+```{r}
+
+```
+
+## Exercise 11. Rowwise operations
+
+WEMWBS columns are items from the [WEMWBS scale](The%20Warwick-Edinburgh%20Mental%20Wellbeing%20Scales) for assessing mental wellbeing.
+
+Create the column `wemwbs_total` from the sum of all columns containing the keyword `wemwbs`. Use the `rowwise()` and `c_across()` functions to achieve this. Assign the result to `dat4`.
+
+```{r}
+
+```
+
+## Exercise 12. More rowwise operations
+
+BRS columns signify items from the [BRS scale](https://pubmed.ncbi.nlm.nih.gov/18696313/) for indexing resilience.
+
+Create the column `brs_total` from the sum of all columns containing the keyword `brs` and divide them by 6. Use the `rowwise()` and `c_across()` functions to achieve this. Assign the result to `dat4`.
+
+```{r}
+
+```
+
+## Exercise 13. Subsetting columns
+
+Drop all columns containing "brs" or "wemwbs" excluding the `brs_total` and `wemwbs_total` columns from the data set. Assign this result to `dat5`.
+
+```{r}
+
+```
+
+## Exercise 14. Chaining it all together
+
+Starting from `dat`, take every operation so far and chain them all together so that you don't save interstitial temporary data sets such as `dat1`, `dat2` etc. Assign the result to `dat_cleaned`.
+
+```{r}
+
+```
+
+## Exercise 15. Save the data
+
+Save your cleaned data in the `data` folder under the new name `bi_loneliness_cleaned.csv`.
+
+```{r}
+
+```
+
+## Exercise 16. Plotting the data
+
+## A.
+
+Investigate the relationship between `brs_total` and `wemwbs_total`. Apply a new theme to the data with your own tweaks to it, use informative titles and axes labels, and change the colour or fill as you see fit. Save this to the object `brs_wellbeing`.
+
+```{r}
+
+```
+
+## B.
+
+Save the `brs_wellbeing`plot to `03_transforming-data` in the `output` subfolder as `brs_wellbeing.png`.
+
+```{r}
+
+```
