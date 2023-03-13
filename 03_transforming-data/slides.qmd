@@ -1,0 +1,606 @@
+---
+title: "Transforming Data"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+editor: visual
+---
+
+## Overview
+
+::: {.r-fit-text}
+
+Today's session is on transforming data:
+
+-   Reading in data sets using the `read_*()` family of functions, e.g. `read_csv()`.
+
+-   Renaming columns with `clean_names()` and `rename()`.
+
+-   Subsetting and reordering data sets with `select()`.
+
+-   Creating and transforming columns with `mutate()`.
+
+-   Filtering to certain rows/observations with `filter()`.
+
+-   Creating summaries of variables with `summarise()`.
+
+We'll look at grouped operations with `group_by()`.
+
+:::
+
+# Reading Data
+
+## `read_*()` functions
+
+::: {.r-fit-text}
+
+:::: {.columns}
+
+::: {.column width="45%"}
+
+The `readr` package allows you to read rectangular data into R from delimited files (e.g. .csv, .tsv)
+
+-   `read_csv()`: comma-separated values (CSV)
+-   `read_tsv()`: tab-separated values (TSV)
+-   `read_csv2()`: semicolon-separated values with `,` as the decimal mark
+-   `read_delim()`: delimited files (CSV and TSV are important special cases)
+-   `read_table()`: whitespace-separated files
+
+...and others.
+
+:::
+
+::: {.column width="45%"}
+If you're working proprietary data formats, use `haven` which has:
+
+-   `read_sav()`:
+-   `read_dta`:
+-   `read_sas()`:
+
+If using Excel, use `readxl` which has the `read_excel()` function.
+:::
+
+::::
+
+**All of these functions take the format `read_*()` and expect the path to your data as input**
+
+:::
+
+## Reading Our Data
+
+- First we need some data. **I made a messy version** of real data from [Dunne et al. (2023): Uncovering the social determinants of brain injury rehabilitation](https://osf.io/rbtms/).
+
+- This data is stored as a **.csv** file in [https://github.com/gpwilliams/ds-psych_course](https://github.com/gpwilliams/ds-psych_course)
+
+- To follow along, download the repository from GitHub and open the exercises file in `03_transforming-data` or make your own Quarto document within the folder.
+
+## Reading Our Data
+
+Load the packages once per session.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+Assuming you're working from the `ds-psych_course` folder, read the data from the `data` subfolder.
+
+```{r}
+raw_data <- read_csv(here("data", "bi-loneliness.csv"))
+```
+
+You will get a message telling you about the data types that have been detected for each column.
+
+## Inspecting Your Data
+
+With any data set, it's important to understand the columns. Either print it out or print the transposed data set with `glimpse()`
+
+```{r}
+glimpse(raw_data)
+```
+
+## A Note on Pipes
+
+In R, we can combine several functions to produce a result with nested code, e.g. to get counts of unique participants
+
+```{r}
+length(unique(raw_data$PID))
+```
+
+This is fine, but can get complicated to read as you have to read in to out. Instead, we can use pipes to read left to right:
+
+```{r}
+raw_data$PID |> 
+  unique() |> 
+  length()
+```
+
+The pipe can be read as **"and then"**, so take our `PID` column from `raw_data` **and then** get the unique values **and then** get the length (or count) of them.
+
+# Separating Columns
+
+## `separate()`
+
+Let's fix the messy data, starting with splitting columns that contain multiple variables.
+
+-   `separate()` looks for separators between data points, e.g. `_` or `-`, and splits columns there. 
+
+-   If we have many separators we need to be explicit in where to split the data.
+
+```{r}
+#| eval: false
+raw_data <- raw_data |> 
+  separate(col = enjoymentFOLLOW, into = c("enjoyment", "follow_up")) |> 
+  separate(col = time, into = c("start_time", "end_time"), sep = "_")
+
+glimpse(raw_data)
+```
+
+## `separate()`
+
+We now have `start_time` and `end_time` columns and `enjoyment` and `follow_up` columns. No more mixed columns!
+
+```{r}
+#| echo: false
+raw_data <- raw_data |> 
+  separate(col = enjoymentFOLLOW, into = c("enjoyment", "follow_up")) |> 
+  separate(col = time, into = c("start_time", "end_time"), sep = "_") 
+
+glimpse(raw_data)
+```
+
+## Selecting Columns to Keep
+
+Often your data set has lots of columns you won't use. We can choose which columns to keep by listing them **by name**.
+
+```{r}
+raw_data |> 
+  select(
+    PID,
+    Gender,
+    Age
+  )
+```
+
+## Selecting Columns to Keep
+
+Often your data set has lots of columns you won't use. We can choose which columns to keep by listing them **by index**.
+
+```{r}
+raw_data |> 
+  select(c(1, 5, 6))
+```
+## Selecting Columns to Remove
+
+We can select columns to remove by using `-` before the names or index. We can list these as between a range, e.g. `6:47` or `c(Age:follow_up)`, or as a specific vector of indices, e.g. `c(1, 2, 3)` or `c(PID, start_time, end_time)`
+
+```{r}
+raw_data |> 
+  select(-c(Age:follow_up))
+```
+## Select Helpers
+
+There are a number of `select()` helpers to make working with it easier:
+
+-   `starts_with()`: keep columns starting with a specific string.
+-   `ends_with()`: keep columns ending with a specific string.
+-   `contains()`: keep columns containing a specific string.
+-   `matches()`: Keeps columns matching a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet). This is useful for complex matching.
+-   `num_range()`: Keeps columns with a matching prefix and a following range of numbers.
+
+## Select Helpers
+### `contains()`
+
+Let's try a few:
+
+```{r}
+raw_data |> 
+  select(contains("DJG"))
+```
+
+## Select Helpers
+### `num_range()`
+
+Let's try a few:
+
+```{r}
+raw_data |> 
+  select(num_range("DJG_", 1:3))
+```
+
+# Reordering and Renaming Columns
+## `select()`, `everything()`, and `rename()`
+
+You can use `select()` to reorder columns. Either specify the exact locations or specify the first few and use `everything()` to select all remaining columns.
+
+```{r}
+raw_data |> 
+  select(PID, Gender, Age, start_time, end_time, everything())
+```
+
+## Renaming Columns
+
+We can use the `rename()` function to change the name of columns. This takes the format of **NEW = OLD**.
+
+```{r}
+raw_data |> 
+  rename(participant_id = PID)
+```
+
+## Renaming Columns Automatically
+
+The `janitor` package has a function, `clean_names()`, which fixes irregularities in names. Mainly, it's good practice to keep one format such as **snake_case**, to avoid spaces in names, and to avoid numbers at the start of column names.
+
+```{r}
+raw_data |> 
+  janitor::clean_names()
+```
+
+# Creating and Changing Columns
+## `mutate()` and `transmute()`
+
+We have two main functions for this:
+
+-   `mutate()`: changes or creates a column, keeping all existing columns.
+-   `transmute()`: changes or creates a column, dropping columns not defined in `transmute()`.
+
+We'll mainly use `mutate()`.
+
+- This can be a simple operation on one column, using two columns to create another, or doing conditional operations within a column.
+
+## Simple Operations
+
+```{r}
+raw_data |> 
+  mutate(
+    birth_year = 2023 - Age
+  ) |> 
+  select(PID, birth_year)
+```
+## Multi-column Operations
+
+```{r}
+raw_data |> 
+  mutate(
+    djg_total = DJG_1 + DJG_2 + DJG_3 + DJG_4 + DJG_5 + DJG_6
+  )
+```
+
+## Multi-Column Operations
+### Fixing Type Problems
+
+If we try to get the total time partitipants took in the study like so, it won't work. 
+
+```{r}
+#| eval: false
+raw_data |> 
+  mutate(total_time = end_time - start_time)
+```
+
+-   That's because R doesn't know how to work with date times.
+
+-   This also wouldn't work if we had a character and numeric column. 
+
+-   To fix this, we change the data type.
+
+## Multi-Column Operations
+
+::: {.r-fit-text}
+
+Notice below we can work with columns we're still in the process of creating during `mutate()` calls.
+
+```{r}
+raw_data |> 
+  mutate(
+    start_time = ymd_hms(start_time),
+    end_time = ymd_hms(end_time),
+    total_time = end_time - start_time
+  ) |> 
+  select(contains("time"))
+```
+
+:::{.callout-note}
+
+If we don't like working with decimal hours, we can change the units to minutes using e.g. `units(TIBBLE$COL) <- "mins"`
+
+:::
+
+:::
+
+## Improving Multi-Column Operations
+
+::: {.r-fit-text}
+
+- The `across()` function tells `mutate()` that we're going to do a row wise operation.
+
+- We use `c_across()` to allow us to use the bare column names, index, or even `select()` helpers to do the operation.
+
+```{r}
+#| eval: false
+raw_data |> 
+  rowwise() |> 
+  mutate(DJG_sum = sum(c_across(DJG_1:DJG_6)))
+```
+
+```{r}
+raw_data |> 
+  rowwise() |> 
+  mutate(DJG_sum = sum(c_across(contains("DJG"))))
+```
+
+:::
+
+## Using Conditionals
+
+- Finally, we can change only certain values within a column with conditionals.
+
+- Notice that we have different impairments (e.g. Vision, Speech) coded as X or NA. We can't work with these for statistics because they aren't numbers. Let's fix that.
+
+- `case_when()` looks for a logical operation, (e.g. when Vision == "X"), and your new value when this is true after the `~` (here, 1).
+
+- `case_when()` takes defaults, so we say "when anything else happens, i.e. TRUE set it to 0".
+
+## Using Conditionals
+
+```{r}
+raw_data |> 
+  select(PID, Vision) |> 
+  mutate(
+    Vision = case_when(
+      Vision == "X" ~ 1,
+      TRUE ~ 0
+    )
+  )
+```
+
+# Filtering Observations
+
+## `filter()`
+
+- `filter()` allows you to subset to rows of data where certain conditions are met.
+- Let's take only those who have `progress` as `FINISH` OR `END`
+
+```{r}
+raw_data |> 
+  filter(progress == "FINISH" | progress == "END")
+```
+
+## The %in% Operator
+
+- If we have many conditions we want to meet, many OR (`|`) statements are verbose. We can instead use `%in%`
+
+- This is `TRUE` if an observation is **in** a value that you provide. 
+
+```{r}
+raw_data |> 
+  filter(progress %in% c("FINISH", "END"))
+```
+
+## Combining Filtering Operations
+
+We can combine these with criteria on other columns.
+
+```{r}
+raw_data |> 
+  filter(
+    progress %in% c("FINISH", "END"),
+    Age > 50
+  )
+```
+
+## Removing by Criteria
+
+Finally, we can do the inverse of these operations using `!`. 
+
+- Here we ask for those whose progress **ISN'T** "FINISH" or "END" but who are over 50.
+
+```{r}
+raw_data |> 
+  filter(
+    !progress %in% c("FINISH", "END"),
+    Age > 50
+  )
+```
+## Handling NAs
+
+- If you ask R if a value is equal to an NA (an unknown value) it is very literal in that it tells us it can’t know. 
+
+So, this doesn't work:
+
+```{r}
+#| eval: false
+raw_data |> filter(progress == NA)
+```
+
+Instead, we have to use `is.na()`:
+
+```{r}
+raw_data |> filter(is.na(progress))
+```
+## Inverting NAs
+
+If we want values that **AREN'T** NAs, then we combine `is.na()` and the NOT (`!`) operator.
+
+```{r}
+raw_data |> filter(!is.na(progress))
+```
+
+# Arranging Data
+
+We can arrange values in a column using `arrange()`. This also works with `desc()` so you can sort by descending order.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+raw_data |> 
+  select(Age) |> 
+  arrange(Age)
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+raw_data |> 
+  select(Age) |> 
+  arrange(desc(Age))
+```
+
+:::
+
+::::
+
+# Summarising Data
+
+If we want summaries of data, e.g. in descriptive statistics, we can use `summarise()`.
+
+```{r}
+raw_data |> 
+  summarise(age_mean = mean(Age))
+```
+One thing to bear in mind is that we need to tell R how to handle `NA`s.
+
+## Summarising Data
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+Either within each operation.
+
+```{r}
+raw_data |> 
+  summarise(age_mean = mean(Age, na.rm = TRUE))
+```
+
+:::
+
+::: {.column width="50%"}
+
+Or within the chain of functions. Note this only keeps complete rows if several columns are provided.
+
+```{r}
+raw_data |> 
+  drop_na(Age) |> 
+  summarise(age_mean = mean(Age))
+```
+:::
+
+::::
+
+## Many Summaries
+
+We can add many summaries to our table and even count the observations with `n()`
+
+```{r}
+raw_data |> 
+  drop_na(Age) |> 
+  summarise(
+    age_mean = mean(Age),
+    age_sd = sd(Age),
+    n = n()
+  )
+```
+# Grouped Operations
+
+## `group_by()`
+
+One of the most powerful functions of `dplyr` is `group_by()`. It will give us grouped operations.
+
+*This nicely highlights some coding problems we need to fix...*
+
+```{r}
+raw_data |> 
+  group_by(Gender) |> 
+  summarise(age_mean = mean(Age, na.rm = TRUE))
+```
+## `group_by()` with other `dplyr` functions
+
+- `group_by()` works with a whole host of functions from `dplyr` including `filter()`, `mutate()` and others.
+
+- Let's filter to the earliest observation in `start_time` for the levels of `Gender`.
+
+```{r}
+raw_data |> 
+  mutate(start_time = ymd_hms(start_time)) |> 
+  group_by(Gender) |> 
+  filter(rank(start_time) == 1)
+```
+## Ungrouping
+
+If you want to perform further operations on the whole data set after your grouped operations, you need to remember to ungroup!
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+Without ungrouping.
+
+```{r}
+raw_data |> 
+  mutate(start_time = ymd_hms(start_time)) |> 
+  group_by(Gender) |> 
+  filter(rank(start_time) == 1) |> 
+  summarise(mean_age = mean(Age, na.rm = TRUE))
+```
+
+:::
+
+::: {.column width="50%"}
+
+With ungrouping.
+
+```{r}
+raw_data |> 
+  mutate(start_time = ymd_hms(start_time)) |> 
+  group_by(Gender) |> 
+  filter(rank(start_time) == 1) |> 
+  ungroup() |> 
+  summarise(mean_age = mean(Age, na.rm = TRUE))
+```
+
+:::
+
+::::
+
+## Chaining Functions
+
+- We've seen already how we can chain many functions. 
+
+- We can combine all functions we've covered to do all our data cleaning and summarising.
+
+- We can also pipe into `ggplot()` calls.
+
+- We'll do this in the **exercises**.
+
+## Saving Files
+
+- Finally, once you're done cleaning your data and making summaries you can save it using the `write_*()` family of functions.
+
+- I suggest saving to a **.csv** file with `write_csv()` as any program can open .csv files (open science, woo!)
+
+- It's a good idea to keep your raw and cleaned data in separate sub-folders.
+
+- Here we save our data to the "cleaned_data" sub-folder. (Obviously, you'd use actually cleaned data here...)
+
+```{r}
+#| eval: false
+write_csv(raw_data, here("cleaned_data", "bi_loneliness.csv"))
+```
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
