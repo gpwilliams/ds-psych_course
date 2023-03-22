@@ -1,0 +1,180 @@
+---
+title: "Tidying and Merging Data"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-03-22"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Working with multiple data sets"
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. These require you to use two data sets from the `data` folder. They are the full data sets associated with the simplified versions given in the chapter/presentation.
+
+The basics will get you used to using individual data transformation functions. The advanced exercises will focus more on chaining together multiple functions to clean a real(ish) data set and make plots of the results using some new function options you haven't used yet.
+
+# Basics
+
+First off, load the libraries you'll need for the exercises. As always, load the `tidyverse` library for working with data and the `here` library for working with file paths. We will also use the `janitor` library for cleaning column names.
+
+```{r}
+#| message: false
+# load the tidyverse
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+## Exercise 1. Loading the data
+
+1.  Load the data from the `height-weights` sub-folder from within the `data` folder. Assign this to the object `exp_dat`.
+2.  Load the data from the file `height-weights_demographics.csv` from within the `data` folder. Assign this to the object `demo_dat`.
+
+```{r}
+
+```
+
+## Exercise 2. Investigating the data
+
+Print the names of the data sets or use `glimpse()` in a code chunk for each data set to get an idea of what the data set looks like.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Exercise 3. Renaming columns
+
+Use the `clean_names()` function from the `janitor` package to make consistent column names. Assign the result of this to `dat2`.
+
+```{r}
+
+```
+
+## Exercise 4. Combine the Data Sets 1
+
+### A
+
+Join the experimental and demographic data, keeping rows from each data set. Print this out without saving the result to a new object. Use the column `subject` as an identifier/key between the data sets.
+
+```{r}
+
+```
+
+### B
+
+What does the warning say? Why do you think this happened?
+
+**Answer:** 
+
+### C
+
+Fix any issues that lead to the warning. Overwrite the offending data set with your changes so this doesn't happen again.
+
+```{r}
+
+```
+
+## Exercise 5. Combine the Data Sets 2
+
+Combine the data sets, keeping only rows in the demographic data that have the same subjects in the experimental data.
+
+```{r}
+
+```
+
+## Exercise 5. Combine the Data Sets 2
+
+Combine the data sets, keeping only rows in the experimental data that have a the same subjects in the demographics data. There are two ways to do this. Try both.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Exercise 6. Combine the Data Sets 3
+
+Join the data sets keeping only rows that have the same subjects in both data sets.
+
+```{r}
+
+```
+
+## Exercise 7. Filter Data 1
+
+Filter the experimental data to only rows with participants for which you have demographic data. Only keep the columns from the experimental data.
+
+```{r}
+
+```
+
+## Exercise 8. Filter Data 2
+
+Filter the experimental data to only rows for which you have no participant IDs in the demographic data. Only keep the columns from the experimental data.
+
+```{r}
+
+```
+
+# Advanced
+
+## Exercise 9. Combining and Fixing the Data Sets
+
+-   Combine the experimental and demographic data sets such that you only include rows for participants that are in the experimental data.
+
+-   Fix any other problems you notice in the data set. This can involve filtering out impossible values or reshaping the data in any way you see fit (note, NAs are fine to keep).
+
+-   Assign the result of this to `dat`.
+
+```{r}
+
+```
+
+## Exercise 10. Plotting the Data
+
+Simulate a data set of 40 participants within a tibble. Create columns for `age` made from sampled values between 18:80 and for IQ sampled randomly from a normal distribution with a mean 150 and a standard deviation of 15. Name this tibble `new_dat`.
+
+```{r}
+
+```
+
+Combine `dat` and `new_dat`. Create a new column called `age_bracket` which has the label "\< 40" for those under 40 years of age and "\> 40" for those over 40 years of age. Assign this to the object `merged_dat`.
+
+```{r}
+
+```
+
+Taking `merged_dat` remove any missing values from the `age` and `iq` columns. **Pipe the result into** `ggplot()`. Create a scatter plot of `age` against `iq`. Add a smooth to the plot using the `loess` method predicting `y` values from `x` values. Remove the ribbon for standard error on the smooth.
+
+::: callout-note
+Use `?geom_smooth()` to see options on which arguments are expected and which options can be specified.
+:::
+
+```{r}
+
+```
+
+Taking `merged_dat` group the data by the age bracket column and make a summary of the mean ages and counts for each age bracket. **Pipe the result into** `ggplot()` and create a bar plot of the counts.
+
+::: callout-note
+If you get an error ensure that you use the correct `stat` in your bar plot.
+:::
+
+```{r}
+
+```

@@ -1,0 +1,478 @@
+---
+title: "Tidying and Merging Data"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+editor: visual
+---
+
+## Overview
+
+::: r-fit-text
+Today's session is on tidying and merging data:
+
+-   Reading in data multiple data sets at once using the `read_*()` family of functions, e.g. `read_csv()`.
+
+-   Binding columns and rows to your data set using `bind_cols()` and `bind_rows()`.
+
+-   Understanding wide and long data formats and how to reshape your data to either format using `pivot_longer()` and `pivot_wider()`.
+
+-   Joining data together from multiple tables using mutating joins such as `inner_join()`, `left_join()`, `right_join()`, and `full_join()`.
+
+-   Filtering to rows in one column based on presence or absence of matches in another using `semi_join()` and `anti_join()`.
+
+-   Perform set operations and remove duplicates across compatible data sources (i.e. with the same columns) using `intersect()`, `union()`, `setdiff()`, and `distinct()`.
+:::
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `04_tidying-and-merging-data`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+## Loading Packages
+
+Load our essential packages, `tidyverse` for data wrangling and presentation and `here` for working with file paths.
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+# Reading Data
+
+-   Often, you might work with programs such as PsychoPy which output individual files for each participant from an experiment.
+
+-   With some functions you might need to use a loop or the `map_*()` family of functions to iterate over a process of reading them in one by one before binding them to one `tibble`.
+
+-   As of `readr` 2.0.0 you can now provide just a list of files to the `read_*()` family of functions.
+
+## Reading Data
+
+::: r-fit-text
+We must define a file path to the folder in which all the files are stored.
+
+```{r}
+files <- list.files(
+  path = here("data", "tidying-and-merging", "stroop"),
+  recursive = TRUE, # check subdirectories?
+  pattern = "\\.csv$", # file ending can only be .csv
+  full.names = TRUE # we need the full path
+)
+```
+
+Print `files` object to see this list in full.
+
+```{r}
+#| message: false
+stroop <- read_csv(files)
+stroop
+```
+:::
+
+# Pivoting
+
+::: r-fit-text
+-   Many of the `tidyverse` functions and statistical packages expect data to be in a long/**tidy** format:
+
+    -   Each column represents a variable.
+    -   Each row represents an observation.
+
+-   More rarely, functions expect data in a wide format:
+
+    -   Each row represents a case (e.g. participant).
+    -   Levels of variables are spread across columns.
+
+*Moving between the two is often necessary, even if you don't intend to stay within the R ecosystem.*
+:::
+
+# Pivoting
+
+## Pivoting to a wider format
+
+We use `pivot_wider()` to take data from a long format and make it wide.
+
+It takes as arguments:
+
+-   `data`: data source (e.g. your tibble) from which to pivot.
+-   `names_from`: column containing the IDs that will become column headings.
+-   `values_from`: column containing the values that will be split between columns.
+
+*We can specify numerous `names_from` or `values_from` with `c()`.*
+
+## `pivot_wider()`
+
+```{r}
+stroop_wide <- stroop |> 
+  pivot_wider(
+    names_from = stroop,
+    values_from = rt
+  )
+stroop_wide
+```
+
+## Pivoting to a longer format
+
+We use `pivot_longer()` to take data from a wide format and make it long.
+
+It takes as arguments:
+
+-   `data`: data source (e.g. your tibble) from which to pivot.
+-   `cols`: the columns to pivot into a longer format.
+-   `names_to`: the new column name for identifying e.g. levels of a factor.
+-   `values_to`: the new column name for identifying e.g. the dependent variable.
+
+## `pivot_longer()`
+
+```{r}
+stroop_long <- stroop_wide |> 
+  pivot_longer(
+    cols = c(Incongruent, Neutral),
+    names_to = "condition",
+    values_to = "rt"
+  )
+stroop_long
+```
+
+# Joining
+
+Often we want to combine multiple data sources into one table. We can do this to:
+
+-   Bind: append rows or columns to a `tibble`.
+-   Mutate: change a single table by combining columns and rows from another table based on shared identifiers.
+-   Filter: Subset a single table by using a reference to another table based on shared identifiers.
+
+# Binding Joins
+
+## Loading more data
+
+We'll load some new data sets for this example.
+
+-   `demo`: some demographics for each participant in the original Stroop data.
+-   `reading-coder-1`: some details of Language expertise for each participant in the original Stroop data.
+-   `stroop_new`: a new data set of participants taking part in the Stroop task.
+
+```{r}
+#| message: false
+demo <- read_csv(here("data", "tidying-and-merging", "stroop_demographics.csv"))
+reading_coder_1 <- read_csv(here("data", "tidying-and-merging", "reading_coder-1.csv"))
+stroop_new <- read_csv(here("data", "tidying-and-merging", "stroop_new.csv"))
+```
+
+## Binding Columns
+
+Check out the `demo` and `reading_coder_1` data sets.
+
+::: columns
+::: {.column width="40%"}
+```{r}
+demo
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+reading_coder_1
+```
+:::
+:::
+
+We can use `bind_cols()` to append the columns of the new data set to the original one.
+
+## `bind_cols()`
+
+::: r-fit-text
+
+::: callout-note
+This only works if the number of rows matches across data sets.
+:::
+
+```{r}
+bind_cols(demo, reading_coder_1)
+```
+
+::: callout-warning
+**Why do we get multiple ID cols?** Shared column headings are repeated. This is safe behaviour so we can check they align. We really should avoid binding columns unless we are certain the rows are perfectly aligned.
+:::
+
+:::
+
+## Binding rows
+
+Check out the `stroop` and `stroop_new` data sets.
+
+::: columns
+::: {.column width="50%"}
+```{r}
+stroop
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+stroop_new
+```
+:::
+:::
+
+## `bind_rows()`
+
+We can use `bind_rows()` to append the rows from the new data set to the original one.
+
+```{r}
+bind_rows(stroop_new, stroop)
+```
+
+## Identifying data in `bind_rows()`
+
+::: r-fit-text
+-   `bind_rows()` has the optional argument, `.id` to give a column heading identifying which data set observations come from.
+
+-   Give a string vector to define the column heading.
+
+```{r}
+bind_rows(stroop_new, stroop, .id = "data_set")
+```
+:::
+
+# Mutating Joins
+
+If we want to have a single data set that combines values from another data set using a shared identifier to combine them, we can use a **mutating** join.
+
+-   **Outer Joins**: Keep observations that with identifiers that appear in at least one of the data sets.
+-   **Inner Joins**: Only keep observations in one data set that has matching identifiers in another data set.
+
+## Mutating Joins
+
+All take the arguments:
+
+-   `x`: the left data set (e.g. a tibble)
+-   `y`: the right data set (e.g. a tibble)
+-   `by`: the column heading to act as a key/identifier across data sets passed as a string vector. This is **optional but encouraged** to not rely on defaults.
+
+## Full Joins (an Outer Join)
+
+-   Keep all observations in `x` and `y`.
+-   Notice that we get `NA`s for values that weren't present in one of the data sets.
+
+```{r}
+full_join(x = stroop, y = demo, by = "subject_id")
+```
+
+## Left Join (an Outer Join)
+
+-   Keep all observations in `x` and match identifiers for these that occur in `y`.
+-   `NA`s are only introduced to values that originally existed in `x` but don't have a value in `y`.
+
+```{r}
+left_join(x = stroop, y = demo, by = "subject_id")
+```
+
+## Right Join (an Outer Join)
+
+-   Keep all observations in `y` and match identifiers for these that occur in `x`.
+-   `NA`s are only introduced to values that originally existed in `y` but don't have a value in `x`.
+
+```{r}
+right_join(x = stroop, y = demo, by = "subject_id")
+```
+
+## Inner Join (...an Inner Join 🙄)
+
+-   Only keep observations from `x` that have a matching identifier in `y`.
+-   We only get complete cases.
+
+```{r}
+inner_join(x = stroop, y = demo, by = "subject_id")
+```
+
+When you have multiple matches, there is advanced help here by using the `join_by()` functions. We won't go into this.
+
+# Inconsistent Naming
+
+Inconsistent naming makes working with joins more difficult, but not impossible. Either:
+
+-   **Rename the headings** so they're consistent across data sets. (We already know how to use `rename()`)
+-   **Define how identifiers** map onto one another in the join call.
+
+## Inconsistent Naming
+
+First, let's break the naming conventions.
+
+```{r}
+demo_2 <- rename(demo, participant = subject_id)
+demo_2
+```
+
+This won't work as the two data sets don't have a shared identifier:
+
+```{r}
+#| eval: false
+full_join(stroop, demo_2)
+```
+
+## Fixing Inconsistent Naming
+
+All joins can pass the `join_by()` function to `by` to allow us to specify how column identifiers are mapped onto one another.
+
+```{r}
+full_join(
+  stroop, 
+  demo_2, 
+  by = join_by(subject_id == participant)
+)
+```
+
+## Fixing Inconsistent Naming
+
+By default it keeps the first name and merges the values, this can be fixed by using `keep = TRUE`.
+
+```{r}
+full_join(
+  stroop, 
+  demo_2, 
+  by = join_by(subject_id == participant),
+  keep = TRUE
+)
+```
+
+# Filtering Joins
+
+-   Often we might want to filter rows out of one data set based on values in another one, e.g. if we have a list of people who need to be excluded or dropped out of our study.
+
+-   Filtering Joins filter rows from `x` based on the presence or absence of matches to identifiers in `y`.
+
+## Semi-Join
+
+-   A semi join **keeps** all rows with an identifier in `x` that have a match in `y`.
+-   This works like `inner_join()` but doesn't append the columns from `y`.
+
+```{r}
+semi_join(stroop, demo, by = "subject_id")
+```
+
+## Anti-Join
+
+-   A semi join **removes** all rows with an identifier in `x` that have a match in `y`.
+-   This works like the **inverse** of `inner_join()` but doesn't append the columns from `y`.
+
+```{r}
+anti_join(x = stroop, y = demo, by = "subject_id")
+```
+
+## Anti-Join
+
+Which data set you define as `x` and `y` has important ramifications. Compare this to the previous result.
+
+```{r}
+anti_join(demo, stroop, by = "subject_id")
+```
+
+# Set Operations
+
+## Load more data
+
+We'll load up some more data to help us see some additional cases where joins are useful.
+
+-   `reading_coder_2`: some details of Language expertise for each participant in the original Stroop data, this time rated by another coder such that values may be inconsistent with `reading_coder_1`.
+-   `reading_dupe`: the same data as `reading_coder_1` but with a duplicate row.
+
+```{r}
+#| message: false
+reading_coder_2 <- read_csv(here("data", "tidying-and-merging", "reading_coder-2.csv"))
+reading_dupe <- read_csv(here("data", "tidying-and-merging", "reading_dupe.csv"))
+```
+
+## Union
+
+Check out the `reading_coder_1` and `stroop_new` data sets.
+
+::: columns
+::: {.column width="50%"}
+```{r}
+reading_coder_1
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+reading_coder_2
+```
+:::
+:::
+
+## `union()`
+
+Find all rows in either `x` or `y`, excluding duplicates.
+
+```{r}
+union(reading_coder_1, reading_coder_2)
+```
+
+## Intersect
+
+Find all rows that occur in **both** `x` and `y`.
+
+```{r}
+intersect(reading_coder_1, reading_coder_2) 
+```
+
+## Set Diff
+
+Find all rows in `x` that **aren't** in `y`.
+
+```{r}
+setdiff(reading_coder_1, reading_coder_2) 
+```
+
+## Set Diff
+
+Check out the `reading_coder_1` and `reading_dupe` data sets.
+
+::: columns
+::: {.column width="50%"}
+```{r}
+reading_coder_1
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+reading_dupe
+```
+:::
+:::
+
+## `union()`
+
+```{r}
+union(reading_coder_1, reading_dupe)
+```
+
+## Working with duplicates
+
+What if we want to exclude duplicate rows from a single data set without using a key from another data set? Just use `distinct()`!
+
+```{r}
+distinct(reading_dupe)
+```
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
