@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.2.313">
 
   <meta name="author" content="Glenn Williams">
-  <meta name="dcterms.date" content="2023-03-10">
+  <meta name="dcterms.date" content="2023-03-22">
   <title>Transforming Data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -399,7 +399,7 @@ Glenn Williams
 </div>
 </div>
 
-  <p class="date">2023-03-10</p>
+  <p class="date">2023-03-22</p>
 </section>
 <section id="overview" class="slide level2">
 <h2>Overview</h2>
@@ -452,7 +452,7 @@ Glenn Williams
 <h2>Reading Our Data</h2>
 <ul>
 <li><p>First we need some data. <strong>I made a messy version</strong> of real data from <a href="https://osf.io/rbtms/">Dunne et al.&nbsp;(2023): Uncovering the social determinants of brain injury rehabilitation</a>.</p></li>
-<li><p>This data is stored as a <strong>.csv</strong> file in <a href="https://github.com/gpwilliams/ds-psych_course">https://github.com/gpwilliams/ds-psych_course</a></p></li>
+<li><p>This data is stored as a <strong>.csv</strong> file in <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a></p></li>
 <li><p>To follow along, download the repository from GitHub and open the exercises file in <code>03_transforming-data</code> or make your own Quarto document within the folder.</p></li>
 </ul>
 </section>
@@ -550,14 +550,17 @@ $ enjoymentFOLLOW       &lt;chr&gt; "7-no", "6-yes", "4-yes", "0-no", "4-no", "5
 <section>
 <section id="separating-columns" class="title-slide slide level1 center">
 <h1>Separating Columns</h1>
-
-</section>
-<section id="separate" class="slide level2">
-<h2><code>separate()</code></h2>
-<p>Let’s fix the messy data, starting with splitting columns that contain multiple variables.</p>
 <ul>
 <li><p><code>separate()</code> looks for separators between data points, e.g.&nbsp;<code>_</code> or <code>-</code>, and splits columns there.</p></li>
 <li><p>If we have many separators we need to be explicit in where to split the data.</p></li>
+</ul>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/separate.png" class="r-stretch quarto-figure-center"></section>
+<section id="separate" class="slide level2">
+<h2><code>separate()</code></h2>
+<ul>
+<li><p>Let’s fix the messy data, starting with splitting columns that contain multiple variables.</p></li>
+<li><p>We now have <code>start_time</code> and <code>end_time</code> columns and <code>enjoyment</code> and <code>follow_up</code> columns.</p></li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>raw_data <span class="ot">&lt;-</span> raw_data <span class="sc">|&gt;</span> </span>
@@ -565,12 +568,6 @@ $ enjoymentFOLLOW       &lt;chr&gt; "7-no", "6-yes", "4-yes", "0-no", "4-no", "5
 <span id="cb9-3"><a href="#cb9-3"></a>  <span class="fu">separate</span>(<span class="at">col =</span> time, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"start_time"</span>, <span class="st">"end_time"</span>), <span class="at">sep =</span> <span class="st">"_"</span>)</span>
 <span id="cb9-4"><a href="#cb9-4"></a></span>
 <span id="cb9-5"><a href="#cb9-5"></a><span class="fu">glimpse</span>(raw_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="separate-1" class="slide level2">
-<h2><code>separate()</code></h2>
-<p>We now have <code>start_time</code> and <code>end_time</code> columns and <code>enjoyment</code> and <code>follow_up</code> columns. No more mixed columns!</p>
-<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 29
 Columns: 47
@@ -623,10 +620,15 @@ $ enjoyment             &lt;chr&gt; "7", "6", "4", "0", "4", "5", "0", "6", "1",
 $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", "no"…</code></pre>
 </div>
 </div>
-</section>
+</section></section>
+<section>
+<section id="selecting-columns" class="title-slide slide level1 center">
+<h1>Selecting Columns</h1>
+<p>Often your data set has lots of columns you won’t use. We can choose which columns to keep by listing them <strong>by name</strong>.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/select.png" class="r-stretch quarto-figure-center"></section>
 <section id="selecting-columns-to-keep" class="slide level2">
 <h2>Selecting Columns to Keep</h2>
-<p>Often your data set has lots of columns you won’t use. We can choose which columns to keep by listing them <strong>by name</strong>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">select</span>(</span>
@@ -798,7 +800,11 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </section>
 <section id="renaming-columns" class="slide level2">
 <h2>Renaming Columns</h2>
-<p>We can use the <code>rename()</code> function to change the name of columns. This takes the format of <strong>NEW = OLD</strong>.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/rename.png" class="r-stretch quarto-figure-center"><p>We can use the <code>rename()</code> function to change the name of columns. This takes the format of <strong>NEW = OLD</strong>.</p>
+</section>
+<section id="renaming-columns-1" class="slide level2">
+<h2>Renaming Columns</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">rename</span>(<span class="at">participant_id =</span> PID)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -873,6 +879,11 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <li>This can be a simple operation on one column, using two columns to create another, or doing conditional operations within a column.</li>
 </ul>
 </section>
+<section id="mutate" class="slide level2">
+<h2>Mutate</h2>
+<p>Here we create a new column by adding together values from columns <code>1</code> and <code>y</code>.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_1.png" class="r-stretch quarto-figure-center"></section>
 <section id="simple-operations" class="slide level2">
 <h2>Simple Operations</h2>
 <div class="cell">
@@ -930,10 +941,15 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </div>
 </div>
 </section>
-<section id="multi-column-operations-1" class="slide level2">
-<h2>Multi-Column Operations</h2>
+<section id="overwriting-columns" class="slide level2">
+<h2>Overwriting Columns</h2>
+<p>We can also update columns by transforming values within them.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_2.png" class="r-stretch quarto-figure-center"></section>
+<section id="overwriting-columns-1" class="slide level2">
+<h2>Overwriting Columns</h2>
 <h3 id="fixing-type-problems">Fixing Type Problems</h3>
-<p>If we try to get the total time partitipants took in the study like so, it won’t work.</p>
+<p>If we try to get the total time participants took in the study like so, it won’t work.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb31-2"><a href="#cb31-2"></a>  <span class="fu">mutate</span>(<span class="at">total_time =</span> end_time <span class="sc">-</span> start_time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -944,7 +960,7 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <li><p>To fix this, we change the data type.</p></li>
 </ul>
 </section>
-<section id="multi-column-operations-2" class="slide level2">
+<section id="multi-column-operations-1" class="slide level2">
 <h2>Multi-Column Operations</h2>
 <div class="r-fit-text">
 <p>Notice below we can work with columns we’re still in the process of creating during <code>mutate()</code> calls.</p>
@@ -998,34 +1014,66 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb34-2"><a href="#cb34-2"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb34-3"><a href="#cb34-3"></a>  <span class="fu">mutate</span>(<span class="at">DJG_sum =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(DJG_1<span class="sc">:</span>DJG_6)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-3"><a href="#cb34-3"></a>  <span class="fu">mutate</span>(<span class="at">DJG_sum =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(DJG_1<span class="sc">:</span>DJG_6))) <span class="sc">|&gt;</span> </span>
+<span id="cb34-4"><a href="#cb34-4"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb35-2"><a href="#cb35-2"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb35-3"><a href="#cb35-3"></a>  <span class="fu">mutate</span>(<span class="at">DJG_sum =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">contains</span>(<span class="st">"DJG"</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-3"><a href="#cb35-3"></a>  <span class="fu">mutate</span>(<span class="at">DJG_sum =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">contains</span>(<span class="st">"DJG"</span>)))) <span class="sc">|&gt;</span> </span>
+<span id="cb35-4"><a href="#cb35-4"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 29 × 48
-# Rowwise: 
-   PID   start_time  end_t…¹ progr…² Gender   Age Region Marit…³ Livin…⁴ Prima…⁵
-   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 1 26    2018-03-22… 2018-0… FINISH  M         54 East   Married With w… None   
- 2 27    2018-03-26… 2018-0… no      M         54 Scotl… Married With w… None   
- 3 28    2018-03-21… 2018-0… END     F         37 South… Married With h… None   
- 4 29    2018-03-25… 2018-0… ethics  M         51 West … Single  Alone   None   
- 5 30    2018-03-24… 2018-0… ethics  M         52 Scotl… Married With w… Wife   
- 6 A2    2018-03-21… 2018-0… END     male      39 North… Married Wife w… None   
- 7 A3    2018-03-25… 2018-0… ethics  M         47 North… Married Wife w… Wife i…
- 8 C     2018-03-24… 2018-0… ethics  M         53 Norfo… With P… Partner None   
- 9 D     2018-03-22… 2018-0… &lt;NA&gt;    M         68 Scotl… Widower With B… Brother
-10 I     2018-03-23… 2018-0… END     M         50 Scotl… In rel… Live w… None   
-# … with 19 more rows, 38 more variables: Employment &lt;chr&gt;,
-#   `Time Since BI` &lt;chr&gt;, `BI Severity` &lt;chr&gt;, Vision &lt;chr&gt;, Speech &lt;chr&gt;,
-#   Motor &lt;chr&gt;, Memory &lt;chr&gt;, Cognitive &lt;chr&gt;, Pain &lt;chr&gt;, BRS1 &lt;dbl&gt;,
-#   BRS2 &lt;dbl&gt;, BRS3 &lt;dbl&gt;, BRS4 &lt;dbl&gt;, BRS5 &lt;dbl&gt;, BRS6 &lt;dbl&gt;, DJG_1 &lt;dbl&gt;,
-#   DJG_2 &lt;dbl&gt;, DJG_3 &lt;dbl&gt;, DJG_4 &lt;dbl&gt;, DJG_5 &lt;dbl&gt;, DJG_6 &lt;dbl&gt;,
-#   `WEMWBS 1` &lt;chr&gt;, `WEMWBS 2` &lt;chr&gt;, `WEMWBS 3` &lt;chr&gt;, `WEMWBS 4` &lt;chr&gt;,
-#   `WEMWBS 5` &lt;chr&gt;, `WEMWBS 6` &lt;chr&gt;, `WEMWBS 7` &lt;chr&gt;, `WEMWBS 8` &lt;chr&gt;, …</code></pre>
+<pre><code>Rows: 29
+Columns: 48
+Rowwise: 
+$ PID                   &lt;chr&gt; "26", "27", "28", "29", "30", "A2", "A3", "C", "…
+$ start_time            &lt;chr&gt; "2018-03-22 23:06:11", "2018-03-26 00:30:20", "2…
+$ end_time              &lt;chr&gt; "2018-03-23 00:25:51", "2018-03-26 02:15:52", "2…
+$ progress              &lt;chr&gt; "FINISH", "no", "END", "ethics", "ethics", "END"…
+$ Gender                &lt;chr&gt; "M", "M", "F", "M", "M", "male", "M", "M", "M", …
+$ Age                   &lt;dbl&gt; 54, 54, 37, 51, 52, 39, 47, 53, 68, 50, 46, 55, …
+$ Region                &lt;chr&gt; "East", "Scotland", "South East", "West Yorkshir…
+$ `Marital Status`      &lt;chr&gt; "Married", "Married", "Married", "Single", "Marr…
+$ `Living Arrangements` &lt;chr&gt; "With wife", "With wife", "With husband and todd…
+$ `Primary Carer`       &lt;chr&gt; "None", "None", "None", "None", "Wife", "None", …
+$ Employment            &lt;chr&gt; "Medically Retired", "Medically Retired", "Long …
+$ `Time Since BI`       &lt;chr&gt; "6 (2015)", "3 (2018)", "5 (2016)", "23 (1998)",…
+$ `BI Severity`         &lt;chr&gt; "Mild", "Severe", "Mild", "Moderate", "Severe", …
+$ Vision                &lt;chr&gt; NA, NA, "X", NA, "X", "x", NA, NA, "X", NA, NA, …
+$ Speech                &lt;chr&gt; "X", "X", NA, NA, NA, "x", NA, NA, "X", "X", "X"…
+$ Motor                 &lt;chr&gt; NA, "X", "X", NA, NA, "x", "X", NA, "X", "X", "X…
+$ Memory                &lt;chr&gt; NA, NA, NA, NA, "X", NA, "X", NA, "X", "X", NA, …
+$ Cognitive             &lt;chr&gt; "X", "X", NA, NA, "X", NA, NA, "X", NA, "X", NA,…
+$ Pain                  &lt;chr&gt; NA, NA, "X", NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ BRS1                  &lt;dbl&gt; 5, 4, 3, 4, 2, 5, 5, 4, 5, 5, 4, 4, 2, 4, NA, 4,…
+$ BRS2                  &lt;dbl&gt; 4, 4, 2, 4, 1, 5, 5, 1, 4, 4, 2, 2, 2, 1, NA, 2,…
+$ BRS3                  &lt;dbl&gt; 3, 4, 1, 4, 5, 2, 5, 4, 4, 5, 2, 2, 2, 2, NA, 5,…
+$ BRS4                  &lt;dbl&gt; 4, 4, 2, 4, 2, 5, 5, 5, 4, 4, 4, 4, 2, 4, NA, 4,…
+$ BRS5                  &lt;dbl&gt; 4, 2, 2, 3, 1, 4, 5, 4, 4, 3, 4, 4, 2, 2, NA, 4,…
+$ BRS6                  &lt;dbl&gt; 5, 2, 1, 3, 2, 4, 5, 5, 4, 4, 2, 5, 3, 5, NA, 4,…
+$ DJG_1                 &lt;dbl&gt; 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, NA, 1,…
+$ DJG_2                 &lt;dbl&gt; 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, NA, 1,…
+$ DJG_3                 &lt;dbl&gt; 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, NA, 1,…
+$ DJG_4                 &lt;dbl&gt; 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, NA, 0,…
+$ DJG_5                 &lt;dbl&gt; 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, NA, 1,…
+$ DJG_6                 &lt;dbl&gt; 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, NA, 0,…
+$ `WEMWBS 1`            &lt;chr&gt; "2 - Rarely", "3 - Some of the time", "3 - Some …
+$ `WEMWBS 2`            &lt;chr&gt; "4 - Often", "2 - Rarely", "2 - Rarely", "2 - Ra…
+$ `WEMWBS 3`            &lt;chr&gt; "4 - Often", "3 - Some of the time", "2 - Rarely…
+$ `WEMWBS 4`            &lt;chr&gt; "3 - Some of the time", "4 - Often", "1 - None o…
+$ `WEMWBS 5`            &lt;chr&gt; "1 - None of the time", "2 - Rarely", "1 - None …
+$ `WEMWBS 6`            &lt;chr&gt; "5 - All of the time", "3 - Some of the time", "…
+$ `WEMWBS 7`            &lt;chr&gt; "4 - Often", "3 - Some of the time", "4 - Often"…
+$ `WEMWBS 8`            &lt;chr&gt; "3 - Some of the time", "2 - Rarely", "2 - Rarel…
+$ `WEMWBS 9`            &lt;chr&gt; "2 - Rarely", "3 - Some of the time", "3 - Some …
+$ `WEMWBS 10`           &lt;chr&gt; "3 - Some of the time", "2 - Rarely", "2 - Rarel…
+$ `WEMWBS 11`           &lt;chr&gt; "5 - All of the time", "3 - Some of the time", "…
+$ `WEMWBS 12`           &lt;chr&gt; "3 - Some of the time", "3 - Some of the time", …
+$ `WEMWBS 13`           &lt;chr&gt; "1 - None of the time", "2 - Rarely", "1 - None …
+$ `WEMWBS 14`           &lt;chr&gt; "3 - Some of the time", "2 - Rarely", "3 - Some …
+$ enjoyment             &lt;chr&gt; "7", "6", "4", "0", "4", "5", "0", "6", "1", "4"…
+$ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", "no"…
+$ DJG_sum               &lt;dbl&gt; 3, 2, 3, 3, 4, 4, 5, 3, 3, 5, 5, 4, 4, 5, NA, 4,…</code></pre>
 </div>
 </div>
 </div>
@@ -1040,6 +1088,15 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </ul>
 </section>
 <section id="using-conditionals-1" class="slide level2">
+<h2>Using Conditionals</h2>
+<p>Here we create a new column <code>z</code>.</p>
+<ul>
+<li><p>If the value in <code>y</code> is equal to 10, that row in <code>z</code> gets a 1.</p></li>
+<li><p>For all other values of <code>y</code> (default, <code>TRUE</code> for everything else), give <code>z</code> a 0.</p></li>
+</ul>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_case_when.png" class="r-stretch quarto-figure-center"></section>
+<section id="using-conditionals-2" class="slide level2">
 <h2>Using Conditionals</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>raw_data <span class="sc">|&gt;</span> </span>
@@ -1071,8 +1128,9 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <section>
 <section id="filtering-observations" class="title-slide slide level1 center">
 <h1>Filtering Observations</h1>
+<p>Here we filter the entire data set to rows where <code>x</code> is greater than 1.</p>
 
-</section>
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/filter.png" class="r-stretch quarto-figure-center"></section>
 <section id="filter" class="slide level2">
 <h2><code>filter()</code></h2>
 <ul>
@@ -1279,9 +1337,15 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </div>
 </div>
 </section></section>
+<section>
 <section id="arranging-data" class="title-slide slide level1 center">
 <h1>Arranging Data</h1>
-<p>We can arrange values in a column using <code>arrange()</code>. This also works with <code>desc()</code> so you can sort by descending order.</p>
+<p>We can arrange values (sorted by value) in a column using <code>arrange()</code>.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/arrange.png" class="r-stretch quarto-figure-center"></section>
+<section id="arranging-data-1" class="slide level2">
+<h2>Arranging Data</h2>
+<p>This also works with <code>desc()</code> so you can sort by descending order.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
@@ -1329,12 +1393,16 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </div>
 </div>
 </div>
-</section>
-
+</section></section>
 <section>
 <section id="summarising-data" class="title-slide slide level1 center">
 <h1>Summarising Data</h1>
 <p>If we want summaries of data, e.g.&nbsp;in descriptive statistics, we can use <code>summarise()</code>.</p>
+<p>Here, we create a new table and define columns in the table from operations in the original data set.</p>
+
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/summarise.png" class="r-stretch quarto-figure-center"></section>
+<section id="summarising-data-1" class="slide level2">
+<h2>Summarising Data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb56-2"><a href="#cb56-2"></a>  <span class="fu">summarise</span>(<span class="at">age_mean =</span> <span class="fu">mean</span>(Age))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1347,14 +1415,17 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 </div>
 <p>One thing to bear in mind is that we need to tell R how to handle <code>NA</code>s.</p>
 </section>
-<section id="summarising-data-1" class="slide level2">
+<section id="summarising-data-2" class="slide level2">
 <h2>Summarising Data</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Either within each operation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a>raw_data <span class="sc">|&gt;</span> </span>
-<span id="cb58-2"><a href="#cb58-2"></a>  <span class="fu">summarise</span>(<span class="at">age_mean =</span> <span class="fu">mean</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb58-2"><a href="#cb58-2"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb58-3"><a href="#cb58-3"></a>    <span class="at">age_mean =</span> </span>
+<span id="cb58-4"><a href="#cb58-4"></a>      <span class="fu">mean</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-5"><a href="#cb58-5"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
   age_mean
@@ -1367,7 +1438,9 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>raw_data <span class="sc">|&gt;</span> </span>
 <span id="cb60-2"><a href="#cb60-2"></a>  <span class="fu">drop_na</span>(Age) <span class="sc">|&gt;</span> </span>
-<span id="cb60-3"><a href="#cb60-3"></a>  <span class="fu">summarise</span>(<span class="at">age_mean =</span> <span class="fu">mean</span>(Age))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb60-3"><a href="#cb60-3"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb60-4"><a href="#cb60-4"></a>    <span class="at">age_mean =</span> <span class="fu">mean</span>(Age)</span>
+<span id="cb60-5"><a href="#cb60-5"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
   age_mean
@@ -1400,8 +1473,9 @@ $ follow_up             &lt;chr&gt; "no", "yes", "yes", "no", "no", "no", "no", 
 <section>
 <section id="grouped-operations" class="title-slide slide level1 center">
 <h1>Grouped Operations</h1>
+<p>We can perform grouped operations using many of the <code>tidyverse</code> functions. For example, we can sum up values for one column for each unique value in another column.</p>
 
-</section>
+<img data-src="https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/group_by_summarise.png" class="r-stretch quarto-figure-center"></section>
 <section id="group_by" class="slide level2">
 <h2><code>group_by()</code></h2>
 <p>One of the most powerful functions of <code>dplyr</code> is <code>group_by()</code>. It will give us grouped operations.</p>

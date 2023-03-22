@@ -7,7 +7,7 @@ author:
 date: "2023-03-09"
 date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
 title-block-banner: true
-abstract: "Understanding the grammar of graphics"
+abstract: "Working with a single data set"
 format: 
   html:
     toc: true

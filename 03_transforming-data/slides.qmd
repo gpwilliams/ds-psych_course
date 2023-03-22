@@ -15,8 +15,7 @@ editor: visual
 
 ## Overview
 
-::: {.r-fit-text}
-
+::: r-fit-text
 Today's session is on transforming data:
 
 -   Reading in data sets using the `read_*()` family of functions, e.g. `read_csv()`.
@@ -32,19 +31,15 @@ Today's session is on transforming data:
 -   Creating summaries of variables with `summarise()`.
 
 We'll look at grouped operations with `group_by()`.
-
 :::
 
 # Reading Data
 
 ## `read_*()` functions
 
-::: {.r-fit-text}
-
-:::: {.columns}
-
+::: r-fit-text
+::: columns
 ::: {.column width="45%"}
-
 The `readr` package allows you to read rectangular data into R from delimited files (e.g. .csv, .tsv)
 
 -   `read_csv()`: comma-separated values (CSV)
@@ -54,7 +49,6 @@ The `readr` package allows you to read rectangular data into R from delimited fi
 -   `read_table()`: whitespace-separated files
 
 ...and others.
-
 :::
 
 ::: {.column width="45%"}
@@ -66,20 +60,18 @@ If you're working proprietary data formats, use `haven` which has:
 
 If using Excel, use `readxl` which has the `read_excel()` function.
 :::
-
-::::
+:::
 
 **All of these functions take the format `read_*()` and expect the path to your data as input**
-
 :::
 
 ## Reading Our Data
 
-- First we need some data. **I made a messy version** of real data from [Dunne et al. (2023): Uncovering the social determinants of brain injury rehabilitation](https://osf.io/rbtms/).
+-   First we need some data. **I made a messy version** of real data from [Dunne et al. (2023): Uncovering the social determinants of brain injury rehabilitation](https://osf.io/rbtms/).
 
-- This data is stored as a **.csv** file in [https://github.com/gpwilliams/ds-psych_course](https://github.com/gpwilliams/ds-psych_course)
+-   This data is stored as a **.csv** file in <https://github.com/gpwilliams/ds-psych_course>
 
-- To follow along, download the repository from GitHub and open the exercises file in `03_transforming-data` or make your own Quarto document within the folder.
+-   To follow along, download the repository from GitHub and open the exercises file in `03_transforming-data` or make your own Quarto document within the folder.
 
 ## Reading Our Data
 
@@ -129,16 +121,19 @@ The pipe can be read as **"and then"**, so take our `PID` column from `raw_data`
 
 # Separating Columns
 
-## `separate()`
-
-Let's fix the messy data, starting with splitting columns that contain multiple variables.
-
--   `separate()` looks for separators between data points, e.g. `_` or `-`, and splits columns there. 
+-   `separate()` looks for separators between data points, e.g. `_` or `-`, and splits columns there.
 
 -   If we have many separators we need to be explicit in where to split the data.
 
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/separate.png){fig-align="center"}
+
+## `separate()`
+
+-   Let's fix the messy data, starting with splitting columns that contain multiple variables.
+
+-   We now have `start_time` and `end_time` columns and `enjoyment` and `follow_up` columns.
+
 ```{r}
-#| eval: false
 raw_data <- raw_data |> 
   separate(col = enjoymentFOLLOW, into = c("enjoyment", "follow_up")) |> 
   separate(col = time, into = c("start_time", "end_time"), sep = "_")
@@ -146,22 +141,13 @@ raw_data <- raw_data |>
 glimpse(raw_data)
 ```
 
-## `separate()`
-
-We now have `start_time` and `end_time` columns and `enjoyment` and `follow_up` columns. No more mixed columns!
-
-```{r}
-#| echo: false
-raw_data <- raw_data |> 
-  separate(col = enjoymentFOLLOW, into = c("enjoyment", "follow_up")) |> 
-  separate(col = time, into = c("start_time", "end_time"), sep = "_") 
-
-glimpse(raw_data)
-```
-
-## Selecting Columns to Keep
+# Selecting Columns
 
 Often your data set has lots of columns you won't use. We can choose which columns to keep by listing them **by name**.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/select.png){fig-align="center"}
+
+## Selecting Columns to Keep
 
 ```{r}
 raw_data |> 
@@ -180,6 +166,7 @@ Often your data set has lots of columns you won't use. We can choose which colum
 raw_data |> 
   select(c(1, 5, 6))
 ```
+
 ## Selecting Columns to Remove
 
 We can select columns to remove by using `-` before the names or index. We can list these as between a range, e.g. `6:47` or `c(Age:follow_up)`, or as a specific vector of indices, e.g. `c(1, 2, 3)` or `c(PID, start_time, end_time)`
@@ -188,6 +175,7 @@ We can select columns to remove by using `-` before the names or index. We can l
 raw_data |> 
   select(-c(Age:follow_up))
 ```
+
 ## Select Helpers
 
 There are a number of `select()` helpers to make working with it easier:
@@ -199,6 +187,7 @@ There are a number of `select()` helpers to make working with it easier:
 -   `num_range()`: Keeps columns with a matching prefix and a following range of numbers.
 
 ## Select Helpers
+
 ### `contains()`
 
 Let's try a few:
@@ -209,6 +198,7 @@ raw_data |>
 ```
 
 ## Select Helpers
+
 ### `num_range()`
 
 Let's try a few:
@@ -219,6 +209,7 @@ raw_data |>
 ```
 
 # Reordering and Renaming Columns
+
 ## `select()`, `everything()`, and `rename()`
 
 You can use `select()` to reorder columns. Either specify the exact locations or specify the first few and use `everything()` to select all remaining columns.
@@ -230,7 +221,11 @@ raw_data |>
 
 ## Renaming Columns
 
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/rename.png){fig-align="center"}
+
 We can use the `rename()` function to change the name of columns. This takes the format of **NEW = OLD**.
+
+## Renaming Columns
 
 ```{r}
 raw_data |> 
@@ -247,6 +242,7 @@ raw_data |>
 ```
 
 # Creating and Changing Columns
+
 ## `mutate()` and `transmute()`
 
 We have two main functions for this:
@@ -256,7 +252,13 @@ We have two main functions for this:
 
 We'll mainly use `mutate()`.
 
-- This can be a simple operation on one column, using two columns to create another, or doing conditional operations within a column.
+-   This can be a simple operation on one column, using two columns to create another, or doing conditional operations within a column.
+
+## Mutate
+
+Here we create a new column by adding together values from columns `1` and `y`.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_1.png){fig-align="center"}
 
 ## Simple Operations
 
@@ -267,6 +269,7 @@ raw_data |>
   ) |> 
   select(PID, birth_year)
 ```
+
 ## Multi-column Operations
 
 ```{r}
@@ -276,10 +279,17 @@ raw_data |>
   )
 ```
 
-## Multi-Column Operations
+## Overwriting Columns
+
+We can also update columns by transforming values within them.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_2.png){fig-align="center"}
+
+## Overwriting Columns
+
 ### Fixing Type Problems
 
-If we try to get the total time partitipants took in the study like so, it won't work. 
+If we try to get the total time participants took in the study like so, it won't work.
 
 ```{r}
 #| eval: false
@@ -289,14 +299,13 @@ raw_data |>
 
 -   That's because R doesn't know how to work with date times.
 
--   This also wouldn't work if we had a character and numeric column. 
+-   This also wouldn't work if we had a character and numeric column.
 
 -   To fix this, we change the data type.
 
 ## Multi-Column Operations
 
-::: {.r-fit-text}
-
+::: r-fit-text
 Notice below we can work with columns we're still in the process of creating during `mutate()` calls.
 
 ```{r}
@@ -309,46 +318,53 @@ raw_data |>
   select(contains("time"))
 ```
 
-:::{.callout-note}
-
+::: callout-note
 If we don't like working with decimal hours, we can change the units to minutes using e.g. `units(TIBBLE$COL) <- "mins"`
-
 :::
-
 :::
 
 ## Improving Multi-Column Operations
 
-::: {.r-fit-text}
+::: r-fit-text
+-   The `across()` function tells `mutate()` that we're going to do a row wise operation.
 
-- The `across()` function tells `mutate()` that we're going to do a row wise operation.
-
-- We use `c_across()` to allow us to use the bare column names, index, or even `select()` helpers to do the operation.
+-   We use `c_across()` to allow us to use the bare column names, index, or even `select()` helpers to do the operation.
 
 ```{r}
 #| eval: false
 raw_data |> 
   rowwise() |> 
-  mutate(DJG_sum = sum(c_across(DJG_1:DJG_6)))
+  mutate(DJG_sum = sum(c_across(DJG_1:DJG_6))) |> 
+  glimpse()
 ```
 
 ```{r}
 raw_data |> 
   rowwise() |> 
-  mutate(DJG_sum = sum(c_across(contains("DJG"))))
+  mutate(DJG_sum = sum(c_across(contains("DJG")))) |> 
+  glimpse()
 ```
-
 :::
 
 ## Using Conditionals
 
-- Finally, we can change only certain values within a column with conditionals.
+-   Finally, we can change only certain values within a column with conditionals.
 
-- Notice that we have different impairments (e.g. Vision, Speech) coded as X or NA. We can't work with these for statistics because they aren't numbers. Let's fix that.
+-   Notice that we have different impairments (e.g. Vision, Speech) coded as X or NA. We can't work with these for statistics because they aren't numbers. Let's fix that.
 
-- `case_when()` looks for a logical operation, (e.g. when Vision == "X"), and your new value when this is true after the `~` (here, 1).
+-   `case_when()` looks for a logical operation, (e.g. when Vision == "X"), and your new value when this is true after the `~` (here, 1).
 
-- `case_when()` takes defaults, so we say "when anything else happens, i.e. TRUE set it to 0".
+-   `case_when()` takes defaults, so we say "when anything else happens, i.e. TRUE set it to 0".
+
+## Using Conditionals
+
+Here we create a new column `z`.
+
+-   If the value in `y` is equal to 10, that row in `z` gets a 1.
+
+-   For all other values of `y` (default, `TRUE` for everything else), give `z` a 0.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/mutate_case_when.png){fig-align="center"}
 
 ## Using Conditionals
 
@@ -365,10 +381,14 @@ raw_data |>
 
 # Filtering Observations
 
+Here we filter the entire data set to rows where `x` is greater than 1.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/filter.png){fig-align="center"}
+
 ## `filter()`
 
-- `filter()` allows you to subset to rows of data where certain conditions are met.
-- Let's take only those who have `progress` as `FINISH` OR `END`
+-   `filter()` allows you to subset to rows of data where certain conditions are met.
+-   Let's take only those who have `progress` as `FINISH` OR `END`
 
 ```{r}
 raw_data |> 
@@ -377,9 +397,9 @@ raw_data |>
 
 ## The %in% Operator
 
-- If we have many conditions we want to meet, many OR (`|`) statements are verbose. We can instead use `%in%`
+-   If we have many conditions we want to meet, many OR (`|`) statements are verbose. We can instead use `%in%`
 
-- This is `TRUE` if an observation is **in** a value that you provide. 
+-   This is `TRUE` if an observation is **in** a value that you provide.
 
 ```{r}
 raw_data |> 
@@ -400,9 +420,9 @@ raw_data |>
 
 ## Removing by Criteria
 
-Finally, we can do the inverse of these operations using `!`. 
+Finally, we can do the inverse of these operations using `!`.
 
-- Here we ask for those whose progress **ISN'T** "FINISH" or "END" but who are over 50.
+-   Here we ask for those whose progress **ISN'T** "FINISH" or "END" but who are over 50.
 
 ```{r}
 raw_data |> 
@@ -411,9 +431,10 @@ raw_data |>
     Age > 50
   )
 ```
+
 ## Handling NAs
 
-- If you ask R if a value is equal to an NA (an unknown value) it is very literal in that it tells us it can’t know. 
+-   If you ask R if a value is equal to an NA (an unknown value) it is very literal in that it tells us it can't know.
 
 So, this doesn't work:
 
@@ -427,6 +448,7 @@ Instead, we have to use `is.na()`:
 ```{r}
 raw_data |> filter(is.na(progress))
 ```
+
 ## Inverting NAs
 
 If we want values that **AREN'T** NAs, then we combine `is.na()` and the NOT (`!`) operator.
@@ -437,69 +459,76 @@ raw_data |> filter(!is.na(progress))
 
 # Arranging Data
 
-We can arrange values in a column using `arrange()`. This also works with `desc()` so you can sort by descending order.
+We can arrange values (sorted by value) in a column using `arrange()`.
 
-:::: {.columns}
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/arrange.png){fig-align="center"}
 
+## Arranging Data
+
+This also works with `desc()` so you can sort by descending order.
+
+::: columns
 ::: {.column width="50%"}
-
 ```{r}
 raw_data |> 
   select(Age) |> 
   arrange(Age)
 ```
-
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
 raw_data |> 
   select(Age) |> 
   arrange(desc(Age))
 ```
-
 :::
-
-::::
+:::
 
 # Summarising Data
 
 If we want summaries of data, e.g. in descriptive statistics, we can use `summarise()`.
 
+Here, we create a new table and define columns in the table from operations in the original data set.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/summarise.png){fig-align="center"}
+
+## Summarising Data
+
 ```{r}
 raw_data |> 
   summarise(age_mean = mean(Age))
 ```
+
 One thing to bear in mind is that we need to tell R how to handle `NA`s.
 
 ## Summarising Data
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 Either within each operation.
 
 ```{r}
 raw_data |> 
-  summarise(age_mean = mean(Age, na.rm = TRUE))
+  summarise(
+    age_mean = 
+      mean(Age, na.rm = TRUE)
+  )
 ```
-
 :::
 
 ::: {.column width="50%"}
-
 Or within the chain of functions. Note this only keeps complete rows if several columns are provided.
 
 ```{r}
 raw_data |> 
   drop_na(Age) |> 
-  summarise(age_mean = mean(Age))
+  summarise(
+    age_mean = mean(Age)
+  )
 ```
 :::
-
-::::
+:::
 
 ## Many Summaries
 
@@ -514,7 +543,12 @@ raw_data |>
     n = n()
   )
 ```
+
 # Grouped Operations
+
+We can perform grouped operations using many of the `tidyverse` functions. For example, we can sum up values for one column for each unique value in another column.
+
+![](https://raw.githubusercontent.com/gpwilliams/ds-psych/main/img/group_by_summarise.png){fig-align="center"}
 
 ## `group_by()`
 
@@ -527,11 +561,12 @@ raw_data |>
   group_by(Gender) |> 
   summarise(age_mean = mean(Age, na.rm = TRUE))
 ```
+
 ## `group_by()` with other `dplyr` functions
 
-- `group_by()` works with a whole host of functions from `dplyr` including `filter()`, `mutate()` and others.
+-   `group_by()` works with a whole host of functions from `dplyr` including `filter()`, `mutate()` and others.
 
-- Let's filter to the earliest observation in `start_time` for the levels of `Gender`.
+-   Let's filter to the earliest observation in `start_time` for the levels of `Gender`.
 
 ```{r}
 raw_data |> 
@@ -539,14 +574,13 @@ raw_data |>
   group_by(Gender) |> 
   filter(rank(start_time) == 1)
 ```
+
 ## Ungrouping
 
 If you want to perform further operations on the whole data set after your grouped operations, you need to remember to ungroup!
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-
 Without ungrouping.
 
 ```{r}
@@ -556,11 +590,9 @@ raw_data |>
   filter(rank(start_time) == 1) |> 
   summarise(mean_age = mean(Age, na.rm = TRUE))
 ```
-
 :::
 
 ::: {.column width="50%"}
-
 With ungrouping.
 
 ```{r}
@@ -571,30 +603,28 @@ raw_data |>
   ungroup() |> 
   summarise(mean_age = mean(Age, na.rm = TRUE))
 ```
-
 :::
-
-::::
+:::
 
 ## Chaining Functions
 
-- We've seen already how we can chain many functions. 
+-   We've seen already how we can chain many functions.
 
-- We can combine all functions we've covered to do all our data cleaning and summarising.
+-   We can combine all functions we've covered to do all our data cleaning and summarising.
 
-- We can also pipe into `ggplot()` calls.
+-   We can also pipe into `ggplot()` calls.
 
-- We'll do this in the **exercises**.
+-   We'll do this in the **exercises**.
 
 ## Saving Files
 
-- Finally, once you're done cleaning your data and making summaries you can save it using the `write_*()` family of functions.
+-   Finally, once you're done cleaning your data and making summaries you can save it using the `write_*()` family of functions.
 
-- I suggest saving to a **.csv** file with `write_csv()` as any program can open .csv files (open science, woo!)
+-   I suggest saving to a **.csv** file with `write_csv()` as any program can open .csv files (open science, woo!)
 
-- It's a good idea to keep your raw and cleaned data in separate sub-folders.
+-   It's a good idea to keep your raw and cleaned data in separate sub-folders.
 
-- Here we save our data to the "cleaned_data" sub-folder. (Obviously, you'd use actually cleaned data here...)
+-   Here we save our data to the "cleaned_data" sub-folder. (Obviously, you'd use actually cleaned data here...)
 
 ```{r}
 #| eval: false
