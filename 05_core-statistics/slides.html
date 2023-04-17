@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.2.313">
+
+  <meta name="author" content="Glenn Williams">
+  <meta name="dcterms.date" content="2023-04-17">
+  <title>Core Statistics</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-captioned.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-captioned) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-captioned.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-captioned .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-captioned .callout-caption  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-captioned.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-captioned.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-caption {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-caption {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-caption {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-captioned .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-captioned .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-captioned) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-caption {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-caption {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-caption {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-caption {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-caption {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Core Statistics</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Glenn Williams 
+</div>
+</div>
+</div>
+
+  <p class="date">2023-04-17</p>
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<div class="r-fit-text">
+<p>Today’s session is on core statistics:</p>
+<ul>
+<li><p>The general linear model as a unifying framework for data analysis involving categorical and continuous variables.</p></li>
+<li><p>Understanding the R formula syntax for building models.</p></li>
+<li><p>Contrast coding for variables and its impact on parameter estimates.</p></li>
+<li><p>Extending the general linear model with link functions to handle data with various data generation processes (i.e.&nbsp;generalised linear models).</p></li>
+<li><p>Reproducing correlations, t-tests, and ANOVAs in R, and these relate to the general linear model.</p></li>
+<li><p>Calculating estimated marginal means and conducting pairwise tests using the <code>emmeans</code> package.</p></li>
+<li><p>Generating standardised effect sizes using the <code>effectsize</code> package from the <code>easystats</code> package.</p></li>
+</ul>
+</div>
+</section>
+<section>
+<section id="getting-started" class="title-slide slide level1 center">
+<h1>Getting Started</h1>
+<ul>
+<li><p>Go to <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p></li>
+<li><p>Click <code>Code</code> &gt; Download ZIP.</p></li>
+<li><p>Unzip the files.</p></li>
+<li><p>Open the file <code>ds-psych_course.RProj</code></p></li>
+<li><p>Create a Quarto document and save it within <code>05_core-statistics</code>. Name it anything you like.</p></li>
+</ul>
+<p>You can copy the code form here on out and everything should work.</p>
+</section>
+<section id="loading-packages" class="slide level2">
+<h2>Loading Packages</h2>
+<p>Load our essential packages, <code>tidyverse</code> for data wrangling and presentation and <code>here</code> for working with file paths.</p>
+<p>We also use <code>emmeans</code> for estimated marginal means and pairwise tests, and <code>easystats</code> for its child package <code>effectsize</code>. It also has some other handy packages rolled into it. Finally, we’ll use <code>afex</code> for analysing factorial experimental data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(easystats)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(afex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section>
+<section>
+<section id="our-data" class="title-slide slide level1 center">
+<h1>Our Data</h1>
+<p>We’ll reuse the Arabic Stroop data from the upcoming Williams et al.&nbsp;paper on cross- and within-language control processes.</p>
+<p>We’ll aggregate the data by subjects in various ways depending on what we’ll show off as we go ahead.</p>
+</section>
+<section id="some-fancy-code" class="slide level2">
+<h2>Some Fancy Code</h2>
+<p>This produces our data sets that we’ll use in the walkthrough.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>all_data <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"arabic_stroop.csv"</span>)),</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="fu">read_csv</span>(</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"arabic_stroop_demographics.csv"</span>),</span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="at">col_select =</span> <span class="fu">c</span>(<span class="st">"SubjectID"</span>, <span class="st">"ParticipantAge"</span>, <span class="st">"ParticipantGender"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a>  )</span>
+<span id="cb2-7"><a href="#cb2-7"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-8"><a href="#cb2-8"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb2-9"><a href="#cb2-9"></a>  <span class="fu">rename</span>(<span class="at">age =</span> participant_age, <span class="at">gender =</span> participant_gender) <span class="sc">|&gt;</span> </span>
+<span id="cb2-10"><a href="#cb2-10"></a>  <span class="fu">filter</span>(</span>
+<span id="cb2-11"><a href="#cb2-11"></a>    accuracy <span class="sc">==</span> <span class="st">"Correct"</span>, </span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="sc">!</span><span class="fu">is.na</span>(rt), rt <span class="sc">&gt;</span> <span class="dv">150</span> <span class="sc">&amp;</span> rt <span class="sc">&lt;</span> <span class="dv">2500</span>, </span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="sc">!</span><span class="fu">is.na</span>(trial_type),</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15"></a>  )</span>
+<span id="cb2-16"><a href="#cb2-16"></a></span>
+<span id="cb2-17"><a href="#cb2-17"></a>lm_demo_data <span class="ot">&lt;-</span> all_data <span class="sc">|&gt;</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a>  <span class="fu">group_by</span>(subject_id, age, gender) <span class="sc">|&gt;</span> </span>
+<span id="cb2-19"><a href="#cb2-19"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-20"><a href="#cb2-20"></a>    <span class="at">mean_rt =</span> <span class="fu">mean</span>(rt),</span>
+<span id="cb2-21"><a href="#cb2-21"></a>    <span class="at">mean_log_rt =</span> <span class="fu">mean</span>(<span class="fu">log</span>(rt)),</span>
+<span id="cb2-22"><a href="#cb2-22"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a>  )</span>
+<span id="cb2-24"><a href="#cb2-24"></a></span>
+<span id="cb2-25"><a href="#cb2-25"></a>lm_trial_data <span class="ot">&lt;-</span> all_data <span class="sc">|&gt;</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a>  <span class="fu">group_by</span>(subject_id, trial_type) <span class="sc">|&gt;</span> </span>
+<span id="cb2-27"><a href="#cb2-27"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-28"><a href="#cb2-28"></a>    <span class="at">mean_rt =</span> <span class="fu">mean</span>(rt),</span>
+<span id="cb2-29"><a href="#cb2-29"></a>    <span class="at">mean_log_rt =</span> <span class="fu">mean</span>(<span class="fu">log</span>(rt)),</span>
+<span id="cb2-30"><a href="#cb2-30"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb2-31"><a href="#cb2-31"></a>  )</span>
+<span id="cb2-32"><a href="#cb2-32"></a></span>
+<span id="cb2-33"><a href="#cb2-33"></a>lm_two_way_data <span class="ot">&lt;-</span> all_data <span class="sc">|&gt;</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a>  <span class="fu">group_by</span>(subject_id, trial_type, stroop) <span class="sc">|&gt;</span> </span>
+<span id="cb2-35"><a href="#cb2-35"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-36"><a href="#cb2-36"></a>    <span class="at">mean_rt =</span> <span class="fu">mean</span>(rt),</span>
+<span id="cb2-37"><a href="#cb2-37"></a>    <span class="at">mean_log_rt =</span> <span class="fu">mean</span>(<span class="fu">log</span>(rt)),</span>
+<span id="cb2-38"><a href="#cb2-38"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb2-39"><a href="#cb2-39"></a>  )</span>
+<span id="cb2-40"><a href="#cb2-40"></a></span>
+<span id="cb2-41"><a href="#cb2-41"></a>lm_mixed_data <span class="ot">&lt;-</span> all_data <span class="sc">|&gt;</span></span>
+<span id="cb2-42"><a href="#cb2-42"></a>  <span class="fu">group_by</span>(subject_id, age, gender, stroop) <span class="sc">|&gt;</span> </span>
+<span id="cb2-43"><a href="#cb2-43"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-44"><a href="#cb2-44"></a>    <span class="at">mean_rt =</span> <span class="fu">mean</span>(rt),</span>
+<span id="cb2-45"><a href="#cb2-45"></a>    <span class="at">mean_log_rt =</span> <span class="fu">mean</span>(<span class="fu">log</span>(rt)),</span>
+<span id="cb2-46"><a href="#cb2-46"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb2-47"><a href="#cb2-47"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="understanding-our-data" class="slide level2">
+<h2>Understanding Our Data</h2>
+<p>We have a few data sets with variables like:</p>
+<ul>
+<li><code>age</code>: Continuous, between-subjects variable of age in years.</li>
+<li><code>gender</code>: Caregorical, between-subjects variable with levels male and female.</li>
+<li><code>trial_type</code>: Categorical, within-subjects variable with levels repeat (i.e.&nbsp;speak in the same language) or switch (i.e.&nbsp;switch to a new language).</li>
+<li><code>stroop</code>: Categorical, within-subjects variable with levels neutral (e.g.&nbsp;say the ink colour of the word “horse”) or incongruent (e.g.&nbsp;say the ink colour of the word “orange” where ink colour doesn’t match the word).</li>
+</ul>
+</section></section>
+<section>
+<section id="the-general-linear-model" class="title-slide slide level1 center">
+<h1>The General Linear Model</h1>
+<p>The general linear model is the basis of many different statistical models (e.g.&nbsp;linear regression, all flavours of ANOVA, t-tests etc.)</p>
+<ul>
+<li>Model unbounded continuous outcomes from continuous and/or categorical predictors.</li>
+<li>Estimate model parameters using ordinary least squares or maximum likelihood estimation.</li>
+</ul>
+</section>
+<section id="general-linear-model-formula" class="slide level2">
+<h2>General Linear Model Formula</h2>
+<p>In a simple form, the general linear model is often expressed as:</p>
+<p><span class="math display">\[Y_i = \alpha + \beta Xi + e_i\]</span></p>
+<p>Each observation <span class="math inline">\(Y_i\)</span>, is made up from:</p>
+<ul>
+<li>A shared <strong>intercept</strong> (<span class="math inline">\(\alpha\)</span>).</li>
+<li>A shared <strong>slope</strong> (<span class="math inline">\(\beta\)</span>) for a predictor multiplied by the participant’s value for said predictor.</li>
+<li>The individual’s <strong>error</strong> (<span class="math inline">\(e\)</span>), assumed to be <span class="math inline">\(e_i \sim \mathcal{N}(0, \sigma^2)\)</span> (and <strong>only the error has this assumption </strong>). Observations are <em>i.i.d.</em></li>
+</ul>
+</section>
+<section id="understanding-model-implications" class="slide level2">
+<h2>Understanding Model Implications</h2>
+<p>As per McElreath (2016), the linear model can be rewritten as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_i \sim \mathcal{N}(\mu, \sigma^2)\\
+\mu = \alpha + \beta X_i\\
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p>This might make it clearer that the <strong>likelihood is Gaussian</strong> (i.e.&nbsp;Normal), meaning the response variable is numeric and continuous with no upper or lower bounds.</p></li>
+<li><p>Notice, the model also makes no assumptions about <strong>by-subjects</strong> effects or <strong>by-items</strong> effects, thus meaning it isn’t appropriate to model trial-level data. We have to work with single scores.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="the-r-formula-interface" class="title-slide slide level1 center">
+<h1>The R Formula Interface</h1>
+<p>R has a shorthand for writing model formulae allowing you to specify arbitrarily complex models using the <strong>design formula</strong>.</p>
+</section>
+<section id="the-r-formula-interface-1" class="slide level2">
+<h2>The R Formula Interface</h2>
+<p>We remove everything from the model excluding variables, so that:</p>
+<p><span class="math display">\[Y_i = \alpha + \beta X_i + e_i\]</span></p>
+<p>equates to:</p>
+<p><code>y ~ 1 + x</code></p>
+<ul>
+<li><p>Where y is the name of the outcome, 1 is the intercept and X is the name of our predictor.</p></li>
+<li><p>Interactions are added using <code>:</code>, i.e.&nbsp;<code>y ~ 1 + x1 + x2 + x1:x2</code>. This can be shortened to <code>y ~ x1 * x2</code>.</p></li>
+</ul>
+</section>
+<section id="specifying-a-linear-model" class="slide level2">
+<h2>Specifying a Linear Model</h2>
+<p>Let’s fit a linear model using <code>age</code> as a predictor to determine <code>mean_log_rt</code>. Assign it to the object, <code>mod_age</code>.</p>
+<ul>
+<li>Use the <code>lm()</code> function to fit a linear model.</li>
+<li>Outcomes go to the <strong>LHS</strong> of the <code>~</code> (tilde).</li>
+<li>Predictors go to the <strong>RHS</strong> of the <code>~</code> (note, <code>1</code> is used to define the intercept and is optional).</li>
+<li>Define the data source using the <code>data</code> argument.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>mod_age <span class="ot">&lt;-</span> <span class="fu">lm</span>(mean_log_rt <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> age, <span class="at">data =</span> lm_demo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="understanding-the-linear-model-output" class="slide level2">
+<h2>Understanding the Linear Model Output</h2>
+<p><code>summary()</code> summarises the fitted formula call, residual error, model coefficients, and various other statistics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">summary</span>(mod_age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ 1 + age, data = lm_demo_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.33484 -0.07408  0.00314  0.06648  0.24318 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 6.834846   0.103670   65.93   &lt;2e-16 ***
+age         0.009343   0.004189    2.23   0.0311 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1167 on 42 degrees of freedom
+Multiple R-squared:  0.1059,    Adjusted R-squared:  0.0846 
+F-statistic: 4.974 on 1 and 42 DF,  p-value: 0.03113</code></pre>
+</div>
+</div>
+</section>
+<section id="understanding-the-parameter-estimates" class="slide level2">
+<h2>Understanding the Parameter Estimates</h2>
+<ul>
+<li><strong>Intercept</strong>: when the predictor(s) are 0, what’s the score for the outcome?</li>
+<li><strong>Age (slope)</strong>: For every 1 unit increase in age, what’s the increase in the outcome?</li>
+</ul>
+<p>So, for a 34 year-old, the model-based predicted score is <strong>Intercept + Age × 34</strong>.</p>
+<p><em>In reality, it’ll be different to this, hence the <strong>residual error</strong> the model can’t explain.</em></p>
+</section>
+<section id="understanding-the-parameter-estimates-1" class="slide level2">
+<h2>Understanding the Parameter Estimates</h2>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<section id="appraising-the-model" class="slide level2">
+<h2>Appraising the Model</h2>
+<p>Pass your saved model object to <code>check_model()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>performance<span class="sc">::</span><span class="fu">check_model</span>(mod_age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
+<section id="categorical-predictors" class="slide level2">
+<h2>Categorical Predictors</h2>
+<p>What happens if we have a categorical predictor? Fit the model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>mod_trial <span class="ot">&lt;-</span> <span class="fu">lm</span>(mean_log_rt <span class="sc">~</span> trial_type, <span class="at">data =</span> lm_trial_data)</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">summary</span>(mod_trial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ trial_type, data = lm_trial_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.32348 -0.07731 -0.00627  0.05501  0.29328 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       7.04386    0.01862  378.32   &lt;2e-16 ***
+trial_typeSwitch  0.03844    0.02633    1.46    0.148    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1235 on 86 degrees of freedom
+Multiple R-squared:  0.02419,   Adjusted R-squared:  0.01284 
+F-statistic: 2.132 on 1 and 86 DF,  p-value: 0.1479</code></pre>
+</div>
+</div>
+</section>
+<section id="categorical-predictors-1" class="slide level2">
+<h2>Categorical Predictors</h2>
+<ul>
+<li><p>R can’t do maths with text. So, it assigns values to non-numeric predictors.</p></li>
+<li><p>We get a matrix with <strong>n-1</strong> contrasts for every level of a variable. For a 2-level variable, this means you have 1 intercept and 1 parameter estimate.</p></li>
+<li><p>By default R uses <strong>treatment contrasts</strong>:</p>
+<ul>
+<li>The first (alphabetic) level is the <strong>reference level (assigned 0)</strong>.</li>
+<li>For each remaining contrast, one level (<strong>assigned 1</strong>) is compared against the reference level.</li>
+</ul></li>
+</ul>
+</section>
+<section id="understanding-treatment-coding" class="slide level2">
+<h2>Understanding Treatment Coding</h2>
+<ul>
+<li>Intercept: The score where all predictors are set to 0. With only 1 predictor this is the case when <code>trial_type</code> is set to 0, i.e.&nbsp;a <strong>non-switch</strong> trial.</li>
+<li><code>trial_typeSwitch</code>(Slope): the difference in log reaction times between the baseline (non-switch) and switch trials.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">summary</span>(mod_trial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ trial_type, data = lm_trial_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.32348 -0.07731 -0.00627  0.05501  0.29328 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       7.04386    0.01862  378.32   &lt;2e-16 ***
+trial_typeSwitch  0.03844    0.02633    1.46    0.148    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1235 on 86 degrees of freedom
+Multiple R-squared:  0.02419,   Adjusted R-squared:  0.01284 
+F-statistic: 2.132 on 1 and 86 DF,  p-value: 0.1479</code></pre>
+</div>
+</div>
+</section>
+<section id="understanding-treatment-coding-1" class="slide level2">
+<h2>Understanding Treatment Coding</h2>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"><p><em>Remember, Repetition is coded as x = 0.</em></p>
+</section>
+<section id="changing-contrasts" class="slide level2">
+<h2>Changing Contrasts</h2>
+<ul>
+<li><p>With only 1 predictor with only 2 levels, the coding scheme really isn’t important.</p></li>
+<li><p>However, when we have multiple predictors, or more than 2 levels in a variable, we need to be careful.</p></li>
+<li><p>Let’s say we fit a model with <code>trial_type</code> and <code>stroop</code> both coded with treatment contrasts. What happens?</p>
+<ul>
+<li><p>The intercept is when <code>trial_type</code> = 0 <strong>and</strong> when <code>stroop</code> = 0.</p></li>
+<li><p>Slopes evaluate the effect of one parameter when others are kept at 0. These are <strong>simple effects</strong>, not <strong>main effects</strong>.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="understanding-different-contrasts" class="slide level2">
+<h2>Understanding Different Contrasts</h2>
+<ul>
+<li><p><strong>Treatment (dummy) coding</strong>: contrasts are coded as 0 and 1. Since the intercept is always when predictors are 0, this becomes one combination of your conditions. Parameter estimates then evaluate simple effects.</p></li>
+<li><p><strong>Sum coding</strong>: contrasts are coded as -1 and 1. Since the intercept is always when predictors are 0 this is the grand mean. Parameter estimates then evaluate main effects. Estimates are half the size of actual differences unless you use deviation coding where contrast are coded -.5 and .5.</p></li>
+</ul>
+<p>Others like Helmert coding exist, but aren’t covered here.</p>
+</section>
+<section id="changing-coding-scheme" class="slide level2">
+<h2>Changing Coding Scheme</h2>
+<ul>
+<li>If we want to change from the default coding scheme, we need to code our predictors as <code>factors</code>.</li>
+<li>Lets do it and check out the default coding scheme.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>lm_two_way_data<span class="sc">$</span>trial_type <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(lm_two_way_data<span class="sc">$</span>trial_type)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>trial_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Switch
+Repetition      0
+Switch          1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>lm_two_way_data<span class="sc">$</span>stroop <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(lm_two_way_data<span class="sc">$</span>stroop)</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>stroop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Neutral
+Incongruent       0
+Neutral           1</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluating-simple-effects-with-treatment-coding" class="slide level2">
+<h2>Evaluating Simple Effects with Treatment Coding</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>mod_treat <span class="ot">&lt;-</span> <span class="fu">lm</span>(mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> trial_type, <span class="at">data =</span> lm_two_way_data)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">summary</span>(mod_treat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ stroop * trial_type, data = lm_two_way_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.36482 -0.07499 -0.01659  0.09209  0.33627 
+
+Coefficients:
+                                Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                     7.093337   0.019739 359.365  &lt; 2e-16 ***
+stroopNeutral                  -0.096645   0.027914  -3.462 0.000676 ***
+trial_typeSwitch                0.034230   0.027914   1.226 0.221782    
+stroopNeutral:trial_typeSwitch  0.008867   0.039477   0.225 0.822543    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1309 on 172 degrees of freedom
+Multiple R-squared:   0.13, Adjusted R-squared:  0.1149 
+F-statistic: 8.571 on 3 and 172 DF,  p-value: 2.461e-05</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluating-simple-effects-with-treatment-coding-1" class="slide level2">
+<h2>Evaluating Simple Effects with Treatment Coding</h2>
+<p>With treatment coding, we are evaluting <strong>simple effects</strong>.</p>
+<p>Conclusions:</p>
+<ul>
+<li>Stroop neutral differs to incongruent for non-switch trials.</li>
+<li>Trial type switch differs to non-switch for incongruent trials.</li>
+<li>No interaction is present.</li>
+</ul>
+</section>
+<section id="changing-coding-scheme-1" class="slide level2">
+<h2>Changing Coding Scheme</h2>
+<p>Use the <code>contr._()</code> family of functions to change the coding scheme for a factor, e.g.&nbsp;<code>contr.sum()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>stroop) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="dv">2</span>)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>trial_type) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check them:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>trial_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]
+Repetition    1
+Switch       -1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">contrasts</span>(lm_two_way_data<span class="sc">$</span>stroop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            [,1]
+Incongruent    1
+Neutral       -1</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluating-main-effects-with-sum-coding" class="slide level2">
+<h2>Evaluating Main Effects with Sum Coding</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>mod_treat <span class="ot">&lt;-</span> <span class="fu">lm</span>(mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> trial_type, <span class="at">data =</span> lm_two_way_data)</span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">summary</span>(mod_treat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ stroop * trial_type, data = lm_two_way_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.36482 -0.07499 -0.01659  0.09209  0.33627 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          7.064347   0.009869 715.793   &lt;2e-16 ***
+stroop1              0.046106   0.009869   4.672    6e-06 ***
+trial_type1         -0.019332   0.009869  -1.959   0.0518 .  
+stroop1:trial_type1  0.002217   0.009869   0.225   0.8225    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1309 on 172 degrees of freedom
+Multiple R-squared:   0.13, Adjusted R-squared:  0.1149 
+F-statistic: 8.571 on 3 and 172 DF,  p-value: 2.461e-05</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluating-main-effects-with-sum-coding-1" class="slide level2">
+<h2>Evaluating Main Effects with Sum Coding</h2>
+<p>With sum coding we are evaluating <strong>main effects</strong>.</p>
+<p>Conclusions:</p>
+<ul>
+<li>There is a main effect of Stroop condition.</li>
+<li>There is no main effect of Trial Type.</li>
+<li>No interaction is present.</li>
+</ul>
+</section>
+<section id="a-note-on-independence" class="slide level2">
+<h2>A Note on Independence</h2>
+<ul>
+<li><p>Models involving <code>trial_type</code> and <code>stroop</code> have so far assumed scores for each condition are <strong>independent</strong> of one-another. This isn’t true as they are <strong>within-subjects</strong> variables.</p></li>
+<li><p>We need to model this dependency to arrive at accurate parameter estimates and statistical tests.</p></li>
+<li><p>We will do this for linear models using <strong>multilevel models</strong> in later sessions.</p></li>
+<li><p>For now, we’ll stick to using techniques that account for this, e.g.&nbsp;<strong>within-subjects t-tests</strong> and <strong>within-subjects ANOVA</strong>. But bear in mind these are limited to categorical within-subjects variables.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="reproducing-typical-statistical-tests" class="title-slide slide level1 center">
+<h1>Reproducing Typical Statistical Tests</h1>
+<ul>
+<li><p>We’ll look at how to reproduce many of your typical statistical tests.</p></li>
+<li><p>Along the way we’ll see how they’re all part of the general linear model family.</p></li>
+</ul>
+</section>
+<section id="correlation" class="slide level2">
+<h2>Correlation</h2>
+<p>Test statistics are exactly the same.</p>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">cor.test</span>(</span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="sc">~</span> age <span class="sc">+</span> mean_log_rt,</span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="at">data =</span> lm_demo_data</span>
+<span id="cb24-4"><a href="#cb24-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  age and mean_log_rt
+t = 2.2302, df = 42, p-value = 0.03113
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.03156924 0.56746079
+sample estimates:
+      cor 
+0.3253999 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:60%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(</span>
+<span id="cb26-2"><a href="#cb26-2"></a>  mean_log_rt <span class="sc">~</span> age,</span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="at">data =</span> lm_demo_data</span>
+<span id="cb26-4"><a href="#cb26-4"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ age, data = lm_demo_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.33484 -0.07408  0.00314  0.06648  0.24318 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 6.834846   0.103670   65.93   &lt;2e-16 ***
+age         0.009343   0.004189    2.23   0.0311 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1167 on 42 degrees of freedom
+Multiple R-squared:  0.1059,    Adjusted R-squared:  0.0846 
+F-statistic: 4.974 on 1 and 42 DF,  p-value: 0.03113</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="within-subjects-t-test" class="slide level2">
+<h2>Within-subjects t-test</h2>
+<p>Test statistics are exactly the same.</p>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">t.test</span>(</span>
+<span id="cb28-2"><a href="#cb28-2"></a>  mean_log_rt <span class="sc">~</span> trial_type,</span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="at">paired =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="at">data =</span> lm_trial_data</span>
+<span id="cb28-5"><a href="#cb28-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Paired t-test
+
+data:  mean_log_rt by trial_type
+t = -7.1337, df = 43, p-value = 8.244e-09
+alternative hypothesis: true mean difference is not equal to 0
+95 percent confidence interval:
+ -0.04931115 -0.02757541
+sample estimates:
+mean difference 
+    -0.03844328 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:60%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(</span>
+<span id="cb30-2"><a href="#cb30-2"></a>  lm_trial_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(trial_type <span class="sc">==</span> <span class="st">"Repetition"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(mean_log_rt) <span class="sc">-</span></span>
+<span id="cb30-3"><a href="#cb30-3"></a>   lm_trial_data <span class="sc">|&gt;</span> <span class="fu">filter</span>(trial_type <span class="sc">==</span> <span class="st">"Switch"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(mean_log_rt) <span class="sc">~</span> <span class="dv">1</span></span>
+<span id="cb30-4"><a href="#cb30-4"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = pull(filter(lm_trial_data, trial_type == "Repetition"), 
+    mean_log_rt) - pull(filter(lm_trial_data, trial_type == "Switch"), 
+    mean_log_rt) ~ 1)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.096639 -0.026940  0.007308  0.022961  0.061888 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -0.038443   0.005389  -7.134 8.24e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.03575 on 43 degrees of freedom</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="between-subjects-t-test" class="slide level2">
+<h2>Between-subjects t-test</h2>
+<p>Test statistics are exactly the same if assuming variance is equal between groups. By default, R doesn’t assume this (i.e.&nbsp;using Welch’s t-test).</p>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">t.test</span>(</span>
+<span id="cb32-2"><a href="#cb32-2"></a>  mean_log_rt <span class="sc">~</span> gender,</span>
+<span id="cb32-3"><a href="#cb32-3"></a>  <span class="at">paired =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb32-4"><a href="#cb32-4"></a>  <span class="at">var.equal =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb32-5"><a href="#cb32-5"></a>  <span class="at">data =</span> lm_demo_data</span>
+<span id="cb32-6"><a href="#cb32-6"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Two Sample t-test
+
+data:  mean_log_rt by gender
+t = -0.79605, df = 42, p-value = 0.4305
+alternative hypothesis: true difference in means between group Female and group Male is not equal to 0
+95 percent confidence interval:
+ -0.10676353  0.04636183
+sample estimates:
+mean in group Female   mean in group Male 
+            7.051026             7.081227 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:60%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(</span>
+<span id="cb34-2"><a href="#cb34-2"></a>  mean_log_rt <span class="sc">~</span> gender, <span class="at">data =</span> lm_demo_data</span>
+<span id="cb34-3"><a href="#cb34-3"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ gender, data = lm_demo_data)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.308099 -0.056377 -0.003987  0.040539  0.298944 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  7.05103    0.02358 299.003   &lt;2e-16 ***
+genderMale   0.03020    0.03794   0.796     0.43    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1225 on 42 degrees of freedom
+Multiple R-squared:  0.01486,   Adjusted R-squared:  -0.008592 
+F-statistic: 0.6337 on 1 and 42 DF,  p-value: 0.4305</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="within-subjects-anova" class="slide level2">
+<h2>Within-subjects ANOVA</h2>
+<p>Here we specify that observations are grouped by participants so that we have paired responses from people for <code>stroop</code> and <code>trial_type</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>afex<span class="sc">::</span><span class="fu">aov_4</span>(</span>
+<span id="cb36-2"><a href="#cb36-2"></a>  mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> trial_type <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> stroop <span class="sc">+</span> trial_type <span class="sc">|</span> subject_id),</span>
+<span id="cb36-3"><a href="#cb36-3"></a>  <span class="at">data =</span> lm_two_way_data</span>
+<span id="cb36-4"><a href="#cb36-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type 3 tests)
+
+Response: mean_log_rt
+             Effect    df  MSE         F   ges p.value
+1            stroop 1, 43 0.01 57.49 ***  .113   &lt;.001
+2        trial_type 1, 43 0.00 52.22 ***  .022   &lt;.001
+3 stroop:trial_type 1, 43 0.00      1.10 &lt;.001    .301
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="within-subjects-anova-as-a-mixed-effects-model" class="slide level2">
+<h2>Within-subjects ANOVA (as a mixed-effects model)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a><span class="fu">anova</span>(<span class="fu">lmer</span>(</span>
+<span id="cb38-2"><a href="#cb38-2"></a>  mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> trial_type <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> stroop <span class="sc">+</span> trial_type <span class="sc">|</span> subject_id),</span>
+<span id="cb38-3"><a href="#cb38-3"></a>  <span class="at">data =</span> lm_two_way_data</span>
+<span id="cb38-4"><a href="#cb38-4"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+                    Sum Sq  Mean Sq NumDF  DenDF F value    Pr(&gt;F)    
+stroop            0.045288 0.045288     1 42.999 57.4858 1.868e-09 ***
+trial_type        0.041140 0.041140     1 43.000 52.2213 6.057e-09 ***
+stroop:trial_type 0.000865 0.000865     1 43.001  1.0979    0.3006    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="between-subjects-anova" class="slide level2">
+<h2>Between-subjects ANOVA</h2>
+<p>Here we specify that observations are grouped by <code>subject_id</code>. With only the intercept specify that gender is between-subjects.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="fu">aov_4</span>(</span>
+<span id="cb40-2"><a href="#cb40-2"></a>  mean_log_rt <span class="sc">~</span> gender <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject_id),</span>
+<span id="cb40-3"><a href="#cb40-3"></a>  <span class="at">observed =</span> <span class="st">"gender"</span>,</span>
+<span id="cb40-4"><a href="#cb40-4"></a>  <span class="at">data =</span> lm_demo_data</span>
+<span id="cb40-5"><a href="#cb40-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type 3 tests)
+
+Response: mean_log_rt
+  Effect    df  MSE    F  ges p.value
+1 gender 1, 42 0.02 0.63 .015    .430
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="between-subjects-anova-as-a-linear-model" class="slide level2">
+<h2>Between-subjects ANOVA (as a linear model)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(</span>
+<span id="cb42-2"><a href="#cb42-2"></a>  mean_log_rt <span class="sc">~</span> gender, <span class="at">data =</span> lm_demo_data</span>
+<span id="cb42-3"><a href="#cb42-3"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean_log_rt ~ gender, data = lm_demo_data)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.308099 -0.056377 -0.003987  0.040539  0.298944 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  7.05103    0.02358 299.003   &lt;2e-16 ***
+genderMale   0.03020    0.03794   0.796     0.43    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.1225 on 42 degrees of freedom
+Multiple R-squared:  0.01486,   Adjusted R-squared:  -0.008592 
+F-statistic: 0.6337 on 1 and 42 DF,  p-value: 0.4305</code></pre>
+</div>
+</div>
+</section>
+<section id="mixed-anova" class="slide level2">
+<h2>Mixed ANOVA</h2>
+<p>Here we specify that observations are grouped by participants so that we have paired responses from people for <code>stroop</code> and <code>trial_type</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>afex<span class="sc">::</span><span class="fu">aov_4</span>(</span>
+<span id="cb44-2"><a href="#cb44-2"></a>  mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> gender <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> stroop <span class="sc">|</span> subject_id),</span>
+<span id="cb44-3"><a href="#cb44-3"></a>  <span class="at">data =</span> lm_mixed_data</span>
+<span id="cb44-4"><a href="#cb44-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type 3 tests)
+
+Response: mean_log_rt
+         Effect    df  MSE         F  ges p.value
+1        gender 1, 42 0.03      0.70 .015    .406
+2        stroop 1, 42 0.00 51.87 *** .106   &lt;.001
+3 gender:stroop 1, 42 0.00      1.23 .003    .273
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="mixed-anova-as-a-mixed-effects-model" class="slide level2">
+<h2>Mixed ANOVA (as a mixed-effects model)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="fu">anova</span>(<span class="fu">lmer</span>(</span>
+<span id="cb46-2"><a href="#cb46-2"></a>  mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> gender <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject_id),</span>
+<span id="cb46-3"><a href="#cb46-3"></a>  <span class="at">data =</span> lm_mixed_data</span>
+<span id="cb46-4"><a href="#cb46-4"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+                Sum Sq  Mean Sq NumDF DenDF F value    Pr(&gt;F)    
+stroop        0.166872 0.166872     1    42 51.8679 7.486e-09 ***
+gender        0.002264 0.002264     1    42  0.7036    0.4063    
+stroop:gender 0.003963 0.003963     1    42  1.2317    0.2734    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="interim-summary" class="slide level2">
+<h2>Interim Summary</h2>
+<ul>
+<li>We’ve seen how using the formula method allows you to fit a range of models using a consistent interface.</li>
+<li>Often, we have cases where the Gaussian likelihood isn’t appropriate.</li>
+<li>Now we know how to fit many models, we might want to consider alternatives or do follow-up tests.</li>
+</ul>
+</section></section>
+<section>
+<section id="generalised-linear-models" class="title-slide slide level1 center">
+<h1>Generalised Linear Models</h1>
+
+</section>
+<section id="generalised-linear-models-1" class="slide level2">
+<h2>Generalised Linear Models</h2>
+<ul>
+<li><p>So far we’ve focused on the <strong>general linear model</strong> and its variants that assume residual errors to be normally distributed and the responses to be numeric and continuous with no upper or lower bounds.</p></li>
+<li><p>Often, one or both of these assumptions don’t hold true and you might like to assume a different <strong>data generating process</strong>.</p></li>
+<li><p>This is where <strong>generalised linear models</strong> come in.</p></li>
+</ul>
+</section>
+<section id="generalising-the-linear-model" class="slide level2">
+<h2>Generalising the Linear Model</h2>
+<p>Works by replacing the Gaussian likelihood with a different one (often still in the exponential family).</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_i \sim Binomial(n, p_i)\\
+logit(p_i) = \alpha + \beta X_i\\
+\end{aligned}
+\]</span></p>
+</section>
+<section id="generalising-the-linear-model-1" class="slide level2">
+<h2>Generalising the Linear Model</h2>
+<ul>
+<li><p>If we have binomial data, this is handled well by a binomial model.</p></li>
+<li><p>We specify the likelihood to be from a Binomial distribution from <strong><em>n</em> trials</strong> with <strong><em>p</em> probability of success</strong>.</p></li>
+<li><p>We use a <strong>link function</strong> to determine the shape of the likelihood. In this case, we use a <em>logit</em> link to determine <em>p</em> from the linear predictors. The link function maps the linear space of the model (unconstrained) onto the non-linear space of the expectation.</p></li>
+</ul>
+</section>
+<section id="likely-likelihoods" class="slide level2">
+<h2>Likely Likelihoods</h2>
+<ul>
+<li><p><strong>Binomial</strong>: Used for discrete data modelling the number of successes in a number of independent trials, e.g.&nbsp;<strong>accuracy</strong>.</p></li>
+<li><p><strong>Gamma</strong>: Used for continuous data constrained to be zero or positive. Handles skewed data well, e.g.&nbsp;<strong>reaction times</strong>. One alternative for RTs is the lognormal.</p></li>
+<li><p><strong>Poisson</strong>: Used for discrete data modelling the number of events happening in a fixed interval of time or space, e.g.&nbsp;<strong>correct answers in a timed test</strong>.</p></li>
+</ul>
+</section>
+<section id="a-generalised-linear-model-for-reaction-times" class="slide level2">
+<h2>A generalised linear model for reaction times</h2>
+<p>Let’s analyse reaction times using a Gamma likelihood with a log link. Instead of <code>lm()</code> use <code>glm()</code> and define the <code>family</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>mod_gamma <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb48-2"><a href="#cb48-2"></a>  mean_rt <span class="sc">~</span> age, </span>
+<span id="cb48-3"><a href="#cb48-3"></a>  <span class="at">family =</span> <span class="fu">Gamma</span>(<span class="at">link =</span> <span class="st">"log"</span>), </span>
+<span id="cb48-4"><a href="#cb48-4"></a>  <span class="at">data =</span> lm_demo_data</span>
+<span id="cb48-5"><a href="#cb48-5"></a>)</span>
+<span id="cb48-6"><a href="#cb48-6"></a><span class="fu">summary</span>(mod_gamma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = mean_rt ~ age, family = Gamma(link = "log"), data = lm_demo_data)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-0.33031  -0.07435  -0.00481   0.06621   0.24894  
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 6.881716   0.102798  66.944   &lt;2e-16 ***
+age         0.008991   0.004154   2.164   0.0362 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for Gamma family taken to be 0.01339918)
+
+    Null deviance: 0.64152  on 43  degrees of freedom
+Residual deviance: 0.57473  on 42  degrees of freedom
+AIC: 564.4
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="estimating-marginal-means" class="title-slide slide level1 center">
+<h1>Estimating Marginal Means</h1>
+<ul>
+<li><p>Often we might want to look at specific contrasts in a model when we haven’t defined these a-priori (e.g.&nbsp;finding a main effect but no interaction).</p></li>
+<li><p><a href="https://glennwilliams.me/blog/2021/03/17/estimating-marginal-means-and-pairwise-tests-by-hand-in-r/">Doing so by hand is difficult</a>, especially when considering errors.</p></li>
+<li><p>We can get model-based predictions and use these to summarise our data and perform pairwise tests.</p></li>
+</ul>
+</section>
+<section id="estimating-marginal-means-using-emmeans" class="slide level2">
+<h2>Estimating Marginal Means using <code>emmeans</code></h2>
+<p>First, let’s fit a two-way ANOVA on our data.</p>
+<p>We have a main effect of Stroop condition, but nothing else:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>mod <span class="ot">&lt;-</span> afex<span class="sc">::</span><span class="fu">aov_4</span>(</span>
+<span id="cb50-2"><a href="#cb50-2"></a>  mean_log_rt <span class="sc">~</span> stroop <span class="sc">*</span> gender <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> stroop <span class="sc">|</span> subject_id),</span>
+<span id="cb50-3"><a href="#cb50-3"></a>  <span class="at">data =</span> lm_mixed_data</span>
+<span id="cb50-4"><a href="#cb50-4"></a>)</span>
+<span id="cb50-5"><a href="#cb50-5"></a>mod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type 3 tests)
+
+Response: mean_log_rt
+         Effect    df  MSE         F  ges p.value
+1        gender 1, 42 0.03      0.70 .015    .406
+2        stroop 1, 42 0.00 51.87 *** .106   &lt;.001
+3 gender:stroop 1, 42 0.00      1.23 .003    .273
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="estimating-marginal-means-using-emmeans-1" class="slide level2">
+<h2>Estimating Marginal Means using <code>emmeans</code></h2>
+<p>We can use the <code>emmeans()</code> function from the <code>emmeans</code> package to get <strong>marginal means</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>emm_stroop <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(mod, <span class="sc">~</span>stroop)</span>
+<span id="cb52-2"><a href="#cb52-2"></a>emm_stroop</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> stroop      emmean     SE df lower.CL upper.CL
+ Incongruent   7.11 0.0214 42     7.07     7.16
+ Neutral       7.02 0.0185 42     6.99     7.06
+
+Results are averaged over the levels of: gender 
+Confidence level used: 0.95 </code></pre>
+</div>
+</div>
+</section>
+<section id="emmeans-on-the-response-scale" class="slide level2">
+<h2>Emmeans on the Response Scale</h2>
+<ul>
+<li><p>If we use <code>type = "response"</code>, we can get them on the response, not log, scale.</p></li>
+<li><p>But look! Since our model didn’t use a link, <code>emmeans</code> doesn’t know which scale to use.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>emm_stroop_resp <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(mod, <span class="sc">~</span>stroop, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb54-2"><a href="#cb54-2"></a>emm_stroop_resp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> stroop      emmean     SE df lower.CL upper.CL
+ Incongruent   7.11 0.0214 42     7.07     7.16
+ Neutral       7.02 0.0185 42     6.99     7.06
+
+Results are averaged over the levels of: gender 
+Confidence level used: 0.95 </code></pre>
+</div>
+</div>
+</section>
+<section id="updating-the-reference-grid" class="slide level2">
+<h2>Updating the Reference Grid</h2>
+<ul>
+<li>Estimates are made up from a <strong>reference grid</strong> of the unique levels within variables.</li>
+<li>With generalised linear models, the transformation on the response variable is also recorded and used in making predictions.</li>
+<li>In cases with pre-computed transformed outcomes, we can add the transformation manually:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>mod_rg <span class="ot">&lt;-</span> <span class="fu">update</span>(<span class="fu">ref_grid</span>(mod), <span class="at">tran =</span> <span class="st">"log"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="getting-emmeans-on-the-response-scale" class="slide level2">
+<h2>Getting Emmeans on the Response Scale</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>emm_stroop_resp <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(mod_rg, <span class="sc">~</span> stroop, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb57-2"><a href="#cb57-2"></a>emm_stroop_resp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> stroop      response   SE df lower.CL upper.CL
+ Incongruent     1227 26.2 42     1175     1281
+ Neutral         1122 20.8 42     1081     1165
+
+Results are averaged over the levels of: gender 
+Confidence level used: 0.95 
+Intervals are back-transformed from the log scale </code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="pairwise-tests" class="title-slide slide level1 center">
+<h1>Pairwise Tests</h1>
+
+</section>
+<section id="pairwise-tests-1" class="slide level2">
+<h2>Pairwise Tests</h2>
+<p>Pairwise tests are as simple as using <code>pairs()</code> on your fitted <code>emmeans</code> object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="fu">pairs</span>(emm_stroop_resp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast              ratio     SE df null t.ratio p.value
+ Incongruent / Neutral  1.09 0.0136 42    1   7.202  &lt;.0001
+
+Results are averaged over the levels of: gender 
+Tests are performed on the log scale </code></pre>
+</div>
+</div>
+</section>
+<section id="grouped-contrasts" class="slide level2">
+<h2>Grouped Contrasts</h2>
+<p>If we had reason to investigate simple effects we can do so by using the nesting operator to get contrasts within groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a><span class="fu">pairs</span>(</span>
+<span id="cb61-2"><a href="#cb61-2"></a>  <span class="fu">emmeans</span>(mod, <span class="sc">~</span> stroop <span class="sc">|</span> gender),</span>
+<span id="cb61-3"><a href="#cb61-3"></a>  <span class="at">adjust =</span> <span class="st">"holm"</span></span>
+<span id="cb61-4"><a href="#cb61-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>gender = Female:
+ contrast              estimate     SE df t.ratio p.value
+ Incongruent - Neutral   0.1032 0.0154 42   6.686  &lt;.0001
+
+gender = Male:
+ contrast              estimate     SE df t.ratio p.value
+ Incongruent - Neutral   0.0757 0.0195 42   3.889  0.0004</code></pre>
+</div>
+</div>
+</section>
+<section id="p-value-adjustment" class="slide level2">
+<h2>P-value Adjustment</h2>
+<p>We can specify different p-value adjustments here if we have multiple tests.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a><span class="fu">pairs</span>(</span>
+<span id="cb63-2"><a href="#cb63-2"></a>  <span class="fu">emmeans</span>(mod, <span class="sc">~</span> gender <span class="sc">*</span> stroop),</span>
+<span id="cb63-3"><a href="#cb63-3"></a>  <span class="at">adjust =</span> <span class="st">"holm"</span></span>
+<span id="cb63-4"><a href="#cb63-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast                              estimate     SE df t.ratio p.value
+ Female Incongruent - Male Incongruent  -0.0181 0.0427 42  -0.423  0.6743
+ Female Incongruent - Female Neutral     0.1032 0.0154 42   6.686  &lt;.0001
+ Female Incongruent - Male Neutral       0.0576 0.0393 42   1.464  0.4519
+ Male Incongruent - Female Neutral       0.1213 0.0406 42   2.986  0.0188
+ Male Incongruent - Male Neutral         0.0757 0.0195 42   3.889  0.0018
+ Female Neutral - Male Neutral          -0.0457 0.0370 42  -1.234  0.4519
+
+P value adjustment: holm method for 6 tests </code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="calculating-effect-sizes" class="title-slide slide level1 center">
+<h1>Calculating Effect Sizes</h1>
+<ul>
+<li><p>Often, it’s enough just to interpret coefficients on their natural scale.</p></li>
+<li><p>But in some cases you might want to provide standardised effect sizes along with your statistical tests. The <code>effectsize</code> package in <code>easystats</code> unsurprisingly makes this…easy.</p></li>
+</ul>
+</section>
+<section id="calculating-effect-sizes-for-anovas" class="slide level2">
+<h2>Calculating Effect Sizes for ANOVAs</h2>
+<p>Get lovely Greek symbols:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a><span class="fu">options</span>(<span class="at">es.use_symbols =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Take our ANOVA model fitted in <code>mod</code>. Common effect sizes include the (partial/generalised) Eta-squared:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a><span class="fu">eta_squared</span>(mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Effect Size for ANOVA (Type III)
+
+Parameter     | η² (partial) |       95% CI
+-------------------------------------------
+gender        |         0.02 | [0.00, 1.00]
+stroop        |         0.55 | [0.38, 1.00]
+gender:stroop |         0.03 | [0.00, 1.00]
+
+- One-sided CIs: upper bound fixed at [1.00].</code></pre>
+</div>
+</div>
+<p>You also have <code>epsilon_squared()</code> and <code>omega_squared()</code> as less biased options.</p>
+</section>
+<section id="calculating-effect-sizes-for-standardised-differences" class="slide level2">
+<h2>Calculating Effect Sizes for Standardised Differences</h2>
+<p>We have options for <code>cohens_d()</code> and <code>hedges_g()</code> for paired and independent samples, and <code>glass_delta()</code> for independent samples with different variances.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a><span class="fu">glass_delta</span>(mean_log_rt <span class="sc">~</span> gender, <span class="at">data =</span> lm_demo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Glass' Δ |        95% CI
+------------------------
+-0.22    | [-0.79, 0.36]</code></pre>
+</div>
+</div>
+</section>
+<section id="exercises" class="slide level2">
+<h2>Exercises</h2>
+<p>Please complete the exercises at <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p>
+<div class="footer footer-default">
+
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        target: function(trigger) {
+          return trigger.previousElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto-reveal',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

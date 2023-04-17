@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Glenn Williams">
+<meta name="dcterms.date" content="2023-04-17">
+
+<title>Core Statistics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="questions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="questions_files/libs/quarto-html/quarto.js"></script>
+<script src="questions_files/libs/quarto-html/popper.min.js"></script>
+<script src="questions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="questions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="questions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="questions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="questions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="questions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="questions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Core Statistics</h1>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      Glenn Williams 
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Northumbria University
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 17, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">April 17, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Abstract</div>
+      The general linear model
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
+  <li><a href="#basics" id="toc-basics" class="nav-link" data-scroll-target="#basics">Basics</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-t-tests" id="toc-exercise-1.-t-tests" class="nav-link" data-scroll-target="#exercise-1.-t-tests">Exercise 1. t-tests</a>
+  <ul class="collapse">
+  <li><a href="#a.-make-mean-log-reaction-times-for-each-person-split-by-task." id="toc-a.-make-mean-log-reaction-times-for-each-person-split-by-task." class="nav-link" data-scroll-target="#a.-make-mean-log-reaction-times-for-each-person-split-by-task.">A. Make mean log reaction times for each person split by task.</a></li>
+  <li><a href="#b.-make-a-box-plot-of-the-mean-log-reaction-times-split-by-task." id="toc-b.-make-a-box-plot-of-the-mean-log-reaction-times-split-by-task." class="nav-link" data-scroll-target="#b.-make-a-box-plot-of-the-mean-log-reaction-times-split-by-task.">B. Make a box plot of the mean log reaction times split by task.</a></li>
+  <li><a href="#c.-carry-out-the-appropriate-t-test-for-the-mean-log-reaction-times-by-task." id="toc-c.-carry-out-the-appropriate-t-test-for-the-mean-log-reaction-times-by-task." class="nav-link" data-scroll-target="#c.-carry-out-the-appropriate-t-test-for-the-mean-log-reaction-times-by-task.">C. Carry out the appropriate t-test for the mean log reaction times by task.</a></li>
+  <li><a href="#d.-make-the-appropriate-standardised-effect-sizes-for-your-mean-log-reaction-times-split-by-task." id="toc-d.-make-the-appropriate-standardised-effect-sizes-for-your-mean-log-reaction-times-split-by-task." class="nav-link" data-scroll-target="#d.-make-the-appropriate-standardised-effect-sizes-for-your-mean-log-reaction-times-split-by-task.">D. Make the appropriate standardised effect sizes for your mean log reaction times split by task.</a></li>
+  </ul></li>
+  <li><a href="#exercise-2.-automated-reporting" id="toc-exercise-2.-automated-reporting" class="nav-link" data-scroll-target="#exercise-2.-automated-reporting">Exercise 2. Automated Reporting</a>
+  <ul class="collapse">
+  <li><a href="#a.-report-the-t-test-test-statistics-along-with-the-effect-sizes-from-exercise-1." id="toc-a.-report-the-t-test-test-statistics-along-with-the-effect-sizes-from-exercise-1." class="nav-link" data-scroll-target="#a.-report-the-t-test-test-statistics-along-with-the-effect-sizes-from-exercise-1.">A. Report the t-test test statistics along with the effect sizes from Exercise 1.</a></li>
+  <li><a href="#b.-look-up-the-report-function-from-easystats.-use-this-to-redo-your-report-in-2a." id="toc-b.-look-up-the-report-function-from-easystats.-use-this-to-redo-your-report-in-2a." class="nav-link" data-scroll-target="#b.-look-up-the-report-function-from-easystats.-use-this-to-redo-your-report-in-2a.">B. Look up the <code>report()</code> function from <code>easystats()</code>. Use this to redo your report in 2A.</a></li>
+  </ul></li>
+  <li><a href="#exercise-3.-anovas" id="toc-exercise-3.-anovas" class="nav-link" data-scroll-target="#exercise-3.-anovas">Exercise 3. ANOVAs</a></li>
+  <li><a href="#a.-aggregate-the-data-for-each-participant-by-task-length-and-stimulus-creating-mean-log-rts." id="toc-a.-aggregate-the-data-for-each-participant-by-task-length-and-stimulus-creating-mean-log-rts." class="nav-link" data-scroll-target="#a.-aggregate-the-data-for-each-participant-by-task-length-and-stimulus-creating-mean-log-rts.">A. Aggregate the data for each participant by task, length, and stimulus, creating mean log RTs.</a>
+  <ul class="collapse">
+  <li><a href="#b.-fit-the-appropriate-anova-for-the-data-looking-for-all-main-effects-and-interactions-between-task-length-and-stimulus." id="toc-b.-fit-the-appropriate-anova-for-the-data-looking-for-all-main-effects-and-interactions-between-task-length-and-stimulus." class="nav-link" data-scroll-target="#b.-fit-the-appropriate-anova-for-the-data-looking-for-all-main-effects-and-interactions-between-task-length-and-stimulus.">B. Fit the appropriate ANOVA for the data looking for all main effects and interactions between task, length, and stimulus.</a></li>
+  <li><a href="#c.-explore-the-estimated-marginal-means-for-task-and-stimulus-from-your-anova-model" id="toc-c.-explore-the-estimated-marginal-means-for-task-and-stimulus-from-your-anova-model" class="nav-link" data-scroll-target="#c.-explore-the-estimated-marginal-means-for-task-and-stimulus-from-your-anova-model">C. Explore the estimated marginal means for task and stimulus from your ANOVA model</a></li>
+  <li><a href="#d.-conduct-pairwise-tests-for-the-task-by-stimulus-interaction." id="toc-d.-conduct-pairwise-tests-for-the-task-by-stimulus-interaction." class="nav-link" data-scroll-target="#d.-conduct-pairwise-tests-for-the-task-by-stimulus-interaction.">D. Conduct pairwise tests for the task by stimulus interaction.</a></li>
+  <li><a href="#e.-make-a-plot-of-the-pairwise-contrasts." id="toc-e.-make-a-plot-of-the-pairwise-contrasts." class="nav-link" data-scroll-target="#e.-make-a-plot-of-the-pairwise-contrasts.">E. Make a plot of the pairwise contrasts.</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#advanced" id="toc-advanced" class="nav-link" data-scroll-target="#advanced">Advanced</a>
+  <ul class="collapse">
+  <li><a href="#exercise-4.-linear-models" id="toc-exercise-4.-linear-models" class="nav-link" data-scroll-target="#exercise-4.-linear-models">Exercise 4. Linear Models</a>
+  <ul class="collapse">
+  <li><a href="#a.-aggregate-the-data-by-id-and-task-removing-nonword-stimuli-to-create-mean-log-reaction-times-and-reaction-times." id="toc-a.-aggregate-the-data-by-id-and-task-removing-nonword-stimuli-to-create-mean-log-reaction-times-and-reaction-times." class="nav-link" data-scroll-target="#a.-aggregate-the-data-by-id-and-task-removing-nonword-stimuli-to-create-mean-log-reaction-times-and-reaction-times.">A. Aggregate the data by id and task removing nonword stimuli to create mean log reaction times and reaction times.</a></li>
+  </ul></li>
+  <li><a href="#b.-fit-a-linear-model-using-treatment-coding-and-another-using-sum-coding.-compare-the-model-estimates.-what-changes-what-doesnt-why" id="toc-b.-fit-a-linear-model-using-treatment-coding-and-another-using-sum-coding.-compare-the-model-estimates.-what-changes-what-doesnt-why" class="nav-link" data-scroll-target="#b.-fit-a-linear-model-using-treatment-coding-and-another-using-sum-coding.-compare-the-model-estimates.-what-changes-what-doesnt-why">B. Fit a linear model using treatment coding and another using sum coding. Compare the model estimates. What changes? What doesn’t? Why?</a>
+  <ul class="collapse">
+  <li><a href="#c.-create-a-new-column-in-your-data-set-called-task_sum-giving-the-numeric-values-of--1-to-naming-and-1-to-lexdec.-make-another-column-called-task_deviation-giving-the-values-of--.5-to-naming-and-.5-to-lexdec.-fit-two-separate-models-using-each-of-these-predictors-instead-of-the-factor-task.-compare-the-results.-what-do-you-see-whats-similar-whats-different" id="toc-c.-create-a-new-column-in-your-data-set-called-task_sum-giving-the-numeric-values-of--1-to-naming-and-1-to-lexdec.-make-another-column-called-task_deviation-giving-the-values-of--.5-to-naming-and-.5-to-lexdec.-fit-two-separate-models-using-each-of-these-predictors-instead-of-the-factor-task.-compare-the-results.-what-do-you-see-whats-similar-whats-different" class="nav-link" data-scroll-target="#c.-create-a-new-column-in-your-data-set-called-task_sum-giving-the-numeric-values-of--1-to-naming-and-1-to-lexdec.-make-another-column-called-task_deviation-giving-the-values-of--.5-to-naming-and-.5-to-lexdec.-fit-two-separate-models-using-each-of-these-predictors-instead-of-the-factor-task.-compare-the-results.-what-do-you-see-whats-similar-whats-different">C. Create a new column in your data set called <code>task_sum</code>, giving the numeric values of -1 to naming and 1 to lexdec. Make another column called <code>task_deviation</code>, giving the values of -.5 to naming and .5 to lexdec. Fit two separate models using each of these predictors instead of the factor <code>task</code>. Compare the results. What do you see? What’s similar? What’s different?</a></li>
+  </ul></li>
+  <li><a href="#exercise-5.-generalised-linear-models" id="toc-exercise-5.-generalised-linear-models" class="nav-link" data-scroll-target="#exercise-5.-generalised-linear-models">Exercise 5. Generalised Linear Models</a>
+  <ul class="collapse">
+  <li><a href="#a.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-log-link." id="toc-a.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-log-link." class="nav-link" data-scroll-target="#a.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-log-link.">A. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the log link.</a></li>
+  <li><a href="#b.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-inverse-link." id="toc-b.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-inverse-link." class="nav-link" data-scroll-target="#b.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-inverse-link.">B. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the inverse link.</a></li>
+  <li><a href="#does-anything-change-between-a-and-b-how-does-this-affect-the-estimated-marginal-means-on-the-response-scale-why-which-link-function-would-you-prefer-to-report-and-why" id="toc-does-anything-change-between-a-and-b-how-does-this-affect-the-estimated-marginal-means-on-the-response-scale-why-which-link-function-would-you-prefer-to-report-and-why" class="nav-link" data-scroll-target="#does-anything-change-between-a-and-b-how-does-this-affect-the-estimated-marginal-means-on-the-response-scale-why-which-link-function-would-you-prefer-to-report-and-why">Does anything change between A and B? How does this affect the estimated marginal means on the response scale? Why? Which link function would you prefer to report and why?</a></li>
+  </ul></li>
+  <li><a href="#exercise-6.-diagnosing-issues-with-model-fit" id="toc-exercise-6.-diagnosing-issues-with-model-fit" class="nav-link" data-scroll-target="#exercise-6.-diagnosing-issues-with-model-fit">Exercise 6. Diagnosing Issues with Model Fit</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="instructions" class="level1">
+<h1>Instructions</h1>
+<p>Complete the following exercises. The basics will get you used to using the core functions. The advanced exercises will focus more on understanding and making model choices.</p>
+</section>
+<section id="basics" class="level1">
+<h1>Basics</h1>
+<p>First off, load the libraries you’ll need for the exercises. As always, load the <code>tidyverse</code> library for working with data and the <code>here</code> library for working with file paths. We will also use the <code>janitor</code> library for cleaning column names.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(easystats)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(afex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Load the <code>fhch2010</code> data set from the <code>afex</code>.</p>
+<p>This data set is from an experiment where participants either name words out loud or make a lexical decision (clicking one button to indicate a word is a real word, e.g.&nbsp;fill, or another to indicate it is a non-word, e.g.&nbsp;xazz). The words themselves are defined in groups as being words or non-words. Along with this we have id, the participant’s ID number; item, the written form of the target stimulus; rt, or reaction time in seconds; and log_rt, the log transformed form of the rt column. (Note log transformation is often used for reaction times to make them more ‘normal’, though other methods for handling the skew in this sort of data can be used.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"fhch2010"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(fhch2010)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 13,222
+Columns: 10
+$ id        &lt;fct&gt; N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, …
+$ task      &lt;fct&gt; naming, naming, naming, naming, naming, naming, naming, nami…
+$ stimulus  &lt;fct&gt; word, word, word, nonword, nonword, word, nonword, nonword, …
+$ density   &lt;fct&gt; high, low, low, high, low, high, low, low, low, low, high, l…
+$ frequency &lt;fct&gt; low, high, high, high, high, high, low, high, low, high, low…
+$ length    &lt;fct&gt; 6, 6, 5, 5, 4, 4, 6, 5, 4, 6, 5, 5, 5, 4, 4, 5, 6, 4, 6, 6, …
+$ item      &lt;fct&gt; potted, engine, ideal, uares, xazz, fill, bounge, psems, jol…
+$ rt        &lt;dbl&gt; 1.091, 0.876, 0.710, 1.210, 0.843, 0.785, 0.662, 0.713, 0.75…
+$ log_rt    &lt;dbl&gt; 0.08709471, -0.13238919, -0.34249031, 0.19062036, -0.1707883…
+$ correct   &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, …</code></pre>
+</div>
+</div>
+<p>Remove the errors from one version of the data set so we only look at reaction times.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fhch_rt <span class="ot">&lt;-</span> fhch2010 <span class="sc">|&gt;</span> <span class="fu">filter</span>(correct <span class="sc">==</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-1.-t-tests" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1.-t-tests">Exercise 1. t-tests</h2>
+<section id="a.-make-mean-log-reaction-times-for-each-person-split-by-task." class="level3">
+<h3 class="anchored" data-anchor-id="a.-make-mean-log-reaction-times-for-each-person-split-by-task.">A. Make mean log reaction times for each person split by task.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="b.-make-a-box-plot-of-the-mean-log-reaction-times-split-by-task." class="level3">
+<h3 class="anchored" data-anchor-id="b.-make-a-box-plot-of-the-mean-log-reaction-times-split-by-task.">B. Make a box plot of the mean log reaction times split by task.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="c.-carry-out-the-appropriate-t-test-for-the-mean-log-reaction-times-by-task." class="level3">
+<h3 class="anchored" data-anchor-id="c.-carry-out-the-appropriate-t-test-for-the-mean-log-reaction-times-by-task.">C. Carry out the appropriate t-test for the mean log reaction times by task.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="d.-make-the-appropriate-standardised-effect-sizes-for-your-mean-log-reaction-times-split-by-task." class="level3">
+<h3 class="anchored" data-anchor-id="d.-make-the-appropriate-standardised-effect-sizes-for-your-mean-log-reaction-times-split-by-task.">D. Make the appropriate standardised effect sizes for your mean log reaction times split by task.</h3>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-2.-automated-reporting" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2.-automated-reporting">Exercise 2. Automated Reporting</h2>
+<section id="a.-report-the-t-test-test-statistics-along-with-the-effect-sizes-from-exercise-1." class="level3">
+<h3 class="anchored" data-anchor-id="a.-report-the-t-test-test-statistics-along-with-the-effect-sizes-from-exercise-1.">A. Report the t-test test statistics along with the effect sizes from Exercise 1.</h3>
+<p>To mix R code with text you can use a backtick followed by the letter r, e.g.&nbsp;`r. Close it with another backtick to contain your R code so it can be executed. Any code here will have the result printed in text.</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="b.-look-up-the-report-function-from-easystats.-use-this-to-redo-your-report-in-2a." class="level3">
+<h3 class="anchored" data-anchor-id="b.-look-up-the-report-function-from-easystats.-use-this-to-redo-your-report-in-2a.">B. Look up the <code>report()</code> function from <code>easystats()</code>. Use this to redo your report in 2A.</h3>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-3.-anovas" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3.-anovas">Exercise 3. ANOVAs</h2>
+</section>
+<section id="a.-aggregate-the-data-for-each-participant-by-task-length-and-stimulus-creating-mean-log-rts." class="level2">
+<h2 class="anchored" data-anchor-id="a.-aggregate-the-data-for-each-participant-by-task-length-and-stimulus-creating-mean-log-rts.">A. Aggregate the data for each participant by task, length, and stimulus, creating mean log RTs.</h2>
+<div class="cell">
+
+</div>
+<section id="b.-fit-the-appropriate-anova-for-the-data-looking-for-all-main-effects-and-interactions-between-task-length-and-stimulus." class="level3">
+<h3 class="anchored" data-anchor-id="b.-fit-the-appropriate-anova-for-the-data-looking-for-all-main-effects-and-interactions-between-task-length-and-stimulus.">B. Fit the appropriate ANOVA for the data looking for all main effects and interactions between task, length, and stimulus.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="c.-explore-the-estimated-marginal-means-for-task-and-stimulus-from-your-anova-model" class="level3">
+<h3 class="anchored" data-anchor-id="c.-explore-the-estimated-marginal-means-for-task-and-stimulus-from-your-anova-model">C. Explore the estimated marginal means for task and stimulus from your ANOVA model</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="d.-conduct-pairwise-tests-for-the-task-by-stimulus-interaction." class="level3">
+<h3 class="anchored" data-anchor-id="d.-conduct-pairwise-tests-for-the-task-by-stimulus-interaction.">D. Conduct pairwise tests for the task by stimulus interaction.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="e.-make-a-plot-of-the-pairwise-contrasts." class="level3">
+<h3 class="anchored" data-anchor-id="e.-make-a-plot-of-the-pairwise-contrasts.">E. Make a plot of the pairwise contrasts.</h3>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Try using the function <code>plot()</code> on your pairwise tests model object.</p>
+</div>
+</div>
+<div class="cell">
+
+</div>
+</section>
+</section>
+</section>
+<section id="advanced" class="level1">
+<h1>Advanced</h1>
+<section id="exercise-4.-linear-models" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4.-linear-models">Exercise 4. Linear Models</h2>
+<section id="a.-aggregate-the-data-by-id-and-task-removing-nonword-stimuli-to-create-mean-log-reaction-times-and-reaction-times." class="level3">
+<h3 class="anchored" data-anchor-id="a.-aggregate-the-data-by-id-and-task-removing-nonword-stimuli-to-create-mean-log-reaction-times-and-reaction-times.">A. Aggregate the data by id and task removing nonword stimuli to create mean log reaction times and reaction times.</h3>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="b.-fit-a-linear-model-using-treatment-coding-and-another-using-sum-coding.-compare-the-model-estimates.-what-changes-what-doesnt-why" class="level2">
+<h2 class="anchored" data-anchor-id="b.-fit-a-linear-model-using-treatment-coding-and-another-using-sum-coding.-compare-the-model-estimates.-what-changes-what-doesnt-why">B. Fit a linear model using treatment coding and another using sum coding. Compare the model estimates. What changes? What doesn’t? Why?</h2>
+<p>Default, treatment contrasts:</p>
+<div class="cell">
+
+</div>
+<p>Sum-coded contrasts:</p>
+<div class="cell">
+
+</div>
+<section id="c.-create-a-new-column-in-your-data-set-called-task_sum-giving-the-numeric-values-of--1-to-naming-and-1-to-lexdec.-make-another-column-called-task_deviation-giving-the-values-of--.5-to-naming-and-.5-to-lexdec.-fit-two-separate-models-using-each-of-these-predictors-instead-of-the-factor-task.-compare-the-results.-what-do-you-see-whats-similar-whats-different" class="level3">
+<h3 class="anchored" data-anchor-id="c.-create-a-new-column-in-your-data-set-called-task_sum-giving-the-numeric-values-of--1-to-naming-and-1-to-lexdec.-make-another-column-called-task_deviation-giving-the-values-of--.5-to-naming-and-.5-to-lexdec.-fit-two-separate-models-using-each-of-these-predictors-instead-of-the-factor-task.-compare-the-results.-what-do-you-see-whats-similar-whats-different">C. Create a new column in your data set called <code>task_sum</code>, giving the numeric values of -1 to naming and 1 to lexdec. Make another column called <code>task_deviation</code>, giving the values of -.5 to naming and .5 to lexdec. Fit two separate models using each of these predictors instead of the factor <code>task</code>. Compare the results. What do you see? What’s similar? What’s different?</h3>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-5.-generalised-linear-models" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5.-generalised-linear-models">Exercise 5. Generalised Linear Models</h2>
+<section id="a.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-log-link." class="level3">
+<h3 class="anchored" data-anchor-id="a.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-log-link.">A. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the log link.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="b.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-inverse-link." class="level3">
+<h3 class="anchored" data-anchor-id="b.-fit-a-gamma-model-for-the-reaction-times-using-task-as-a-predictor.-ensure-you-use-the-inverse-link.">B. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the inverse link.</h3>
+<div class="cell">
+
+</div>
+</section>
+<section id="does-anything-change-between-a-and-b-how-does-this-affect-the-estimated-marginal-means-on-the-response-scale-why-which-link-function-would-you-prefer-to-report-and-why" class="level3">
+<h3 class="anchored" data-anchor-id="does-anything-change-between-a-and-b-how-does-this-affect-the-estimated-marginal-means-on-the-response-scale-why-which-link-function-would-you-prefer-to-report-and-why">Does anything change between A and B? How does this affect the estimated marginal means on the response scale? Why? Which link function would you prefer to report and why?</h3>
+<div class="cell">
+
+</div>
+</section>
+</section>
+<section id="exercise-6.-diagnosing-issues-with-model-fit" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.-diagnosing-issues-with-model-fit">Exercise 6. Diagnosing Issues with Model Fit</h2>
+<p>Investigate the assumptions of your two Gamma models. Are the models appropriate for your data? Compare this to your linear model of log reaction times. Which model would you prefer?</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+<div class="cell">
+
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

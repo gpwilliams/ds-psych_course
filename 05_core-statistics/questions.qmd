@@ -1,0 +1,204 @@
+---
+title: "Core Statistics"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-04-17"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "The general linear model"
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to using the core functions. The advanced exercises will focus more on understanding and making model choices.
+
+# Basics
+
+First off, load the libraries you'll need for the exercises. As always, load the `tidyverse` library for working with data and the `here` library for working with file paths. We will also use the `janitor` library for cleaning column names.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(emmeans)
+library(easystats)
+library(afex)
+```
+
+Load the `fhch2010` data set from the `afex`.
+
+This data set is from an experiment where participants either name words out loud or make a lexical decision (clicking one button to indicate a word is a real word, e.g. fill, or another to indicate it is a non-word, e.g. xazz). The words themselves are defined in groups as being words or non-words. Along with this we have id, the participant's ID number; item, the written form of the target stimulus; rt, or reaction time in seconds; and log_rt, the log transformed form of the rt column. (Note log transformation is often used for reaction times to make them more 'normal', though other methods for handling the skew in this sort of data can be used.)
+
+```{r}
+data("fhch2010")
+glimpse(fhch2010)
+```
+
+Remove the errors from one version of the data set so we only look at reaction times.
+
+```{r}
+fhch_rt <- fhch2010 |> filter(correct == TRUE)
+```
+
+## Exercise 1. t-tests
+
+### A. Make mean log reaction times for each person split by task.
+
+```{r}
+
+```
+
+### B. Make a box plot of the mean log reaction times split by task.
+
+```{r}
+
+```
+
+### C. Carry out the appropriate t-test for the mean log reaction times by task.
+
+```{r}
+
+```
+
+### D. Make the appropriate standardised effect sizes for your mean log reaction times split by task.
+
+```{r}
+
+```
+
+## Exercise 2. Automated Reporting
+
+### A. Report the t-test test statistics along with the effect sizes from Exercise 1.
+
+To mix R code with text you can use a backtick followed by the letter r, e.g. \`r. Close it with another backtick to contain your R code so it can be executed. Any code here will have the result printed in text.
+
+```{r}
+
+```
+
+### B. Look up the `report()` function from `easystats()`. Use this to redo your report in 2A.
+
+```{r}
+
+```
+
+## Exercise 3. ANOVAs
+
+## A. Aggregate the data for each participant by task, length, and stimulus, creating mean log RTs.
+
+```{r}
+
+```
+
+### B. Fit the appropriate ANOVA for the data looking for all main effects and interactions between task, length, and stimulus.
+
+```{r}
+
+```
+
+### C. Explore the estimated marginal means for task and stimulus from your ANOVA model
+
+```{r}
+
+```
+
+### D. Conduct pairwise tests for the task by stimulus interaction.
+
+```{r}
+
+```
+
+### E. Make a plot of the pairwise contrasts.
+
+::: callout-note
+Try using the function `plot()` on your pairwise tests model object.
+:::
+
+```{r}
+
+```
+
+# Advanced
+
+## Exercise 4. Linear Models
+
+### A. Aggregate the data by id and task removing nonword stimuli to create mean log reaction times and reaction times.
+
+```{r}
+
+```
+
+## B. Fit a linear model using treatment coding and another using sum coding. Compare the model estimates. What changes? What doesn't? Why?
+
+Default, treatment contrasts:
+
+```{r}
+
+```
+
+Sum-coded contrasts:
+
+```{r}
+
+```
+
+### C. Create a new column in your data set called `task_sum`, giving the numeric values of -1 to naming and 1 to lexdec. Make another column called `task_deviation`, giving the values of -.5 to naming and .5 to lexdec. Fit two separate models using each of these predictors instead of the factor `task`. Compare the results. What do you see? What's similar? What's different?
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Exercise 5. Generalised Linear Models
+
+### A. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the log link.
+
+```{r}
+
+```
+
+### B. Fit a Gamma model for the reaction times using task as a predictor. Ensure you use the inverse link.
+
+```{r}
+
+```
+
+### Does anything change between A and B? How does this affect the estimated marginal means on the response scale? Why? Which link function would you prefer to report and why?
+
+```{r}
+
+```
+
+## Exercise 6. Diagnosing Issues with Model Fit
+
+Investigate the assumptions of your two Gamma models. Are the models appropriate for your data? Compare this to your linear model of log reaction times. Which model would you prefer?
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

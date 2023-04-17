@@ -1,0 +1,751 @@
+---
+title: "Core Statistics"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+editor: visual
+---
+
+## Overview
+
+::: r-fit-text
+Today's session is on core statistics:
+
+-   The general linear model as a unifying framework for data analysis involving categorical and continuous variables.
+
+-   Understanding the R formula syntax for building models.
+
+-   Contrast coding for variables and its impact on parameter estimates.
+
+-   Extending the general linear model with link functions to handle data with various data generation processes (i.e. generalised linear models).
+
+-   Reproducing correlations, t-tests, and ANOVAs in R, and these relate to the general linear model.
+
+-   Calculating estimated marginal means and conducting pairwise tests using the `emmeans` package.
+
+-   Generating standardised effect sizes using the `effectsize` package from the `easystats` package.
+:::
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `05_core-statistics`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+## Loading Packages
+
+Load our essential packages, `tidyverse` for data wrangling and presentation and `here` for working with file paths.
+
+We also use `emmeans` for estimated marginal means and pairwise tests, and `easystats` for its child package `effectsize`. It also has some other handy packages rolled into it. Finally, we'll use `afex` for analysing factorial experimental data.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(emmeans)
+library(easystats)
+library(afex)
+```
+
+# Our Data
+
+We'll reuse the Arabic Stroop data from the upcoming Williams et al. paper on cross- and within-language control processes.
+
+We'll aggregate the data by subjects in various ways depending on what we'll show off as we go ahead.
+
+## Some Fancy Code
+
+This produces our data sets that we'll use in the walkthrough.
+
+```{r}
+#| message: false
+all_data <- left_join(
+  read_csv(here("data", "arabic_stroop.csv")),
+  read_csv(
+    here("data", "arabic_stroop_demographics.csv"),
+    col_select = c("SubjectID", "ParticipantAge", "ParticipantGender")
+  )
+) |> 
+  janitor::clean_names() |> 
+  rename(age = participant_age, gender = participant_gender) |> 
+  filter(
+    accuracy == "Correct", 
+  !is.na(rt), rt > 150 & rt < 2500, 
+  !is.na(trial_type),
+  gender %in% c("Male", "Female")
+  )
+
+lm_demo_data <- all_data |>
+  group_by(subject_id, age, gender) |> 
+  summarise(
+    mean_rt = mean(rt),
+    mean_log_rt = mean(log(rt)),
+    .groups = "drop"
+  )
+
+lm_trial_data <- all_data |>
+  group_by(subject_id, trial_type) |> 
+  summarise(
+    mean_rt = mean(rt),
+    mean_log_rt = mean(log(rt)),
+    .groups = "drop"
+  )
+
+lm_two_way_data <- all_data |>
+  group_by(subject_id, trial_type, stroop) |> 
+  summarise(
+    mean_rt = mean(rt),
+    mean_log_rt = mean(log(rt)),
+    .groups = "drop"
+  )
+
+lm_mixed_data <- all_data |>
+  group_by(subject_id, age, gender, stroop) |> 
+  summarise(
+    mean_rt = mean(rt),
+    mean_log_rt = mean(log(rt)),
+    .groups = "drop"
+  )
+```
+
+## Understanding Our Data
+
+We have a few data sets with variables like:
+
+-   `age`: Continuous, between-subjects variable of age in years.
+-   `gender`: Caregorical, between-subjects variable with levels male and female.
+-   `trial_type`: Categorical, within-subjects variable with levels repeat (i.e. speak in the same language) or switch (i.e. switch to a new language).
+-   `stroop`: Categorical, within-subjects variable with levels neutral (e.g. say the ink colour of the word "horse") or incongruent (e.g. say the ink colour of the word "orange" where ink colour doesn't match the word).
+
+# The General Linear Model
+
+The general linear model is the basis of many different statistical models (e.g. linear regression, all flavours of ANOVA, t-tests etc.)
+
+-   Model unbounded continuous outcomes from continuous and/or categorical predictors.
+-   Estimate model parameters using ordinary least squares or maximum likelihood estimation.
+
+## General Linear Model Formula
+
+In a simple form, the general linear model is often expressed as:
+
+$$Y_i = \alpha + \beta Xi + e_i$$
+
+Each observation $Y_i$, is made up from:
+
+-   A shared **intercept** ($\alpha$).
+-   A shared **slope** ($\beta$) for a predictor multiplied by the participant's value for said predictor.
+-   The individual's **error** ($e$), assumed to be $e_i \sim \mathcal{N}(0, \sigma^2)$ (and **only the error has this assumption **). Observations are *i.i.d.*
+
+## Understanding Model Implications
+
+As per McElreath (2016), the linear model can be rewritten as:
+
+$$
+\begin{aligned}
+Y_i \sim \mathcal{N}(\mu, \sigma^2)\\
+\mu = \alpha + \beta X_i\\
+\end{aligned}
+$$
+
+-   This might make it clearer that the **likelihood is Gaussian** (i.e. Normal), meaning the response variable is numeric and continuous with no upper or lower bounds.
+
+-   Notice, the model also makes no assumptions about **by-subjects** effects or **by-items** effects, thus meaning it isn't appropriate to model trial-level data. We have to work with single scores.
+
+# The R Formula Interface
+
+R has a shorthand for writing model formulae allowing you to specify arbitrarily complex models using the **design formula**.
+
+## The R Formula Interface
+
+We remove everything from the model excluding variables, so that:
+
+$$Y_i = \alpha + \beta X_i + e_i$$
+
+equates to:
+
+`y ~ 1 + x`
+
+- Where y is the name of the outcome, 1 is the intercept and X is the name of our predictor.
+
+- Interactions are added using `:`, i.e. `y ~ 1 + x1 + x2 + x1:x2`. This can be shortened to `y ~ x1 * x2`.
+
+## Specifying a Linear Model
+
+Let's fit a linear model using `age` as a predictor to determine `mean_log_rt`. Assign it to the object, `mod_age`.
+
+-   Use the `lm()` function to fit a linear model.
+-   Outcomes go to the **LHS** of the `~` (tilde).
+-   Predictors go to the **RHS** of the `~` (note, `1` is used to define the intercept and is optional).
+-   Define the data source using the `data` argument.
+
+```{r}
+mod_age <- lm(mean_log_rt ~ 1 + age, data = lm_demo_data)
+```
+
+## Understanding the Linear Model Output
+
+`summary()` summarises the fitted formula call, residual error, model coefficients, and various other statistics.
+
+```{r}
+summary(mod_age)
+```
+
+## Understanding the Parameter Estimates
+
+-   **Intercept**: when the predictor(s) are 0, what's the score for the outcome?
+-   **Age (slope)**: For every 1 unit increase in age, what's the increase in the outcome?
+
+So, for a 34 year-old, the model-based predicted score is **Intercept + Age × 34**.
+
+*In reality, it'll be different to this, hence the **residual error** the model can't explain.*
+
+## Understanding the Parameter Estimates
+
+```{r}
+#| echo: false
+#| message: false
+curve_dat <- tibble(
+  x1 = 10,
+  x2 = 0,
+  y1 = 6.8,
+  y2 = coef(mod_age)[[1]]
+)
+
+lm_demo_data |> 
+  mutate(my_model = predict(mod_age)) |> 
+  ggplot(aes(x = age, y = mean_log_rt)) +
+  geom_point() +
+  coord_cartesian(xlim = c(0, 40)) +
+  geom_abline(intercept = coef(mod_age)[[1]], slope = coef(mod_age)[[2]]) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_curve(
+    aes(x = x1, y = y1, xend = x2, yend = y2),
+    data = curve_dat,
+    arrow = arrow(length = unit(0.03, "npc")),
+    angle = 90,
+    curvature = -0.2
+  ) +
+  geom_label(aes(x = 13.5, y = 6.8, label = paste0("Intercept = ", round(coef(mod_age)[[1]], 3)))) +
+  geom_segment(
+    x = 5, 
+    y = coef(mod_age)[[1]] + coef(mod_age)[[2]] + .1, 
+    xend = 15, 
+    yend = coef(mod_age)[[1]] + (coef(mod_age)[[2]]*10) + .1, 
+    arrow = arrow(length = unit(0.03, "npc"))
+  ) +
+  ggtext::geom_richtext(aes(x = 10, y = coef(mod_age)[[1]] + (coef(mod_age)[[2]]*10) + .06, label = paste0("Slope = ", round(coef(mod_age)[[2]], 3)), angle = 13)) +
+  labs(x = "Age", y = "Mean Log RT")
+```
+
+## Appraising the Model
+
+Pass your saved model object to `check_model()`.
+
+```{r}
+performance::check_model(mod_age)
+```
+
+## Categorical Predictors
+
+What happens if we have a categorical predictor? Fit the model.
+
+```{r}
+mod_trial <- lm(mean_log_rt ~ trial_type, data = lm_trial_data)
+summary(mod_trial)
+```
+
+## Categorical Predictors
+
+-   R can't do maths with text. So, it assigns values to non-numeric predictors.
+
+-   We get a matrix with **n-1** contrasts for every level of a variable. For a 2-level variable, this means you have 1 intercept and 1 parameter estimate.
+
+-   By default R uses **treatment contrasts**:
+
+    -   The first (alphabetic) level is the **reference level (assigned 0)**.
+    -   For each remaining contrast, one level (**assigned 1**) is compared against the reference level.
+
+## Understanding Treatment Coding
+
+-   Intercept: The score where all predictors are set to 0. With only 1 predictor this is the case when `trial_type` is set to 0, i.e. a **non-switch** trial.
+-   `trial_typeSwitch`(Slope): the difference in log reaction times between the baseline (non-switch) and switch trials.
+
+```{r}
+summary(mod_trial)
+```
+
+## Understanding Treatment Coding
+
+```{r}
+#| echo: false
+curve_dat_treat <- tibble(
+  x1 = 0.5,
+  x2 = 0.95,
+  y1 = 7.025,
+  y2 = coef(mod_trial)[[1]]
+)
+
+lm_trial_data |> 
+  ggplot(aes(x = trial_type, y = mean_log_rt)) +
+  stat_summary(fun.data = mean_cl_normal, geom = "pointrange") +
+  labs(x = "Trial Type", y = "Mean Log RT") +
+  geom_curve(
+    aes(x = x1, y = y1, xend = x2, yend = y2),
+    data = curve_dat_treat,
+    arrow = arrow(length = unit(0.03, "npc")),
+    angle = 90,
+    curvature = -0.2
+  ) +
+  geom_label(aes(x = 0.6, y = 7.02, label = paste0("Intercept = ", round(coef(mod_trial)[[1]], 3)))) +
+  geom_segment(
+    aes(x = 1.1, y = coef(mod_trial)[[1]] + .003, xend = 1.9, yend = coef(mod_trial)[[1]] + coef(mod_trial)[[2]] - .003),
+    arrow = arrow(length = unit(0.5, "cm"), ends = "both")
+  ) +
+  geom_label(aes(x = 1.5, y = 7.065, label = paste0("Slope = ", round(coef(mod_trial)[[2]], 3)))) +
+  scale_y_continuous(breaks = seq(7, 7.13, by = 0.01)) +
+  coord_cartesian(xlim = c(0.75, 2.25)) +
+  theme(
+    panel.grid.minor.y = element_blank(), 
+    panel.grid.major.x = element_blank()
+  )
+```
+
+*Remember, Repetition is coded as x = 0.*
+
+## Changing Contrasts
+
+- With only 1 predictor with only 2 levels, the coding scheme really isn't important. 
+
+- However, when we have multiple predictors, or more than 2 levels in a variable, we need to be careful.
+
+- Let's say we fit a model with `trial_type` and `stroop` both coded with treatment contrasts. What happens? 
+
+    - The intercept is when `trial_type` = 0 **and** when `stroop` = 0.
+    
+    - Slopes evaluate the effect of one parameter when others are kept at 0. These are **simple effects**, not **main effects**.
+    
+## Understanding Different Contrasts
+
+- **Treatment (dummy) coding**: contrasts are coded as 0 and 1. Since the intercept is always when predictors are 0, this becomes one combination of your conditions. Parameter estimates then evaluate simple effects.
+
+- **Sum coding**: contrasts are coded as -1 and 1. Since the intercept is always when predictors are 0 this is the grand mean. Parameter estimates then evaluate main effects. Estimates are half the size of actual differences unless you use deviation coding where contrast are coded -.5 and .5.
+
+Others like Helmert coding exist, but aren't covered here.
+
+## Changing Coding Scheme
+
+- If we want to change from the default coding scheme, we need to code our predictors as `factors`.
+- Lets do it and check out the default coding scheme.
+
+```{r}
+lm_two_way_data$trial_type <- as.factor(lm_two_way_data$trial_type)
+contrasts(lm_two_way_data$trial_type)
+```
+
+```{r}
+lm_two_way_data$stroop <- as.factor(lm_two_way_data$stroop)
+contrasts(lm_two_way_data$stroop)
+```
+    
+## Evaluating Simple Effects with Treatment Coding
+
+```{r}
+mod_treat <- lm(mean_log_rt ~ stroop * trial_type, data = lm_two_way_data)
+summary(mod_treat)
+```
+
+## Evaluating Simple Effects with Treatment Coding
+
+With treatment coding, we are evaluting **simple effects**.
+
+Conclusions: 
+
+- Stroop neutral differs to incongruent for non-switch trials.
+- Trial type switch differs to non-switch for incongruent trials.
+- No interaction is present.
+
+## Changing Coding Scheme
+
+Use the `contr._()` family of functions to change the coding scheme for a factor, e.g. `contr.sum()`.
+
+```{r}
+contrasts(lm_two_way_data$stroop) <- contr.sum(2)
+contrasts(lm_two_way_data$trial_type) <- contr.sum(2)
+```
+
+Check them:
+
+```{r}
+contrasts(lm_two_way_data$trial_type)
+contrasts(lm_two_way_data$stroop)
+```
+
+## Evaluating Main Effects with Sum Coding
+
+```{r}
+mod_treat <- lm(mean_log_rt ~ stroop * trial_type, data = lm_two_way_data)
+summary(mod_treat)
+```
+## Evaluating Main Effects with Sum Coding
+
+With sum coding we are evaluating **main effects**.
+
+Conclusions: 
+
+- There is a main effect of Stroop condition.
+- There is no main effect of Trial Type.
+- No interaction is present.
+
+## A Note on Independence
+
+-   Models involving `trial_type` and `stroop` have so far assumed scores for each condition are **independent** of one-another. This isn't true as they are **within-subjects** variables.
+
+-   We need to model this dependency to arrive at accurate parameter estimates and statistical tests.
+
+-   We will do this for linear models using **multilevel models** in later sessions.
+
+-   For now, we'll stick to using techniques that account for this, e.g. **within-subjects t-tests** and **within-subjects ANOVA**. But bear in mind these are limited to categorical within-subjects variables.
+
+# Reproducing Typical Statistical Tests
+
+- We'll look at how to reproduce many of your typical statistical tests.
+
+- Along the way we'll see how they're all part of the general linear model family.
+
+## Correlation
+
+Test statistics are exactly the same.
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+```{r}
+cor.test(
+  ~ age + mean_log_rt,
+  data = lm_demo_data
+)
+```
+
+:::
+
+::: {.column width="60%"}
+
+```{r}
+summary(lm(
+  mean_log_rt ~ age,
+  data = lm_demo_data
+))
+```
+
+:::
+
+::::
+
+## Within-subjects t-test
+
+Test statistics are exactly the same.
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+```{r}
+t.test(
+  mean_log_rt ~ trial_type,
+  paired = TRUE,
+  data = lm_trial_data
+)
+```
+:::
+
+::: {.column width="60%"}
+
+```{r}
+summary(lm(
+  lm_trial_data |> filter(trial_type == "Repetition") |> pull(mean_log_rt) -
+   lm_trial_data |> filter(trial_type == "Switch") |> pull(mean_log_rt) ~ 1
+))
+```
+
+:::
+
+::::
+
+## Between-subjects t-test
+
+Test statistics are exactly the same if assuming variance is equal between groups. By default, R doesn't assume this (i.e. using Welch's t-test).
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+```{r}
+t.test(
+  mean_log_rt ~ gender,
+  paired = FALSE,
+  var.equal = TRUE,
+  data = lm_demo_data
+)
+```
+:::
+
+::: {.column width="60%"}
+
+```{r}
+summary(lm(
+  mean_log_rt ~ gender, data = lm_demo_data
+))
+```
+
+:::
+
+::::
+
+## Within-subjects ANOVA
+
+Here we specify that observations are grouped by participants so that we have paired responses from people for `stroop` and `trial_type`.
+
+```{r}
+afex::aov_4(
+  mean_log_rt ~ stroop * trial_type + (1 + stroop + trial_type | subject_id),
+  data = lm_two_way_data
+)
+```
+
+## Within-subjects ANOVA (as a mixed-effects model)
+
+```{r}
+anova(lmer(
+  mean_log_rt ~ stroop * trial_type + (1 + stroop + trial_type | subject_id),
+  data = lm_two_way_data
+))
+```
+## Between-subjects ANOVA
+
+Here we specify that observations are grouped by `subject_id`. With only the intercept specify that gender is between-subjects.
+
+```{r}
+aov_4(
+  mean_log_rt ~ gender + (1 | subject_id),
+  observed = "gender",
+  data = lm_demo_data
+)
+```
+## Between-subjects ANOVA (as a linear model)
+
+```{r}
+summary(lm(
+  mean_log_rt ~ gender, data = lm_demo_data
+))
+```
+
+## Mixed ANOVA
+
+Here we specify that observations are grouped by participants so that we have paired responses from people for `stroop` and `trial_type`.
+
+```{r}
+afex::aov_4(
+  mean_log_rt ~ stroop * gender + (1 + stroop | subject_id),
+  data = lm_mixed_data
+)
+```
+
+## Mixed ANOVA (as a mixed-effects model)
+
+```{r}
+anova(lmer(
+  mean_log_rt ~ stroop * gender + (1 | subject_id),
+  data = lm_mixed_data
+))
+```
+
+## Interim Summary
+
+- We've seen how using the formula method allows you to fit a range of models using a consistent interface.
+- Often, we have cases where the Gaussian likelihood isn't appropriate.
+- Now we know how to fit many models, we might want to consider alternatives or do follow-up tests.
+
+# Generalised Linear Models
+
+## Generalised Linear Models
+
+- So far we've focused on the **general linear model** and its variants that assume residual errors to be normally distributed and the responses to be numeric and continuous with no upper or lower bounds.
+
+- Often, one or both of these assumptions don't hold true and you might like to assume a different **data generating process**.
+
+- This is where **generalised linear models** come in.
+
+## Generalising the Linear Model
+
+Works by replacing the Gaussian likelihood with a different one (often still in the exponential family). 
+
+$$
+\begin{aligned}
+Y_i \sim Binomial(n, p_i)\\
+logit(p_i) = \alpha + \beta X_i\\
+\end{aligned}
+$$
+
+## Generalising the Linear Model
+
+- If we have binomial data, this is handled well by a binomial model.
+
+- We specify the likelihood to be from a Binomial distribution from ***n* trials** with ***p* probability of success**.
+
+- We use a **link function** to determine the shape of the likelihood. In this case, we use a *logit* link to determine *p* from the linear predictors. The link function maps the linear space of the model (unconstrained) onto the non-linear space of the expectation.
+
+## Likely Likelihoods
+
+- **Binomial**: Used for discrete data modelling the number of successes in a number of independent trials, e.g. **accuracy**.
+
+- **Gamma**: Used for continuous data constrained to be zero or positive. Handles skewed data well, e.g. **reaction times**. One alternative for RTs is the lognormal.
+
+- **Poisson**: Used for discrete data modelling the number of events happening in a fixed interval of time or space, e.g. **correct answers in a timed test**.
+
+## A generalised linear model for reaction times
+
+Let's analyse reaction times using a Gamma likelihood with a log link. Instead of `lm()` use `glm()` and define the `family`.
+
+```{r}
+mod_gamma <- glm(
+  mean_rt ~ age, 
+  family = Gamma(link = "log"), 
+  data = lm_demo_data
+)
+summary(mod_gamma)
+```
+
+# Estimating Marginal Means
+
+- Often we might want to look at specific contrasts in a model when we haven't defined these a-priori (e.g. finding a main effect but no interaction).
+
+- [Doing so by hand is difficult](https://glennwilliams.me/blog/2021/03/17/estimating-marginal-means-and-pairwise-tests-by-hand-in-r/), especially when considering errors.
+
+- We can get model-based predictions and use these to summarise our data and perform pairwise tests.
+
+## Estimating Marginal Means using `emmeans`
+
+First, let's fit a two-way ANOVA on our data.
+
+We have a main effect of Stroop condition, but nothing else:
+
+```{r}
+mod <- afex::aov_4(
+  mean_log_rt ~ stroop * gender + (1 + stroop | subject_id),
+  data = lm_mixed_data
+)
+mod
+```
+
+## Estimating Marginal Means using `emmeans`
+
+We can use the `emmeans()` function from the `emmeans` package to get **marginal means**.
+
+```{r}
+emm_stroop <- emmeans(mod, ~stroop)
+emm_stroop
+```
+## Emmeans on the Response Scale
+
+- If we use `type = "response"`, we can get them on the response, not log, scale. 
+
+- But look! Since our model didn't use a link, `emmeans` doesn't know which scale to use.
+
+```{r}
+emm_stroop_resp <- emmeans(mod, ~stroop, type = "response")
+emm_stroop_resp
+```
+## Updating the Reference Grid
+
+- Estimates are made up from a **reference grid** of the unique levels within variables. 
+- With generalised linear models, the transformation on the response variable is also recorded and used in making predictions.
+- In cases with pre-computed transformed outcomes, we can add the transformation manually:
+
+```{r}
+mod_rg <- update(ref_grid(mod), tran = "log")
+```
+
+## Getting Emmeans on the Response Scale
+
+```{r}
+emm_stroop_resp <- emmeans(mod_rg, ~ stroop, type = "response")
+emm_stroop_resp
+```
+# Pairwise Tests
+
+## Pairwise Tests
+
+Pairwise tests are as simple as using `pairs()` on your fitted `emmeans` object.
+
+```{r}
+pairs(emm_stroop_resp)
+```
+## Grouped Contrasts
+
+If we had reason to investigate simple effects we can do so by using the nesting operator to get contrasts within groups.
+
+```{r}
+pairs(
+  emmeans(mod, ~ stroop | gender),
+  adjust = "holm"
+)
+```
+## P-value Adjustment
+
+We can specify different p-value adjustments here if we have multiple tests.
+
+```{r}
+pairs(
+  emmeans(mod, ~ gender * stroop),
+  adjust = "holm"
+)
+```
+# Calculating Effect Sizes
+
+- Often, it's enough just to interpret coefficients on their natural scale.
+
+- But in some cases you might want to provide standardised effect sizes along with your statistical tests. The `effectsize` package in `easystats` unsurprisingly makes this...easy.
+
+## Calculating Effect Sizes for ANOVAs
+
+Get lovely Greek symbols:
+
+```{r}
+options(es.use_symbols = TRUE)
+```
+
+Take our ANOVA model fitted in `mod`. Common effect sizes include the (partial/generalised) Eta-squared:
+
+```{r}
+eta_squared(mod)
+```
+You also have `epsilon_squared()` and `omega_squared()` as less biased options.
+
+## Calculating Effect Sizes for Standardised Differences
+
+We have options for `cohens_d()` and `hedges_g()` for paired and independent samples, and `glass_delta()` for independent samples with different variances.
+
+```{r}
+glass_delta(mean_log_rt ~ gender, data = lm_demo_data)
+```
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
