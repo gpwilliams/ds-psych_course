@@ -1,0 +1,100 @@
+---
+title: "Open Science"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-04-24"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Version control, project hosting, pre-registration, and pre-prints."
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to the basics of Git/GitHub. You'll create a project, begin a pre-registration, and then update your project with analyses/outputs.
+
+The project we'll base our work on comes from real data from the recent replication of **Jacowitz and Kahneman (1995) in the Klein et al. (2014) Many Labs project.**
+
+Jacowitz and Kahneman presented a number of scenarios in which participants estimated size or distance after first receiving a number that was clearly too large or too small. In the original study, participants answered 3 questions about each of 15 topics for which they estimated a quantity. First, they indicated if the quantity was greater or less than an anchor value. Second, they estimated the quantity. Third, they indicated their confidence in their estimate. The original number served as an anchor, biasing estimates to be closer to it. For the purposes of the replication we will provide anchoring information (either 2000 feet or 45,500 feet) before asking just for the estimated quantity for the height of Mt. Everest (29,032 feet).
+
+The data set **should have** the following columns:
+
+-   **session_id**: a unique numeric code to identify participants.
+
+-   **age**: the participants' age in years.
+
+-   **sex**: the participants' sex; f = female, m = male.
+
+-   **condition**: which condition participants were in; small anchor (2000 feet) or large anchor (45,500 feet).
+
+-   **feet**: the participants' estimate of the height of Mount Everest in feet.
+
+# Git/GitHub
+
+First, you will have to create a GitHub repo and link it to a local repo for your project, getting started with just the raw data and basic file structure.
+
+1.  Create a repository on GitHub for the project.
+2.  Make a Version Control project in RStudio and link it with your GitHub repo.
+3.  Once you've created the project on your computer update the repo and push it to GitHub so the `.RStudio` project is saved.
+4.  Add a logical folder structure to the project. This should have the following folders:
+    -   `01_data/01_raw`
+    -   `01_data/02_cleaned`
+    -   `02_plots`
+    -   `03_analysis`
+    -   `04_reports`
+    -   `R`
+
+The R folder should contain any scripts you write, if you choose to write your scripts in .R files. Otherwise, make a Quarto document right in the reports folder and drop the R folder.
+
+Any plots, tables of model results, or descriptives should be saved externally in the relevant folders.
+
+Note that folders aren't automatically added to GitHub unless they contain a file.
+
+5.  Add your raw data from `ds-psych_course/data/jk_data.csv` to the `01_data/01_raw` folder.
+6.  Commit the addition and push it to GitHub.
+
+## Making an OSF Project and Pre-Registering Your Work
+
+1.  Make an OSF project for the Jacowitz and Kahneman (1995) replication.
+2.  Link the project with your GitHub repo.
+3.  Add a license and description for the project.
+
+## Pre-Registration
+
+Next, we'll work on a simple AsPredicted.org template pre-registration. Go to the registrations menu and pick this template. Briefly fill out the details for the pre-registration. Don't take too much time on it for these purposes, but definitely think more deeply for real submissions. For now:
+
+1.  Think about potential data you could get from the study. How might you process the data? Consider potential exclusion criteria or handling of outliers and rules for removing them if you think this is appropriate.
+2.  Think about your hypotheses and how you'll test for them. How might you analyse the data? Consider potential analyses. If you're unsure of which analysis to conduct, write criteria that define what you'll do. For example, if you plan to do a parametric analysis first, discuss checking test assumptions and what you'll do if they're violated and/or alternative analyses if assumptions aren't met. If you need to correct for multiple comparisons, write down you method and reasoning for it.
+3.  Write down your plans for anything else that you think is important.
+4.  Submit your pre-registration and set an embargo.
+5.  End the embargo early and make a note of the link. We'll return to this later.
+
+## R Coding
+
+Make a Quarto file or several R scripts to do the following. At each stage commit and push changes once you're happy with what you've done.
+
+1.  Clean the data, save it to the `01_data/02_cleaned` folder and commit and push changes to GitHub.
+2.  Make some descriptive statistics and/or plots to go with the data. Save the outputs to file in either the `03_analysis` or `02_plots` folder. Again, commit and push changes.
+3.  Conduct the appropriate analysis for your data. Save the outputs to file. Again, commit and push changes.
+4.  Finish up your report of the data, using in-text R code and code chunks to make a dynamic document.
+5.  Drop one participant from the cleaned data and update your codebook (pick at random). Hopefully you'll see how easily every change propagates through the document.
+6.  Commit and push all your changes.
+7.  If there's anything else you'd like to do, but don't have time to do, look into GitHub Issues to set yourself a goal to achieve in the project. This is a good way to make a TODO list.
+
+## Sharing and Collaborating
+
+1.  Go to <https://github.com/gpwilliams/ds-psych_version-control> and look for the **Fork** option in the top right.
+2.  Create a fork of the repository, essentially a copy you can work on.
+3.  Edit the file `osf-links.md` by adding your name and OSF link to the work you've just done.
+4.  Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) based on your fork to the main repository, asking me to integrate your changes in the repository.
+
+I'll review your pull request to make sure it's appropriate (looking at you, Stephen), then I can integrate it in to the repository. You should see the changes by next week!
+
+You now know how to engage in version control for your project, how to host it all through GitHub for proper tracking, and how to share everything on the OSF so you can add additional documentation (e.g. materials) to your OSF account, link it with a pre-registration, and finally link all that to a pre/post-print. We won't do the latter today as they get vetted by admins, but it's as easy as dragging and dropping a file onto the pre-print website.

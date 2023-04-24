@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Glenn Williams">
+<meta name="dcterms.date" content="2023-04-24">
+
+<title>Open Science</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="questions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="questions_files/libs/quarto-html/quarto.js"></script>
+<script src="questions_files/libs/quarto-html/popper.min.js"></script>
+<script src="questions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="questions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="questions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="questions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="questions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="questions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="questions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Open Science</h1>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      Glenn Williams 
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Northumbria University
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 24, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">April 24, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Abstract</div>
+      Version control, project hosting, pre-registration, and pre-prints.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
+  <li><a href="#gitgithub" id="toc-gitgithub" class="nav-link" data-scroll-target="#gitgithub">Git/GitHub</a>
+  <ul class="collapse">
+  <li><a href="#making-an-osf-project-and-pre-registering-your-work" id="toc-making-an-osf-project-and-pre-registering-your-work" class="nav-link" data-scroll-target="#making-an-osf-project-and-pre-registering-your-work">Making an OSF Project and Pre-Registering Your Work</a></li>
+  <li><a href="#pre-registration" id="toc-pre-registration" class="nav-link" data-scroll-target="#pre-registration">Pre-Registration</a></li>
+  <li><a href="#r-coding" id="toc-r-coding" class="nav-link" data-scroll-target="#r-coding">R Coding</a></li>
+  <li><a href="#sharing-and-collaborating" id="toc-sharing-and-collaborating" class="nav-link" data-scroll-target="#sharing-and-collaborating">Sharing and Collaborating</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="instructions" class="level1">
+<h1>Instructions</h1>
+<p>Complete the following exercises. The basics will get you used to the basics of Git/GitHub. You’ll create a project, begin a pre-registration, and then update your project with analyses/outputs.</p>
+<p>The project we’ll base our work on comes from real data from the recent replication of <strong>Jacowitz and Kahneman (1995) in the Klein et al.&nbsp;(2014) Many Labs project.</strong></p>
+<p>Jacowitz and Kahneman presented a number of scenarios in which participants estimated size or distance after first receiving a number that was clearly too large or too small. In the original study, participants answered 3 questions about each of 15 topics for which they estimated a quantity. First, they indicated if the quantity was greater or less than an anchor value. Second, they estimated the quantity. Third, they indicated their confidence in their estimate. The original number served as an anchor, biasing estimates to be closer to it. For the purposes of the replication we will provide anchoring information (either 2000 feet or 45,500 feet) before asking just for the estimated quantity for the height of Mt. Everest (29,032 feet).</p>
+<p>The data set <strong>should have</strong> the following columns:</p>
+<ul>
+<li><p><strong>session_id</strong>: a unique numeric code to identify participants.</p></li>
+<li><p><strong>age</strong>: the participants’ age in years.</p></li>
+<li><p><strong>sex</strong>: the participants’ sex; f = female, m = male.</p></li>
+<li><p><strong>condition</strong>: which condition participants were in; small anchor (2000 feet) or large anchor (45,500 feet).</p></li>
+<li><p><strong>feet</strong>: the participants’ estimate of the height of Mount Everest in feet.</p></li>
+</ul>
+</section>
+<section id="gitgithub" class="level1">
+<h1>Git/GitHub</h1>
+<p>First, you will have to create a GitHub repo and link it to a local repo for your project, getting started with just the raw data and basic file structure.</p>
+<ol type="1">
+<li>Create a repository on GitHub for the project.</li>
+<li>Make a Version Control project in RStudio and link it with your GitHub repo.</li>
+<li>Once you’ve created the project on your computer update the repo and push it to GitHub so the <code>.RStudio</code> project is saved.</li>
+<li>Add a logical folder structure to the project. This should have the following folders:
+<ul>
+<li><code>01_data/01_raw</code></li>
+<li><code>01_data/02_cleaned</code></li>
+<li><code>02_plots</code></li>
+<li><code>03_analysis</code></li>
+<li><code>04_reports</code></li>
+<li><code>R</code></li>
+</ul></li>
+</ol>
+<p>The R folder should contain any scripts you write, if you choose to write your scripts in .R files. Otherwise, make a Quarto document right in the reports folder and drop the R folder.</p>
+<p>Any plots, tables of model results, or descriptives should be saved externally in the relevant folders.</p>
+<p>Note that folders aren’t automatically added to GitHub unless they contain a file.</p>
+<ol start="5" type="1">
+<li>Add your raw data from <code>ds-psych_course/data/jk_data.csv</code> to the <code>01_data/01_raw</code> folder.</li>
+<li>Commit the addition and push it to GitHub.</li>
+</ol>
+<section id="making-an-osf-project-and-pre-registering-your-work" class="level2">
+<h2 class="anchored" data-anchor-id="making-an-osf-project-and-pre-registering-your-work">Making an OSF Project and Pre-Registering Your Work</h2>
+<ol type="1">
+<li>Make an OSF project for the Jacowitz and Kahneman (1995) replication.</li>
+<li>Link the project with your GitHub repo.</li>
+<li>Add a license and description for the project.</li>
+</ol>
+</section>
+<section id="pre-registration" class="level2">
+<h2 class="anchored" data-anchor-id="pre-registration">Pre-Registration</h2>
+<p>Next, we’ll work on a simple AsPredicted.org template pre-registration. Go to the registrations menu and pick this template. Briefly fill out the details for the pre-registration. Don’t take too much time on it for these purposes, but definitely think more deeply for real submissions. For now:</p>
+<ol type="1">
+<li>Think about potential data you could get from the study. How might you process the data? Consider potential exclusion criteria or handling of outliers and rules for removing them if you think this is appropriate.</li>
+<li>Think about your hypotheses and how you’ll test for them. How might you analyse the data? Consider potential analyses. If you’re unsure of which analysis to conduct, write criteria that define what you’ll do. For example, if you plan to do a parametric analysis first, discuss checking test assumptions and what you’ll do if they’re violated and/or alternative analyses if assumptions aren’t met. If you need to correct for multiple comparisons, write down you method and reasoning for it.</li>
+<li>Write down your plans for anything else that you think is important.</li>
+<li>Submit your pre-registration and set an embargo.</li>
+<li>End the embargo early and make a note of the link. We’ll return to this later.</li>
+</ol>
+</section>
+<section id="r-coding" class="level2">
+<h2 class="anchored" data-anchor-id="r-coding">R Coding</h2>
+<p>Make a Quarto file or several R scripts to do the following. At each stage commit and push changes once you’re happy with what you’ve done.</p>
+<ol type="1">
+<li>Clean the data, save it to the <code>01_data/02_cleaned</code> folder and commit and push changes to GitHub.</li>
+<li>Make some descriptive statistics and/or plots to go with the data. Save the outputs to file in either the <code>03_analysis</code> or <code>02_plots</code> folder. Again, commit and push changes.</li>
+<li>Conduct the appropriate analysis for your data. Save the outputs to file. Again, commit and push changes.</li>
+<li>Finish up your report of the data, using in-text R code and code chunks to make a dynamic document.</li>
+<li>Drop one participant from the cleaned data and update your codebook (pick at random). Hopefully you’ll see how easily every change propagates through the document.</li>
+<li>Commit and push all your changes.</li>
+<li>If there’s anything else you’d like to do, but don’t have time to do, look into GitHub Issues to set yourself a goal to achieve in the project. This is a good way to make a TODO list.</li>
+</ol>
+</section>
+<section id="sharing-and-collaborating" class="level2">
+<h2 class="anchored" data-anchor-id="sharing-and-collaborating">Sharing and Collaborating</h2>
+<ol type="1">
+<li>Go to <a href="https://github.com/gpwilliams/ds-psych_version-control" class="uri">https://github.com/gpwilliams/ds-psych_version-control</a> and look for the <strong>Fork</strong> option in the top right.</li>
+<li>Create a fork of the repository, essentially a copy you can work on.</li>
+<li>Edit the file <code>osf-links.md</code> by adding your name and OSF link to the work you’ve just done.</li>
+<li>Create a <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">pull request</a> based on your fork to the main repository, asking me to integrate your changes in the repository.</li>
+</ol>
+<p>I’ll review your pull request to make sure it’s appropriate (looking at you, Stephen), then I can integrate it in to the repository. You should see the changes by next week!</p>
+<p>You now know how to engage in version control for your project, how to host it all through GitHub for proper tracking, and how to share everything on the OSF so you can add additional documentation (e.g.&nbsp;materials) to your OSF account, link it with a pre-registration, and finally link all that to a pre/post-print. We won’t do the latter today as they get vetted by admins, but it’s as easy as dragging and dropping a file onto the pre-print website.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
