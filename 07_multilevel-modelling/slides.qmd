@@ -1,0 +1,698 @@
+---
+title: "Multilevel Modelling"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+editor: visual
+---
+
+## Overview
+
+::: r-fit-text
+
+Today's session is on multilevel modelling:
+
+-   Understanding when multilevel models are necessary and the benefits to using multilevel models by default even when single-level models suffice.
+
+-   How multilevel models are extensions to single-level models (e.g. linear regression) and the implications of model structure.
+
+-   The difference between fixed and random effects, and crossed/nested random effects, and when random intercepts and slopes are necessary.
+
+-   The importance of partial pooling/shrinkage/regularisation on model estimates.
+
+:::
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `07_mixed-effects-models`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+## Loading Packages
+
+Load our essential packages, `tidyverse` for data wrangling and presentation and `here` for working with file paths. The core packages today are `lme4` for mixed effects models and `afex` which builds on `lme4` but adds more functionality.
+
+We also use `emmeans` for estimated marginal means and pairwise tests, and `easystats` for its child packages `effectsize` for getting effect sizes and `performance` for calculating intraclass-correlation coefficients.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(lme4)
+library(afex)
+library(emmeans)
+library(easystats)
+```
+
+## The Data
+
+We'll use the `sleepstudy` data set from `lme4` which has reaction times of subjects who were deprived of sleep over several days, getting only 3 hours of sleep each day.
+
+```{r}
+data(sleepstudy)
+
+sleepstudy <- sleepstudy |> 
+  janitor::clean_names() |> 
+  bind_rows(
+    # add two fake participants
+    tibble(reaction = c(286, 288), days = 0:1, subject = "374"),
+    tibble(reaction = 245, days = 0, subject = "373")
+  )
+```
+
+## The Data
+
+```{r}
+glimpse(sleepstudy)
+```
+
+## Plotting the Data
+
+There is some trend going on.
+
+```{r}
+ggplot(data = sleepstudy, mapping = aes(x = days, y = reaction)) +
+  geom_point() +
+  facet_wrap(~subject) +
+  scale_x_continuous(breaks = 0:9)
+```
+
+# Modelling the Data
+
+We want to estimate the mean effect of sleep deprivation on reaction times.
+
+## An Initial Attempt
+
+One approach you might think to use is a linear model, with:
+
+$$
+\begin{aligned}
+RT_{subj, days} = \alpha + \beta Days_{subj, days} + e_{subj, days}\\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}$$
+
+Or equivalently with:
+
+$$
+\begin{aligned}
+RT_{subj, days} \sim \mathcal{N}(\mu_{subj, days}, \sigma^2)\\
+\mu_{subj, days} = \alpha + \beta Days_{subj, days}\\
+\end{aligned}
+$$
+
+## Complete Pooling
+
+-   But, we need to be wary of the assumptions we encode in this model.
+
+::: callout-important
+## Assumptions
+
+-   ❌ Residual errors are independent.
+
+-   ❌ Sleep deprivation has the same impact for each participant.
+:::
+
+## Fit the Model
+
+We appear to have an effect whereby reaction times increase as days without sleep increase.
+
+```{r}
+complete_pool_mod <- lm(reaction ~ days, data = sleepstudy)
+summary(complete_pool_mod)
+```
+
+## Model Predictions
+
+Not great!
+
+```{r}
+#| message: false
+#| echo: false
+new_data <- crossing(
+  subject = unique(sleepstudy$subject),
+  days = unique(sleepstudy$days)
+)
+new_data$fitted_c <- predict(complete_pool_mod, new_data)
+
+ggplot(data = sleepstudy, mapping = aes(x = days, y = reaction)) +
+  facet_wrap(~subject) +
+  geom_point() +
+  geom_line(colour = "#ffa07a", data = new_data, aes(y = fitted_c), linewidth = 2) +
+  scale_x_continuous(breaks = 0:9)
+```
+
+## Changing Assumptions
+
+-   We know that participants might start off with different reaction times (i.e. different intercepts) and for them to respond differently to sleep deprivation (i.e. different slopes).
+
+-   Let's estimate an average reaction time and the impact of sleep deprivation on reaction time for each subject.
+
+## An Alternative Model
+
+We can model an intercept, slope, and intercepts and slopes by subjects with:
+
+$$
+\begin{aligned}
+RT_{subj, days} = \alpha + \beta Days_{days} + \beta Subject_{subj} + \beta Days_{days} \cdot Subject_{subj} + e_{subj, days}\\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}$$
+
+Or equivalently with:
+
+$$
+\begin{aligned}
+RT_{subj, days} \sim \mathcal{N}(\mu_{subj, days}, \sigma^2)\\
+\mu_{subj, days} = \alpha + \beta Days_{days} + \beta Subject_{subject} + \beta Days_{days} \cdot Subject_{subj}\\
+\end{aligned}
+$$
+
+## No Pooling
+
+-   But, we need to be wary of the assumptions we encode in this model.
+
+::: callout-important
+## Assumptions
+
+-   ✅ Residual errors are independent.
+
+-   ✅ Sleep deprivation has **a different impact** for each participant.
+
+-   ❌ Knowledge of the sample does not help with estimating the individual.
+:::
+
+## Nominal Variables
+
+::: r-fit-text
+
+-   By default, numeric variables are treated as continuous.
+
+-   `subject` is numeric, but is not continuous. It should be nominal.
+
+-   If we treat `subject` as continuous we implicitly assume going from participant
+
+-   However, if we add subject as a continuous variable to our model we will assume that the difference between participants is linear, additive, and equally spaced.
+
+-   So, we assume the difference between participants 308 and 309 is the same as between participants 309 and 310, which it probably isn't, amongst other weird things. So treat it as a `factor`.
+
+:::
+
+```{r}
+sleepstudy$subject <- as.factor(sleepstudy$subject)
+contrasts(sleepstudy$subject) <- contr.sum(length(unique(sleepstudy$subject)))
+```
+
+## Fit the Model
+
+```{r}
+no_pooling_mod <- lm(
+  reaction ~ 1 + days + subject + days:subject, 
+  data = sleepstudy
+)
+summary(no_pooling_mod)
+```
+
+## Model Predictions
+
+Better, but we can't make good predictions from subjects 373 and 374.
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+new_data$fitted_n <- predict(no_pooling_mod, new_data)
+
+filtering_data <- tibble(
+  subject = c(rep("373", 10), rep("374", 9)),
+  days = c(0:9, 1:9),
+  fitted_n = rep(NA, 19)
+)
+
+new_data <- new_data |> 
+  anti_join(filtering_data) |> 
+  bind_rows(filtering_data)
+
+ggplot(data = sleepstudy, mapping = aes(x = days, y = reaction)) +
+  facet_wrap(~subject) +
+  geom_point() +
+  geom_line(colour = "#af8dc3", data = new_data, aes(y = fitted_n), linewidth = 2) +
+  scale_x_continuous(breaks = 0:9)
+```
+
+## Changing Assumptions
+
+-   We'd like to estimate the mean effect of sleep deprivation on reaction times.
+
+-   We know that participants might start off with different reaction times (i.e. different intercepts) and for them to respond differently to sleep deprivation (i.e. different slopes).
+
+-   We'd like individual intercepts and slopes to contribute to our mean estimates.
+
+-   We'd like to use the mean estimates to regularise the estimates for each individual.
+
+## The Best of Both?
+
+$$
+\begin{aligned}
+RT_{subj, days} = \alpha_{subj} + \beta_{subj}Days_{subj, days}  + e_{subj, days}\\
+\alpha_{subj} = \alpha + S_{0, subj}\\
+\beta_{subj} = \beta + S_{1, subj}\\
+\begin{bmatrix} \alpha_{subj} \\ \beta_{subj} \end{bmatrix} \sim \mathcal{N}(\begin{bmatrix} 0, 0 \end{bmatrix}, \Sigma)\\
+\Sigma = \begin{pmatrix} \tau_{0}^2, \rho_{\tau_{0}\tau_{1}} \\ \rho_{\tau_{0}\tau_{1}}, \tau_{1} \end{pmatrix}\\ \\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}
+$$
+
+## Partial Pooling
+
+Are these assumptions appropriate?
+
+::: callout-important
+## Assumptions
+
+-   ✅ Residual errors are independent, even with repeated observations per subject.
+
+-   ✅ There is an average reaction time (intercept) and effect of sleep deprivation on reaction time (slope).
+
+-   ✅ Subjects' average reaction times are offset from the average.
+
+-   ✅ Effects of sleep deprivation on subjects varies around the average.
+
+-   ✅ Average reaction times and effects of sleep deprivation are correlated within subjects.
+
+-   ✅ Knowledge of the sample helps with estimating the individual.
+:::
+
+## Fit the Model
+
+```{r}
+partial_pooling_mod <- lmer(
+  reaction ~ days + (1 + days | subject), 
+  data = sleepstudy
+)
+summary(partial_pooling_mod)
+```
+
+## Model Predictions
+
+```{r}
+#| message: false
+#| echo: false
+new_data$fitted_p <- predict(partial_pooling_mod, new_data)
+
+ggplot(data = sleepstudy, mapping = aes(x = days, y = reaction)) +
+  geom_point() +
+  facet_wrap(~subject) +
+  geom_line(colour = "#95d5d0", data = new_data, aes(y = fitted_p), linewidth = 2) +
+  scale_x_continuous(breaks = 0:9)
+```
+
+# Comparing Methods
+
+```{r}
+#| echo: false
+new_data$fitted_c <- predict(complete_pool_mod, new_data)
+new_data_long <- new_data |> 
+  pivot_longer(
+    cols = c(fitted_c, fitted_n, fitted_p),
+    names_to = "method",
+    values_to = "reaction_pred"
+  ) |> 
+  mutate(
+    method = case_when(
+      method == "fitted_c" ~ "complete pooling",
+      method == "fitted_n" ~ "no pooling",
+      method == "fitted_p" ~ "partial pooling"
+    )
+  )
+
+ggplot(data = new_data_long, mapping = aes(x = days, y = reaction_pred)) +
+  facet_wrap(~subject) +
+  geom_line(aes(colour = method), linewidth = 1.5, alpha = .7) +
+  geom_point(data = sleepstudy, aes(y = reaction)) +
+  scale_colour_manual(values = c("#ffa07a", "#af8dc3", "#95d5d0")) +
+  scale_x_continuous(breaks = 0:9)
+```
+
+## Zooming In
+
+Note that the partially-pooled results are *regularised*.
+
+```{r}
+#| echo: false
+filtered_subj <- c("308", "309", "373", "374")
+
+new_data_long |> 
+  filter(subject %in% filtered_subj) |> 
+  ggplot(mapping = aes(x = days, y = reaction_pred)) +
+    facet_wrap(~subject) +
+    geom_line(aes(colour = method), linewidth = 1.5, alpha = .7) +
+    geom_point(
+      data = sleepstudy |> 
+        filter(subject %in% filtered_subj), 
+      aes(y = reaction)
+    ) +
+    scale_colour_manual(values = c("#ffa07a", "#af8dc3", "#95d5d0")) +
+    scale_x_continuous(breaks = 0:9)
+```
+
+# Understanding Mixed Effects Models
+
+## Understanding the Model Formula
+
+In the formula `y ~ 1 + x + (1 + x | id)` we get estimates for:
+
+-   a fixed effect estimate for the intercept
+
+-   a fixed effect estimate for the slope, `x`
+
+-   a random intercept for each `id` (i.e. offsets for each `id`).
+
+-   a random slope for each `x` within id (i.e. offsets for each `id`).
+
+-   a correlation between the random intercepts and slopes.
+
+## Fixed and Random Effects
+
+-   **Fixed effects** typically contain all possible levels of a factor in a study/experiment.
+
+-   **Random effects** are often a random sample of the possible levels.
+
+-   We usually want to **generalise** **our findings** **beyond** **the** **groups for random effects**.
+
+Any time something we have some categorical variable with an index that's **exchangeable**, e.g. participant IDs, we should **pool information** for this variable, keeping it as a random effect grouping factor.
+
+# Understanding Random Effects Structures
+
+## Random Intercepts
+
+```{r}
+i_mod <- lmer(reaction ~ 1 + days + (1 | subject), data = sleepstudy)
+summary(i_mod)
+```
+
+## Random Slopes
+
+```{r}
+s_mod <- lmer(
+  reaction ~ 1 + days + (0 + days | subject), 
+  data = sleepstudy
+)
+summary(s_mod)
+```
+
+## Uncorrelated Random Intercepts and Slopes
+
+```{r}
+u_is_mod <- lmer(
+  reaction ~ 1 + days + (1 | subject) + (0 + days | subject), 
+  data = sleepstudy
+)
+summary(u_is_mod)
+```
+
+## Correlated Random Intercepts and Slopes
+
+```{r}
+is_mod <- lmer(
+  reaction ~ 1 + days + (1 + days | subject), 
+  data = sleepstudy
+)
+summary(is_mod)
+```
+
+## Comparing Methods
+
+```{r}
+#| echo: false
+new_data2 <- crossing(
+  subject = unique(sleepstudy$subject),
+  days = unique(sleepstudy$days)
+)
+
+new_data2$intercepts <- predict(i_mod, new_data2)
+new_data2$slopes <- predict(s_mod, new_data2)
+new_data2$u_intercepts_slopes <- predict(u_is_mod, new_data2)
+new_data2$c_intercept_slopes <- predict(is_mod, new_data2)
+
+new_data2_long <- new_data2 |> 
+  pivot_longer(
+    cols = c(intercepts, slopes, u_intercepts_slopes, c_intercept_slopes),
+    names_to = "method",
+    values_to = "reaction_pred"
+  ) |> 
+  mutate(
+    method = case_when(
+      method == "u_intercepts_slopes" ~ "uncorrelated intercepts + slopes",
+      method == "c_intercept_slopes" ~ "correlated intercepts + slopes",
+      TRUE ~ method
+    )
+  )
+
+ranef_subjs <- c(308, 309, 335, 337)
+
+ggplot(
+  data = new_data2_long |> filter(subject %in% ranef_subjs), 
+  mapping = aes(x = days, y = reaction_pred)
+  ) +
+  facet_grid(cols = vars(subject)) +
+  geom_line(linewidth = 2, alpha = .5, aes(colour = method)) +
+  geom_point(data = sleepstudy |> filter(subject %in% ranef_subjs), aes(y = reaction)) +
+  scale_x_continuous(breaks = 0:9) +
+  theme(legend.position = "top")
+```
+
+# When to Include Parameters in Random Effects
+
+## Keep it Maximal
+
+Barr et al. (2013) show that the maximal random effects structure **justified by the design** protects against Type-I and Type-II errors.
+
+-   Random intercepts should be present for random/exchangeable factors, e.g. subjects and items.
+
+-   Random slopes for r**epeated observations** within a unit, e.g. within-subjects or within-items effects. Introduce the highest-order interaction and all lower order terms that are within-unit.
+
+-   No random slopes for **non-repeated observations** within a unit, e.g. between-subjects or between-items effects.
+
+## Keeping it Maximal
+
+We are interested in predicting the outcome `y` from `x` and have several `subject`s who took part in our study.
+
+-   Where `x` is between-subjects: `y ~ x + (1 | subject)`.
+
+-   where `x` is within-subjects but we only have one observation per level of `x`: `y ~ x + (1 | subject)`.
+
+-   where `x` is within-subjects but we have more than one observation per level of `x`: `y ~ x + (1 + x | subject)`.
+
+## Parsimonious Mixed Effects Models
+
+Matuschek et al. (2017) instead argue that we should retain random slopes that are j**ustified by the design** only if they contribute enough to explaining the variance in the model. They argue this gives a better balance between Type-I error and power.
+
+-   Use a similar method to introduce random intercepts and slopes as in Barr et al. (2013).
+
+-   Evaluate the impact of adding/removing random slopes on the amount of variance explained by the model.
+
+-   Compare the impact of random effects through **model comparison**.
+
+# Crossed Random Effects
+
+## Analysing Subjects and Items
+
+-   Aggregating participant-by-trial level data by participants treats the items as a **fixed effect**.
+
+-   This assumes the items in your study are the only ones of interest and you don't want to **generalise to new items**.
+
+-   This has been a known problem in psycholinguistics since the 1970s, where we used F1/F2 analyses: effects are only significant if they come up significant in tests of data aggregated by subjects and items.
+
+-   Separate by-subjects and by-items analyses are still problematic in terms of error rates.
+
+## Using Crossed Random Effects
+
+We can specify crossed random effects of subjects and items (or any other unit) by adding additional random effects components to the model. Minimally:
+
+`y ~ x + (1 | subject) + (1 | item)`
+
+The random slopes still matter here. So, if `x` is within-subjects but not within-items, our formula would look like:
+
+`y ~ x + (1 + x | subject) + (1 | item)`
+
+If it's within both, it would be:
+
+`y ~ x + (1 + x | subject) + (1 + x | item)`
+
+# Nested Random Effects
+
+Sometimes your data are hierarchical, such that observational units are nested within higher units. For example, **students are nested within classes and schools**.
+
+Accounting for unique effects of classes and schools on individuals is needed.
+
+## Using Nested Random Effects
+
+If you have data with shared identifiers for e.g. students and classes, but unique identifiers for schools, e.g.:
+
+```{r}
+#| echo: false
+nested_data <- tibble(
+  student = seq(1:10),
+  class = rep(seq(1:5), 2),
+  school = c(rep(1, 5), rep(2, 5)),
+  intervention = rep(c("yes", "no"), 5),
+  outcome = rnorm(n = 10, mean = 200, sd = 20)
+)
+
+head(nested_data)
+```
+
+The appropriate formula is `y ~ 1 + intervention + (1 | school/class/student)`.
+
+## Using Unique Codes
+
+If instead you add a unique identifier for students and classes, e.g.
+
+```{r}
+nested_data$class_id <- paste(nested_data$school, nested_data$class, sep = "_")
+head(nested_data)
+```
+
+You can use crossed random effects like:
+
+```{}
+y ~ 1 + intervention + (1 | school) + (1 | class_id)
+```
+
+# When Models Break Down
+
+## Non-Convergence and Singularity
+
+Often, trying to fit the maximal model results in **non-convergence** or a **singular fit**.
+
+-   With maximum likelihood estimation the model can sometimes not settle (converge) on a reliable estimate.
+
+-   Sometimes your variance-covariance matrix has perfectly correlations (e.g. -1 or 1) or variances that are practically 0.
+
+In either case you should try (1) a different **optimiser** for getting estimates, (2) increasing **iterations** before settling on an estimate, or (3) **reducing** **complexity** in your random effects.
+
+## Optimisers
+
+The default optimiser in `lme4` is `nloptwrap`. Try `Nelder_Mead` or `bobyqa` instead.
+
+```{r}
+boby_mod <- lmer(
+  reaction ~ 1 + days + (1 + days | subject), 
+  data = sleepstudy,
+  control = lmerControl(optimizer = "bobyqa")
+)
+```
+
+Note, for generalised models fitted with `glmer()` you need to use `control = glmerControl()`.
+
+## Iterations
+
+To increase the number of iterations before settling on estimates, again use the `control` options.
+
+```{r}
+iter_mod <- lmer(
+  reaction ~ 1 + days + (1 + days | subject), 
+  data = sleepstudy,
+  control = lmerControl(optCtrl = list(maxfun = 20000))
+)
+```
+
+## Reducing Model Complexity
+
+Some heuristics can be helpful here, including:
+
+-   Correlations between random effects, especially with many interactions, can be difficult to estimate. Suppress them with:
+
+`y ~ x + z (1 + x * z || subject)`.
+
+::: callout-note
+The double bar notation only works in `lme4::lmer()` with numeric predictors. Either expand your formula manually, e.g. \``y ~ x + z (1 | subject) + (0 + x | subject) + (0 + z | subject) + (0 + x:z | subject)`\` or use numeric codes to use the double bar notation. Otherwise, use `afex::mixed()` which allows double bar notation with factors.
+:::
+
+## Reducing Model Complexity
+
+-   Next, **higher-order interactions** usually soak up less variance than lower-order interactions. Remove the highest-order interactions from random slopes before moving down.
+
+-   Remove **slopes** before intercepts.
+
+-   Assuming you've conducted an experiment with tight control on your items, **items will usually soak up less variance** than subjects. So, reduce the random effects structure on items before subjects.
+
+# Evaluating Evidence in Mixed Effects Models
+
+Inference can be more complicated than using a traditional ANOVA. However, there are a few methods to get main effects and interactions.
+
+## Parameter Estimates/Contrasts
+
+If your factors only have two levels, then you can look directly at the parameter estimates for main effects if you use sum-to-zero coding (e.g. -1/1 or -.5/.5) for factors.
+
+```{r}
+data(fhch2010) # get some data
+contrasts(fhch2010$stimulus) <- contr.sum(2) # sum code it
+
+# fit the model
+stim_mod <- lmer(
+  log_rt ~ 1 + stimulus + 
+    (1 + stimulus | id) + (1 | item), 
+  data = fhch2010
+)
+```
+
+## Parameter Estimates/Contrasts
+
+Look at the *t* and/or *p*-values in the parameter estimates table.
+
+```{r}
+summary(stim_mod)
+```
+
+## Likelihood Ratio Tests (LRT)
+
+If your factors have more than 2 levels, you can look for main effects using likelihood ratio tests. Only two models can be compared at once, so **forward or backward selection** is needed.
+
+```{r}
+stim_mod_0 <- lmer(log_rt ~ 1 + (1 + stimulus | id) + (1 | item), data = fhch2010)
+anova(stim_mod_0, stim_mod)
+```
+
+*Note that BIC and AIC are alternatives to LRT*.
+
+## ANOVA
+
+You can use the built-in ANOVA function. When combined with `lmerTest` or `afex` packages, this gets type-III sums of squares and Satterhwaite's method for calculating the *p*-value.
+
+::: callout-caution
+Type-III sums of squares are only appropriate with orthogonal contrasts, such as sum-to-zero coding. Only interpret these values if you use this coding strategy.
+:::
+
+```{r}
+anova(stim_mod)
+```
+
+# Marginal Predictions and Tests
+
+These work just like in regular models we've explored in the core statistics lessons. Check out `emmeans::emmeans()` and `emmeans::pairs()` for estimated marginal means and pairwise tests.
+
+# Non-Linear Models
+
+## Generalised Linear Mixed Effects Models
+
+These work just like the regular general linear models we've covered in core statistics. However, instead of using `lme4::lmer()` we would use `lme4::glmer()`. As before, we need a likelihood and link function defined in the model call.
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.

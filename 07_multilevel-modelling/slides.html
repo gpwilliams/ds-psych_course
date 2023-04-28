@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.3.340">
+
+  <meta name="author" content="Glenn Williams">
+  <meta name="dcterms.date" content="2023-04-28">
+  <title>Multilevel Modelling</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Multilevel Modelling</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Glenn Williams 
+</div>
+</div>
+</div>
+
+  <p class="date">2023-04-28</p>
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<div class="r-fit-text">
+<p>Today’s session is on multilevel modelling:</p>
+<ul>
+<li><p>Understanding when multilevel models are necessary and the benefits to using multilevel models by default even when single-level models suffice.</p></li>
+<li><p>How multilevel models are extensions to single-level models (e.g.&nbsp;linear regression) and the implications of model structure.</p></li>
+<li><p>The difference between fixed and random effects, and crossed/nested random effects, and when random intercepts and slopes are necessary.</p></li>
+<li><p>The importance of partial pooling/shrinkage/regularisation on model estimates.</p></li>
+</ul>
+</div>
+</section>
+<section>
+<section id="getting-started" class="title-slide slide level1 center">
+<h1>Getting Started</h1>
+<ul>
+<li><p>Go to <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p></li>
+<li><p>Click <code>Code</code> &gt; Download ZIP.</p></li>
+<li><p>Unzip the files.</p></li>
+<li><p>Open the file <code>ds-psych_course.RProj</code></p></li>
+<li><p>Create a Quarto document and save it within <code>07_mixed-effects-models</code>. Name it anything you like.</p></li>
+</ul>
+<p>You can copy the code form here on out and everything should work.</p>
+</section>
+<section id="loading-packages" class="slide level2">
+<h2>Loading Packages</h2>
+<p>Load our essential packages, <code>tidyverse</code> for data wrangling and presentation and <code>here</code> for working with file paths. The core packages today are <code>lme4</code> for mixed effects models and <code>afex</code> which builds on <code>lme4</code> but adds more functionality.</p>
+<p>We also use <code>emmeans</code> for estimated marginal means and pairwise tests, and <code>easystats</code> for its child packages <code>effectsize</code> for getting effect sizes and <code>performance</code> for calculating intraclass-correlation coefficients.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(afex)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(easystats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-data" class="slide level2">
+<h2>The Data</h2>
+<p>We’ll use the <code>sleepstudy</code> data set from <code>lme4</code> which has reaction times of subjects who were deprived of sleep over several days, getting only 3 hours of sleep each day.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">data</span>(sleepstudy)</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>sleepstudy <span class="ot">&lt;-</span> sleepstudy <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="co"># add two fake participants</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="fu">tibble</span>(<span class="at">reaction =</span> <span class="fu">c</span>(<span class="dv">286</span>, <span class="dv">288</span>), <span class="at">days =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">subject =</span> <span class="st">"374"</span>),</span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="fu">tibble</span>(<span class="at">reaction =</span> <span class="dv">245</span>, <span class="at">days =</span> <span class="dv">0</span>, <span class="at">subject =</span> <span class="st">"373"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-data-1" class="slide level2">
+<h2>The Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">glimpse</span>(sleepstudy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 183
+Columns: 3
+$ reaction &lt;dbl&gt; 249.5600, 258.7047, 250.8006, 321.4398, 356.8519, 414.6901, 3…
+$ days     &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0…
+$ subject  &lt;chr&gt; "308", "308", "308", "308", "308", "308", "308", "308", "308"…</code></pre>
+</div>
+</div>
+</section>
+<section id="plotting-the-data" class="slide level2">
+<h2>Plotting the Data</h2>
+<p>There is some trend going on.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> sleepstudy, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> days, <span class="at">y =</span> reaction)) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>subject) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="modelling-the-data" class="title-slide slide level1 center">
+<h1>Modelling the Data</h1>
+<p>We want to estimate the mean effect of sleep deprivation on reaction times.</p>
+</section>
+<section id="an-initial-attempt" class="slide level2">
+<h2>An Initial Attempt</h2>
+<p>One approach you might think to use is a linear model, with:</p>
+<p><span class="math display">\[
+\begin{aligned}
+RT_{subj, days} = \alpha + \beta Days_{subj, days} + e_{subj, days}\\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}\]</span></p>
+<p>Or equivalently with:</p>
+<p><span class="math display">\[
+\begin{aligned}
+RT_{subj, days} \sim \mathcal{N}(\mu_{subj, days}, \sigma^2)\\
+\mu_{subj, days} = \alpha + \beta Days_{subj, days}\\
+\end{aligned}
+\]</span></p>
+</section>
+<section id="complete-pooling" class="slide level2">
+<h2>Complete Pooling</h2>
+<ul>
+<li>But, we need to be wary of the assumptions we encode in this model.</li>
+</ul>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Assumptions</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><p>❌ Residual errors are independent.</p></li>
+<li><p>❌ Sleep deprivation has the same impact for each participant.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="fit-the-model" class="slide level2">
+<h2>Fit the Model</h2>
+<p>We appear to have an effect whereby reaction times increase as days without sleep increase.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>complete_pool_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(reaction <span class="sc">~</span> days, <span class="at">data =</span> sleepstudy)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">summary</span>(complete_pool_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = reaction ~ days, data = sleepstudy)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-110.646  -27.951    1.829   26.388  139.875 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  252.321      6.406  39.389  &lt; 2e-16 ***
+days          10.328      1.210   8.537 5.48e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 47.43 on 181 degrees of freedom
+Multiple R-squared:  0.2871,    Adjusted R-squared:  0.2831 
+F-statistic: 72.88 on 1 and 181 DF,  p-value: 5.484e-15</code></pre>
+</div>
+</div>
+</section>
+<section id="model-predictions" class="slide level2">
+<h2>Model Predictions</h2>
+<p>Not great!</p>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
+<section id="changing-assumptions" class="slide level2">
+<h2>Changing Assumptions</h2>
+<ul>
+<li><p>We know that participants might start off with different reaction times (i.e.&nbsp;different intercepts) and for them to respond differently to sleep deprivation (i.e.&nbsp;different slopes).</p></li>
+<li><p>Let’s estimate an average reaction time and the impact of sleep deprivation on reaction time for each subject.</p></li>
+</ul>
+</section>
+<section id="an-alternative-model" class="slide level2">
+<h2>An Alternative Model</h2>
+<p>We can model an intercept, slope, and intercepts and slopes by subjects with:</p>
+<p><span class="math display">\[
+\begin{aligned}
+RT_{subj, days} = \alpha + \beta Days_{days} + \beta Subject_{subj} + \beta Days_{days} \cdot Subject_{subj} + e_{subj, days}\\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}\]</span></p>
+<p>Or equivalently with:</p>
+<p><span class="math display">\[
+\begin{aligned}
+RT_{subj, days} \sim \mathcal{N}(\mu_{subj, days}, \sigma^2)\\
+\mu_{subj, days} = \alpha + \beta Days_{days} + \beta Subject_{subject} + \beta Days_{days} \cdot Subject_{subj}\\
+\end{aligned}
+\]</span></p>
+</section>
+<section id="no-pooling" class="slide level2">
+<h2>No Pooling</h2>
+<ul>
+<li>But, we need to be wary of the assumptions we encode in this model.</li>
+</ul>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Assumptions</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><p>✅ Residual errors are independent.</p></li>
+<li><p>✅ Sleep deprivation has <strong>a different impact</strong> for each participant.</p></li>
+<li><p>❌ Knowledge of the sample does not help with estimating the individual.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="nominal-variables" class="slide level2">
+<h2>Nominal Variables</h2>
+<div class="r-fit-text">
+<ul>
+<li><p>By default, numeric variables are treated as continuous.</p></li>
+<li><p><code>subject</code> is numeric, but is not continuous. It should be nominal.</p></li>
+<li><p>If we treat <code>subject</code> as continuous we implicitly assume going from participant</p></li>
+<li><p>However, if we add subject as a continuous variable to our model we will assume that the difference between participants is linear, additive, and equally spaced.</p></li>
+<li><p>So, we assume the difference between participants 308 and 309 is the same as between participants 309 and 310, which it probably isn’t, amongst other weird things. So treat it as a <code>factor</code>.</p></li>
+</ul>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>sleepstudy<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(sleepstudy<span class="sc">$</span>subject)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">contrasts</span>(sleepstudy<span class="sc">$</span>subject) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="fu">length</span>(<span class="fu">unique</span>(sleepstudy<span class="sc">$</span>subject)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fit-the-model-1" class="slide level2">
+<h2>Fit the Model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>no_pooling_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> subject <span class="sc">+</span> days<span class="sc">:</span>subject, </span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="at">data =</span> sleepstudy</span>
+<span id="cb9-4"><a href="#cb9-4"></a>)</span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fu">summary</span>(no_pooling_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = reaction ~ 1 + days + subject + days:subject, data = sleepstudy)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-106.40  -10.55    0.00   11.17  132.51 
+
+Coefficients: (1 not defined because of singularities)
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)    252.8146     3.6683  68.920  &lt; 2e-16 ***
+days            10.0216     2.0061   4.996 1.67e-06 ***
+subject1        -8.6219    14.7337  -0.585 0.559341    
+subject2       -47.7596    14.7337  -3.242 0.001477 ** 
+subject3       -49.3304    14.7337  -3.348 0.001038 ** 
+subject4        36.8705    14.7337   2.502 0.013451 *  
+subject5        32.9244    14.7337   2.235 0.026982 *  
+subject6        11.4370    14.7337   0.776 0.438876    
+subject7        22.2045    14.7337   1.507 0.133988    
+subject8       -12.6517    14.7337  -0.859 0.391940    
+subject9        10.2201    14.7337   0.694 0.489018    
+subject10       37.2895    14.7337   2.531 0.012452 *  
+subject11      -37.7028    14.7337  -2.559 0.011531 *  
+subject12      -26.9800    14.7337  -1.831 0.069142 .  
+subject13        8.3324    14.7337   0.566 0.572591    
+subject14       23.5575    14.7337   1.599 0.112039    
+subject15        2.1536    14.7337   0.146 0.883996    
+subject16      -42.3655    14.7337  -2.875 0.004648 ** 
+subject17        0.8214    14.7337   0.056 0.955616    
+subject18       14.2302    14.7337   0.966 0.335751    
+subject19       -7.8146    24.5541  -0.318 0.750748    
+days:subject1   11.7431     3.3358   3.520 0.000577 ***
+days:subject2   -7.7599     3.3358  -2.326 0.021400 *  
+days:subject3   -3.9067     3.3358  -1.171 0.243466    
+days:subject4   -7.0136     3.3358  -2.103 0.037247 *  
+days:subject5   -4.7556     3.3358  -1.426 0.156135    
+days:subject6   -0.4549     3.3358  -0.136 0.891726    
+days:subject7   -0.8796     3.3358  -0.264 0.792399    
+days:subject8    2.2315     3.3358   0.669 0.504591    
+days:subject9  -12.9027     3.3358  -3.868 0.000166 ***
+days:subject10   9.0043     3.3358   2.699 0.007780 ** 
+days:subject11   3.4723     3.3358   1.041 0.299654    
+days:subject12   9.4824     3.3358   2.843 0.005125 ** 
+days:subject13  -3.5881     3.3358  -1.076 0.283880    
+days:subject14   3.5449     3.3358   1.063 0.289698    
+days:subject15   1.3265     3.3358   0.398 0.691477    
+days:subject16   8.0345     3.3358   2.409 0.017278 *  
+days:subject17  -0.8332     3.3358  -0.250 0.803117    
+days:subject18   1.2764     3.3358   0.383 0.702543    
+days:subject19       NA         NA      NA       NA    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 25.59 on 144 degrees of freedom
+Multiple R-squared:  0.8348,    Adjusted R-squared:  0.7913 
+F-statistic: 19.16 on 38 and 144 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="model-predictions-1" class="slide level2">
+<h2>Model Predictions</h2>
+<p>Better, but we can’t make good predictions from subjects 373 and 374.</p>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<section id="changing-assumptions-1" class="slide level2">
+<h2>Changing Assumptions</h2>
+<ul>
+<li><p>We’d like to estimate the mean effect of sleep deprivation on reaction times.</p></li>
+<li><p>We know that participants might start off with different reaction times (i.e.&nbsp;different intercepts) and for them to respond differently to sleep deprivation (i.e.&nbsp;different slopes).</p></li>
+<li><p>We’d like individual intercepts and slopes to contribute to our mean estimates.</p></li>
+<li><p>We’d like to use the mean estimates to regularise the estimates for each individual.</p></li>
+</ul>
+</section>
+<section id="the-best-of-both" class="slide level2">
+<h2>The Best of Both?</h2>
+<p><span class="math display">\[
+\begin{aligned}
+RT_{subj, days} = \alpha_{subj} + \beta_{subj}Days_{subj, days}  + e_{subj, days}\\
+\alpha_{subj} = \alpha + S_{0, subj}\\
+\beta_{subj} = \beta + S_{1, subj}\\
+\begin{bmatrix} \alpha_{subj} \\ \beta_{subj} \end{bmatrix} \sim \mathcal{N}(\begin{bmatrix} 0, 0 \end{bmatrix}, \Sigma)\\
+\Sigma = \begin{pmatrix} \tau_{0}^2, \rho_{\tau_{0}\tau_{1}} \\ \rho_{\tau_{0}\tau_{1}}, \tau_{1} \end{pmatrix}\\ \\
+e_{subj, days} \sim \mathcal{N}(0, \sigma^2)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="partial-pooling" class="slide level2">
+<h2>Partial Pooling</h2>
+<p>Are these assumptions appropriate?</p>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Assumptions</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><p>✅ Residual errors are independent, even with repeated observations per subject.</p></li>
+<li><p>✅ There is an average reaction time (intercept) and effect of sleep deprivation on reaction time (slope).</p></li>
+<li><p>✅ Subjects’ average reaction times are offset from the average.</p></li>
+<li><p>✅ Effects of sleep deprivation on subjects varies around the average.</p></li>
+<li><p>✅ Average reaction times and effects of sleep deprivation are correlated within subjects.</p></li>
+<li><p>✅ Knowledge of the sample helps with estimating the individual.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="fit-the-model-2" class="slide level2">
+<h2>Fit the Model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>partial_pooling_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  reaction <span class="sc">~</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="at">data =</span> sleepstudy</span>
+<span id="cb11-4"><a href="#cb11-4"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="fu">summary</span>(partial_pooling_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: reaction ~ days + (1 + days | subject)
+   Data: sleepstudy
+
+REML criterion at convergence: 1771.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9707 -0.4703  0.0276  0.4594  5.2009 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr
+ subject  (Intercept) 582.72   24.140       
+          days         35.03    5.919   0.07
+ Residual             649.36   25.483       
+Number of obs: 183, groups:  subject, 20
+
+Fixed effects:
+            Estimate Std. Error      df t value Pr(&gt;|t|)    
+(Intercept)  252.543      6.433  19.295  39.257  &lt; 2e-16 ***
+days          10.452      1.542  17.163   6.778 3.06e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+     (Intr)
+days -0.137</code></pre>
+</div>
+</div>
+</section>
+<section id="model-predictions-2" class="slide level2">
+<h2>Model Predictions</h2>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="comparing-methods" class="title-slide slide level1 center">
+<h1>Comparing Methods</h1>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
+<section id="zooming-in" class="slide level2">
+<h2>Zooming In</h2>
+<p>Note that the partially-pooled results are <em>regularised</em>.</p>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="understanding-mixed-effects-models" class="title-slide slide level1 center">
+<h1>Understanding Mixed Effects Models</h1>
+
+</section>
+<section id="understanding-the-model-formula" class="slide level2">
+<h2>Understanding the Model Formula</h2>
+<p>In the formula <code>y ~ 1 + x + (1 + x | id)</code> we get estimates for:</p>
+<ul>
+<li><p>a fixed effect estimate for the intercept</p></li>
+<li><p>a fixed effect estimate for the slope, <code>x</code></p></li>
+<li><p>a random intercept for each <code>id</code> (i.e.&nbsp;offsets for each <code>id</code>).</p></li>
+<li><p>a random slope for each <code>x</code> within id (i.e.&nbsp;offsets for each <code>id</code>).</p></li>
+<li><p>a correlation between the random intercepts and slopes.</p></li>
+</ul>
+</section>
+<section id="fixed-and-random-effects" class="slide level2">
+<h2>Fixed and Random Effects</h2>
+<ul>
+<li><p><strong>Fixed effects</strong> typically contain all possible levels of a factor in a study/experiment.</p></li>
+<li><p><strong>Random effects</strong> are often a random sample of the possible levels.</p></li>
+<li><p>We usually want to <strong>generalise</strong> <strong>our findings</strong> <strong>beyond</strong> <strong>the</strong> <strong>groups for random effects</strong>.</p></li>
+</ul>
+<p>Any time something we have some categorical variable with an index that’s <strong>exchangeable</strong>, e.g.&nbsp;participant IDs, we should <strong>pool information</strong> for this variable, keeping it as a random effect grouping factor.</p>
+</section></section>
+<section>
+<section id="understanding-random-effects-structures" class="title-slide slide level1 center">
+<h1>Understanding Random Effects Structures</h1>
+
+</section>
+<section id="random-intercepts" class="slide level2">
+<h2>Random Intercepts</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>i_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject), <span class="at">data =</span> sleepstudy)</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">summary</span>(i_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: reaction ~ 1 + days + (1 | subject)
+   Data: sleepstudy
+
+REML criterion at convergence: 1815.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2361 -0.5406  0.0143  0.5204  4.2699 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ subject  (Intercept) 1296     36.00   
+ Residual              952     30.85   
+Number of obs: 183, groups:  subject, 20
+
+Fixed effects:
+            Estimate Std. Error       df t value Pr(&gt;|t|)    
+(Intercept) 252.5777     9.1033  26.1095   27.75   &lt;2e-16 ***
+days         10.4319     0.7963 165.2122   13.10   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+     (Intr)
+days -0.367</code></pre>
+</div>
+</div>
+</section>
+<section id="random-slopes" class="slide level2">
+<h2>Random Slopes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>s_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb15-2"><a href="#cb15-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="at">data =</span> sleepstudy</span>
+<span id="cb15-4"><a href="#cb15-4"></a>)</span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="fu">summary</span>(s_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: reaction ~ 1 + days + (0 + days | subject)
+   Data: sleepstudy
+
+REML criterion at convergence: 1794.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.5174 -0.5661  0.0499  0.6140  4.6109 
+
+Random effects:
+ Groups   Name Variance Std.Dev.
+ subject  days  52.67    7.257  
+ Residual      837.90   28.947  
+Number of obs: 183, groups:  subject, 20
+
+Fixed effects:
+            Estimate Std. Error      df t value Pr(&gt;|t|)    
+(Intercept)  252.296      3.911 164.168  64.504  &lt; 2e-16 ***
+days          10.414      1.864  21.609   5.587 1.37e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+     (Intr)
+days -0.337</code></pre>
+</div>
+</div>
+</section>
+<section id="uncorrelated-random-intercepts-and-slopes" class="slide level2">
+<h2>Uncorrelated Random Intercepts and Slopes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>u_is_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb17-2"><a href="#cb17-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> subject) <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb17-3"><a href="#cb17-3"></a>  <span class="at">data =</span> sleepstudy</span>
+<span id="cb17-4"><a href="#cb17-4"></a>)</span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="fu">summary</span>(u_is_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: reaction ~ 1 + days + (1 | subject) + (0 + days | subject)
+   Data: sleepstudy
+
+REML criterion at convergence: 1771.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9806 -0.4673  0.0250  0.4589  5.2083 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ subject   (Intercept) 598.14   24.46   
+ subject.1 days         35.88    5.99   
+ Residual              647.89   25.45   
+Number of obs: 183, groups:  subject, 20
+
+Fixed effects:
+            Estimate Std. Error      df t value Pr(&gt;|t|)    
+(Intercept)  252.550      6.491  20.635  38.906  &lt; 2e-16 ***
+days          10.439      1.556  18.254   6.708 2.54e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+     (Intr)
+days -0.184</code></pre>
+</div>
+</div>
+</section>
+<section id="correlated-random-intercepts-and-slopes" class="slide level2">
+<h2>Correlated Random Intercepts and Slopes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>is_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb19-2"><a href="#cb19-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb19-3"><a href="#cb19-3"></a>  <span class="at">data =</span> sleepstudy</span>
+<span id="cb19-4"><a href="#cb19-4"></a>)</span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="fu">summary</span>(is_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: reaction ~ 1 + days + (1 + days | subject)
+   Data: sleepstudy
+
+REML criterion at convergence: 1771.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9707 -0.4703  0.0276  0.4594  5.2009 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr
+ subject  (Intercept) 582.72   24.140       
+          days         35.03    5.919   0.07
+ Residual             649.36   25.483       
+Number of obs: 183, groups:  subject, 20
+
+Fixed effects:
+            Estimate Std. Error      df t value Pr(&gt;|t|)    
+(Intercept)  252.543      6.433  19.295  39.257  &lt; 2e-16 ***
+days          10.452      1.542  17.163   6.778 3.06e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+     (Intr)
+days -0.137</code></pre>
+</div>
+</div>
+</section>
+<section id="comparing-methods-1" class="slide level2">
+<h2>Comparing Methods</h2>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-18-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="when-to-include-parameters-in-random-effects" class="title-slide slide level1 center">
+<h1>When to Include Parameters in Random Effects</h1>
+
+</section>
+<section id="keep-it-maximal" class="slide level2">
+<h2>Keep it Maximal</h2>
+<p>Barr et al.&nbsp;(2013) show that the maximal random effects structure <strong>justified by the design</strong> protects against Type-I and Type-II errors.</p>
+<ul>
+<li><p>Random intercepts should be present for random/exchangeable factors, e.g.&nbsp;subjects and items.</p></li>
+<li><p>Random slopes for r<strong>epeated observations</strong> within a unit, e.g.&nbsp;within-subjects or within-items effects. Introduce the highest-order interaction and all lower order terms that are within-unit.</p></li>
+<li><p>No random slopes for <strong>non-repeated observations</strong> within a unit, e.g.&nbsp;between-subjects or between-items effects.</p></li>
+</ul>
+</section>
+<section id="keeping-it-maximal" class="slide level2">
+<h2>Keeping it Maximal</h2>
+<p>We are interested in predicting the outcome <code>y</code> from <code>x</code> and have several <code>subject</code>s who took part in our study.</p>
+<ul>
+<li><p>Where <code>x</code> is between-subjects: <code>y ~ x + (1 | subject)</code>.</p></li>
+<li><p>where <code>x</code> is within-subjects but we only have one observation per level of <code>x</code>: <code>y ~ x + (1 | subject)</code>.</p></li>
+<li><p>where <code>x</code> is within-subjects but we have more than one observation per level of <code>x</code>: <code>y ~ x + (1 + x | subject)</code>.</p></li>
+</ul>
+</section>
+<section id="parsimonious-mixed-effects-models" class="slide level2">
+<h2>Parsimonious Mixed Effects Models</h2>
+<p>Matuschek et al.&nbsp;(2017) instead argue that we should retain random slopes that are j<strong>ustified by the design</strong> only if they contribute enough to explaining the variance in the model. They argue this gives a better balance between Type-I error and power.</p>
+<ul>
+<li><p>Use a similar method to introduce random intercepts and slopes as in Barr et al.&nbsp;(2013).</p></li>
+<li><p>Evaluate the impact of adding/removing random slopes on the amount of variance explained by the model.</p></li>
+<li><p>Compare the impact of random effects through <strong>model comparison</strong>.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="crossed-random-effects" class="title-slide slide level1 center">
+<h1>Crossed Random Effects</h1>
+
+</section>
+<section id="analysing-subjects-and-items" class="slide level2">
+<h2>Analysing Subjects and Items</h2>
+<ul>
+<li><p>Aggregating participant-by-trial level data by participants treats the items as a <strong>fixed effect</strong>.</p></li>
+<li><p>This assumes the items in your study are the only ones of interest and you don’t want to <strong>generalise to new items</strong>.</p></li>
+<li><p>This has been a known problem in psycholinguistics since the 1970s, where we used F1/F2 analyses: effects are only significant if they come up significant in tests of data aggregated by subjects and items.</p></li>
+<li><p>Separate by-subjects and by-items analyses are still problematic in terms of error rates.</p></li>
+</ul>
+</section>
+<section id="using-crossed-random-effects" class="slide level2">
+<h2>Using Crossed Random Effects</h2>
+<p>We can specify crossed random effects of subjects and items (or any other unit) by adding additional random effects components to the model. Minimally:</p>
+<p><code>y ~ x + (1 | subject) + (1 | item)</code></p>
+<p>The random slopes still matter here. So, if <code>x</code> is within-subjects but not within-items, our formula would look like:</p>
+<p><code>y ~ x + (1 + x | subject) + (1 | item)</code></p>
+<p>If it’s within both, it would be:</p>
+<p><code>y ~ x + (1 + x | subject) + (1 + x | item)</code></p>
+</section></section>
+<section>
+<section id="nested-random-effects" class="title-slide slide level1 center">
+<h1>Nested Random Effects</h1>
+<p>Sometimes your data are hierarchical, such that observational units are nested within higher units. For example, <strong>students are nested within classes and schools</strong>.</p>
+<p>Accounting for unique effects of classes and schools on individuals is needed.</p>
+</section>
+<section id="using-nested-random-effects" class="slide level2">
+<h2>Using Nested Random Effects</h2>
+<p>If you have data with shared identifiers for e.g.&nbsp;students and classes, but unique identifiers for schools, e.g.:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  student class school intervention outcome
+    &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt;
+1       1     1      1 yes             204.
+2       2     2      1 no              217.
+3       3     3      1 yes             233.
+4       4     4      1 no              231.
+5       5     5      1 yes             215.
+6       6     1      2 no              193.</code></pre>
+</div>
+</div>
+<p>The appropriate formula is <code>y ~ 1 + intervention + (1 | school/class/student)</code>.</p>
+</section>
+<section id="using-unique-codes" class="slide level2">
+<h2>Using Unique Codes</h2>
+<p>If instead you add a unique identifier for students and classes, e.g.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>nested_data<span class="sc">$</span>class_id <span class="ot">&lt;-</span> <span class="fu">paste</span>(nested_data<span class="sc">$</span>school, nested_data<span class="sc">$</span>class, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">head</span>(nested_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  student class school intervention outcome class_id
+    &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;   
+1       1     1      1 yes             204. 1_1     
+2       2     2      1 no              217. 1_2     
+3       3     3      1 yes             233. 1_3     
+4       4     4      1 no              231. 1_4     
+5       5     5      1 yes             215. 1_5     
+6       6     1      2 no              193. 2_1     </code></pre>
+</div>
+</div>
+<p>You can use crossed random effects like:</p>
+<pre><code>y ~ 1 + intervention + (1 | school) + (1 | class_id)</code></pre>
+</section></section>
+<section>
+<section id="when-models-break-down" class="title-slide slide level1 center">
+<h1>When Models Break Down</h1>
+
+</section>
+<section id="non-convergence-and-singularity" class="slide level2">
+<h2>Non-Convergence and Singularity</h2>
+<p>Often, trying to fit the maximal model results in <strong>non-convergence</strong> or a <strong>singular fit</strong>.</p>
+<ul>
+<li><p>With maximum likelihood estimation the model can sometimes not settle (converge) on a reliable estimate.</p></li>
+<li><p>Sometimes your variance-covariance matrix has perfectly correlations (e.g.&nbsp;-1 or 1) or variances that are practically 0.</p></li>
+</ul>
+<p>In either case you should try (1) a different <strong>optimiser</strong> for getting estimates, (2) increasing <strong>iterations</strong> before settling on an estimate, or (3) <strong>reducing</strong> <strong>complexity</strong> in your random effects.</p>
+</section>
+<section id="optimisers" class="slide level2">
+<h2>Optimisers</h2>
+<p>The default optimiser in <code>lme4</code> is <code>nloptwrap</code>. Try <code>Nelder_Mead</code> or <code>bobyqa</code> instead.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>boby_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb25-2"><a href="#cb25-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb25-3"><a href="#cb25-3"></a>  <span class="at">data =</span> sleepstudy,</span>
+<span id="cb25-4"><a href="#cb25-4"></a>  <span class="at">control =</span> <span class="fu">lmerControl</span>(<span class="at">optimizer =</span> <span class="st">"bobyqa"</span>)</span>
+<span id="cb25-5"><a href="#cb25-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note, for generalised models fitted with <code>glmer()</code> you need to use <code>control = glmerControl()</code>.</p>
+</section>
+<section id="iterations" class="slide level2">
+<h2>Iterations</h2>
+<p>To increase the number of iterations before settling on estimates, again use the <code>control</code> options.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>iter_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb26-2"><a href="#cb26-2"></a>  reaction <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> days <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> days <span class="sc">|</span> subject), </span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="at">data =</span> sleepstudy,</span>
+<span id="cb26-4"><a href="#cb26-4"></a>  <span class="at">control =</span> <span class="fu">lmerControl</span>(<span class="at">optCtrl =</span> <span class="fu">list</span>(<span class="at">maxfun =</span> <span class="dv">20000</span>))</span>
+<span id="cb26-5"><a href="#cb26-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="reducing-model-complexity" class="slide level2">
+<h2>Reducing Model Complexity</h2>
+<p>Some heuristics can be helpful here, including:</p>
+<ul>
+<li>Correlations between random effects, especially with many interactions, can be difficult to estimate. Suppress them with:</li>
+</ul>
+<p><code>y ~ x + z (1 + x * z || subject)</code>.</p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The double bar notation only works in <code>lme4::lmer()</code> with numeric predictors. Either expand your formula manually, e.g.&nbsp;`<code>y ~ x + z (1 | subject) + (0 + x | subject) + (0 + z | subject) + (0 + x:z | subject)</code>` or use numeric codes to use the double bar notation. Otherwise, use <code>afex::mixed()</code> which allows double bar notation with factors.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="reducing-model-complexity-1" class="slide level2">
+<h2>Reducing Model Complexity</h2>
+<ul>
+<li><p>Next, <strong>higher-order interactions</strong> usually soak up less variance than lower-order interactions. Remove the highest-order interactions from random slopes before moving down.</p></li>
+<li><p>Remove <strong>slopes</strong> before intercepts.</p></li>
+<li><p>Assuming you’ve conducted an experiment with tight control on your items, <strong>items will usually soak up less variance</strong> than subjects. So, reduce the random effects structure on items before subjects.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="evaluating-evidence-in-mixed-effects-models" class="title-slide slide level1 center">
+<h1>Evaluating Evidence in Mixed Effects Models</h1>
+<p>Inference can be more complicated than using a traditional ANOVA. However, there are a few methods to get main effects and interactions.</p>
+</section>
+<section id="parameter-estimatescontrasts" class="slide level2">
+<h2>Parameter Estimates/Contrasts</h2>
+<p>If your factors only have two levels, then you can look directly at the parameter estimates for main effects if you use sum-to-zero coding (e.g.&nbsp;-1/1 or -.5/.5) for factors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">data</span>(fhch2010) <span class="co"># get some data</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a><span class="fu">contrasts</span>(fhch2010<span class="sc">$</span>stimulus) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="dv">2</span>) <span class="co"># sum code it</span></span>
+<span id="cb27-3"><a href="#cb27-3"></a></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="co"># fit the model</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a>stim_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb27-6"><a href="#cb27-6"></a>  log_rt <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> stimulus <span class="sc">+</span> </span>
+<span id="cb27-7"><a href="#cb27-7"></a>    (<span class="dv">1</span> <span class="sc">+</span> stimulus <span class="sc">|</span> id) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> item), </span>
+<span id="cb27-8"><a href="#cb27-8"></a>  <span class="at">data =</span> fhch2010</span>
+<span id="cb27-9"><a href="#cb27-9"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="parameter-estimatescontrasts-1" class="slide level2">
+<h2>Parameter Estimates/Contrasts</h2>
+<p>Look at the <em>t</em> and/or <em>p</em>-values in the parameter estimates table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">summary</span>(stim_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: log_rt ~ 1 + stimulus + (1 + stimulus | id) + (1 | item)
+   Data: fhch2010
+
+REML criterion at convergence: 7833.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-6.0778 -0.6049 -0.1080  0.4828  5.5021 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr
+ item     (Intercept) 0.003715 0.06095      
+ id       (Intercept) 0.048958 0.22126      
+          stimulus1   0.006211 0.07881  0.30
+ Residual             0.100291 0.31669      
+Number of obs: 13222, groups:  item, 600; id, 45
+
+Fixed effects:
+            Estimate Std. Error       df t value Pr(&gt;|t|)    
+(Intercept) -0.07535    0.03319 44.50566  -2.270   0.0281 *  
+stimulus1   -0.08443    0.01232 47.79799  -6.851 1.27e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+          (Intr)
+stimulus1 0.284 </code></pre>
+</div>
+</div>
+</section>
+<section id="likelihood-ratio-tests-lrt" class="slide level2">
+<h2>Likelihood Ratio Tests (LRT)</h2>
+<p>If your factors have more than 2 levels, you can look for main effects using likelihood ratio tests. Only two models can be compared at once, so <strong>forward or backward selection</strong> is needed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>stim_mod_0 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(log_rt <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> stimulus <span class="sc">|</span> id) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> item), <span class="at">data =</span> fhch2010)</span>
+<span id="cb30-2"><a href="#cb30-2"></a><span class="fu">anova</span>(stim_mod_0, stim_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data: fhch2010
+Models:
+stim_mod_0: log_rt ~ 1 + (1 + stimulus | id) + (1 | item)
+stim_mod: log_rt ~ 1 + stimulus + (1 + stimulus | id) + (1 | item)
+           npar    AIC    BIC  logLik deviance  Chisq Df Pr(&gt;Chisq)    
+stim_mod_0    6 7866.2 7911.2 -3927.1   7854.2                         
+stim_mod      7 7835.1 7887.5 -3910.5   7821.1 33.131  1  8.614e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><em>Note that BIC and AIC are alternatives to LRT</em>.</p>
+</section>
+<section id="anova" class="slide level2">
+<h2>ANOVA</h2>
+<p>You can use the built-in ANOVA function. When combined with <code>lmerTest</code> or <code>afex</code> packages, this gets type-III sums of squares and Satterhwaite’s method for calculating the <em>p</em>-value.</p>
+<div class="callout callout-caution callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Caution</strong></p>
+</div>
+<div class="callout-content">
+<p>Type-III sums of squares are only appropriate with orthogonal contrasts, such as sum-to-zero coding. Only interpret these values if you use this coding strategy.</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">anova</span>(stim_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Type III Analysis of Variance Table with Satterthwaite's method
+         Sum Sq Mean Sq NumDF  DenDF F value    Pr(&gt;F)    
+stimulus 4.7069  4.7069     1 47.798  46.932 1.271e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section></section>
+<section id="marginal-predictions-and-tests" class="title-slide slide level1 center">
+<h1>Marginal Predictions and Tests</h1>
+<p>These work just like in regular models we’ve explored in the core statistics lessons. Check out <code>emmeans::emmeans()</code> and <code>emmeans::pairs()</code> for estimated marginal means and pairwise tests.</p>
+</section>
+
+<section>
+<section id="non-linear-models" class="title-slide slide level1 center">
+<h1>Non-Linear Models</h1>
+
+</section>
+<section id="generalised-linear-mixed-effects-models" class="slide level2">
+<h2>Generalised Linear Mixed Effects Models</h2>
+<p>These work just like the regular general linear models we’ve covered in core statistics. However, instead of using <code>lme4::lmer()</code> we would use <code>lme4::glmer()</code>. As before, we need a likelihood and link function defined in the model call.</p>
+</section>
+<section id="exercises" class="slide level2">
+<h2>Exercises</h2>
+<p>Please complete the exercises at <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p>
+<div class="footer footer-default">
+
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
