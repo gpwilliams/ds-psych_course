@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Glenn Williams">
+<meta name="dcterms.date" content="2023-04-28">
+
+<title>Multilevel Modelling</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="questions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="questions_files/libs/quarto-html/quarto.js"></script>
+<script src="questions_files/libs/quarto-html/popper.min.js"></script>
+<script src="questions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="questions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="questions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="questions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="questions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="questions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="questions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Multilevel Modelling</h1>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Glenn Williams </p>
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Northumbria University
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 28, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">May 4, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Abstract</div>
+      Multilevel modelling with lme4 and friends.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
+  <li><a href="#basics" id="toc-basics" class="nav-link" data-scroll-target="#basics">Basics</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-continuous-fixed-effects" id="toc-exercise-1.-continuous-fixed-effects" class="nav-link" data-scroll-target="#exercise-1.-continuous-fixed-effects">Exercise 1. Continuous Fixed Effects</a></li>
+  <li><a href="#exercise-2.-continuous-fixed-effects-with-centred-predictors" id="toc-exercise-2.-continuous-fixed-effects-with-centred-predictors" class="nav-link" data-scroll-target="#exercise-2.-continuous-fixed-effects-with-centred-predictors">Exercise 2. Continuous Fixed Effects with Centred Predictors</a>
+  <ul class="collapse">
+  <li><a href="#a.-model-fitting-and-interpreting-fixed-effect-estimates" id="toc-a.-model-fitting-and-interpreting-fixed-effect-estimates" class="nav-link" data-scroll-target="#a.-model-fitting-and-interpreting-fixed-effect-estimates">A. Model fitting and interpreting fixed effect estimates</a></li>
+  <li><a href="#b.-understanding-implications-for-fixed-and-random-effects" id="toc-b.-understanding-implications-for-fixed-and-random-effects" class="nav-link" data-scroll-target="#b.-understanding-implications-for-fixed-and-random-effects">B. Understanding implications for fixed and random effects</a></li>
+  </ul></li>
+  <li><a href="#exercise-3.-categorical-fixed-effects" id="toc-exercise-3.-categorical-fixed-effects" class="nav-link" data-scroll-target="#exercise-3.-categorical-fixed-effects">Exercise 3. Categorical Fixed Effects</a>
+  <ul class="collapse">
+  <li><a href="#a.-treatment-default-coded-fixed-effects" id="toc-a.-treatment-default-coded-fixed-effects" class="nav-link" data-scroll-target="#a.-treatment-default-coded-fixed-effects">A. Treatment (default) Coded Fixed Effects</a></li>
+  <li><a href="#b.-sum-coded-fixed-effects" id="toc-b.-sum-coded-fixed-effects" class="nav-link" data-scroll-target="#b.-sum-coded-fixed-effects">B. Sum-Coded Fixed Effects</a></li>
+  </ul></li>
+  <li><a href="#exercise-4.-categorical-and-continuous-fixed-effects" id="toc-exercise-4.-categorical-and-continuous-fixed-effects" class="nav-link" data-scroll-target="#exercise-4.-categorical-and-continuous-fixed-effects">Exercise 4. Categorical and Continuous Fixed Effects</a>
+  <ul class="collapse">
+  <li><a href="#a.-uncentred-continuous-and-treatment-coded-categorical-effects" id="toc-a.-uncentred-continuous-and-treatment-coded-categorical-effects" class="nav-link" data-scroll-target="#a.-uncentred-continuous-and-treatment-coded-categorical-effects">A. Uncentred Continuous and Treatment coded Categorical Effects</a></li>
+  <li><a href="#b.-sum-coded-categorical-and-continuous-fixed-effects" id="toc-b.-sum-coded-categorical-and-continuous-fixed-effects" class="nav-link" data-scroll-target="#b.-sum-coded-categorical-and-continuous-fixed-effects">B. Sum-Coded Categorical and Continuous Fixed Effects</a></li>
+  <li><a href="#c.-sum-coded-categorical-and-centred-continuous-fixed-effects" id="toc-c.-sum-coded-categorical-and-centred-continuous-fixed-effects" class="nav-link" data-scroll-target="#c.-sum-coded-categorical-and-centred-continuous-fixed-effects">C. Sum-Coded Categorical and Centred Continuous Fixed Effects</a></li>
+  </ul></li>
+  <li><a href="#exercise-5.-model-comparison" id="toc-exercise-5.-model-comparison" class="nav-link" data-scroll-target="#exercise-5.-model-comparison">Exercise 5. Model Comparison</a>
+  <ul class="collapse">
+  <li><a href="#a.-comparing-candidate-models-with-likelihood-ratio-tests" id="toc-a.-comparing-candidate-models-with-likelihood-ratio-tests" class="nav-link" data-scroll-target="#a.-comparing-candidate-models-with-likelihood-ratio-tests">A. Comparing Candidate Models with Likelihood Ratio Tests</a></li>
+  <li><a href="#b.-understanding-warnings." id="toc-b.-understanding-warnings." class="nav-link" data-scroll-target="#b.-understanding-warnings.">B. Understanding warnings.</a></li>
+  </ul></li>
+  <li><a href="#exercise-6.-comparing-the-summary-and-anova-methods" id="toc-exercise-6.-comparing-the-summary-and-anova-methods" class="nav-link" data-scroll-target="#exercise-6.-comparing-the-summary-and-anova-methods">Exercise 6. Comparing the <code>summary()</code> and <code>anova()</code> methods</a></li>
+  </ul></li>
+  <li><a href="#advanced" id="toc-advanced" class="nav-link" data-scroll-target="#advanced">Advanced</a>
+  <ul class="collapse">
+  <li><a href="#exercise-7.-moderation-predictions" id="toc-exercise-7.-moderation-predictions" class="nav-link" data-scroll-target="#exercise-7.-moderation-predictions">Exercise 7. Moderation Predictions</a>
+  <ul class="collapse">
+  <li><a href="#a.-moderation-estimates" id="toc-a.-moderation-estimates" class="nav-link" data-scroll-target="#a.-moderation-estimates">A. Moderation Estimates</a></li>
+  <li><a href="#b.-plotting-moderation-estimates" id="toc-b.-plotting-moderation-estimates" class="nav-link" data-scroll-target="#b.-plotting-moderation-estimates">B. Plotting Moderation Estimates</a></li>
+  </ul></li>
+  <li><a href="#exercise-8.-models-with-2-levels" id="toc-exercise-8.-models-with-2-levels" class="nav-link" data-scroll-target="#exercise-8.-models-with-2-levels">Exercise 8. Models with &gt; 2 Levels</a>
+  <ul class="collapse">
+  <li><a href="#a.-fit-the-model" id="toc-a.-fit-the-model" class="nav-link" data-scroll-target="#a.-fit-the-model">A. Fit the Model</a></li>
+  <li><a href="#b.-altering-contrasts-within-emmeans" id="toc-b.-altering-contrasts-within-emmeans" class="nav-link" data-scroll-target="#b.-altering-contrasts-within-emmeans">B. Altering contrasts within emmeans</a></li>
+  <li><a href="#c.-refit-the-model-with-helmert-contrasts-for-dialect_words.-the-contrasts-have-been-coded-for-you." id="toc-c.-refit-the-model-with-helmert-contrasts-for-dialect_words.-the-contrasts-have-been-coded-for-you." class="nav-link" data-scroll-target="#c.-refit-the-model-with-helmert-contrasts-for-dialect_words.-the-contrasts-have-been-coded-for-you.">C. Refit the model with Helmert contrasts for dialect_words. The contrasts have been coded for you.</a></li>
+  <li><a href="#d.-refit-the-helmert-contrast-model-with-nested-fixed-effects." id="toc-d.-refit-the-helmert-contrast-model-with-nested-fixed-effects." class="nav-link" data-scroll-target="#d.-refit-the-helmert-contrast-model-with-nested-fixed-effects.">D. Refit the Helmert contrast model with nested fixed effects.</a></li>
+  <li><a href="#e.-compare-these-parameter-estimates-to-those-in-8b." id="toc-e.-compare-these-parameter-estimates-to-those-in-8b." class="nav-link" data-scroll-target="#e.-compare-these-parameter-estimates-to-those-in-8b.">E. Compare these parameter estimates to those in 8B.</a></li>
+  </ul></li>
+  <li><a href="#exercise-9.-using-lme4lmer-lmertestlmer-and-afexmixed" id="toc-exercise-9.-using-lme4lmer-lmertestlmer-and-afexmixed" class="nav-link" data-scroll-target="#exercise-9.-using-lme4lmer-lmertestlmer-and-afexmixed">Exercise 9. Using <code>lme4::lmer()</code>, <code>lmerTest::lmer()</code>, and <code>afex::mixed()</code></a>
+  <ul class="collapse">
+  <li><a href="#a.-comparing-model-fits" id="toc-a.-comparing-model-fits" class="nav-link" data-scroll-target="#a.-comparing-model-fits">A. Comparing model fits</a></li>
+  <li><a href="#b.-using-advanced-features-in-afexmixed" id="toc-b.-using-advanced-features-in-afexmixed" class="nav-link" data-scroll-target="#b.-using-advanced-features-in-afexmixed">B. Using advanced features in <code>afex::mixed()</code></a></li>
+  </ul></li>
+  <li><a href="#exercise-10.-intraclass-correlation-coefficients" id="toc-exercise-10.-intraclass-correlation-coefficients" class="nav-link" data-scroll-target="#exercise-10.-intraclass-correlation-coefficients">Exercise 10. Intraclass Correlation Coefficients</a></li>
+  <li><a href="#exercise-11.-fixed-and-random-effects" id="toc-exercise-11.-fixed-and-random-effects" class="nav-link" data-scroll-target="#exercise-11.-fixed-and-random-effects">Exercise 11. Fixed and Random Effects</a>
+  <ul class="collapse">
+  <li><a href="#a.-random-slopes-without-fixed-slopes" id="toc-a.-random-slopes-without-fixed-slopes" class="nav-link" data-scroll-target="#a.-random-slopes-without-fixed-slopes">A. Random Slopes without Fixed Slopes</a></li>
+  <li><a href="#b.-interactions-and-main-effects" id="toc-b.-interactions-and-main-effects" class="nav-link" data-scroll-target="#b.-interactions-and-main-effects">B. Interactions and Main Effects</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="instructions" class="level1">
+<h1>Instructions</h1>
+<p>Complete the following exercises. The basics will get you used to using the core functions. The advanced exercises will focus more on understanding and making model choices.</p>
+</section>
+<section id="basics" class="level1">
+<h1>Basics</h1>
+<p>First off, load the libraries you’ll need for the exercises. As always, load the <code>tidyverse</code> library for working with data. We’ll also use <code>lme4</code> for fitting mixed effects models and, later, <code>afex</code> to see how it adds useful functionality to <code>lme4</code>. We’ll use <code>emmeans</code> for estimating marginal means and pairwise tests of these means from the model estimates. <code>easystats</code> is used for standardised effect sizes and model checking. Finally, <code>languageR</code> is used for a dataset with continuous and categorical variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4) <span class="co"># not strictly needed as it's imported by afex</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(afex) <span class="co"># lme4 with addons</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans) <span class="co"># estimating marginal means and pairwise tests</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(easystats) <span class="co"># for effect sizes, model checking, etc.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(languageR) <span class="co"># for one of the data sets</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor) <span class="co"># for cleaning names</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance) <span class="co"># for ICC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll use the <code>lexdec</code> dataset from <code>languageR</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lexdec <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(lexdec) <span class="sc">|&gt;</span>  </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(subject, trial, word, frequency, length, native_language, rt, correct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This contains data from a lexical decision experiment where participants view words or non-words that are structured to adhere to the rules of English. Participants had to press a button to indicate the word was a real word or not. We’ve extracted just the reaction times and whether participants got the trials correct or not. This data is structured on the participant-by-trial level and we have additional data such as the participants’ native languages (English or Other), the length (number of letters) in the word, the frequency of the words per million (larger values indicate more common words).</p>
+<section id="exercise-1.-continuous-fixed-effects" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1.-continuous-fixed-effects">Exercise 1. Continuous Fixed Effects</h2>
+<p>Fit a model looking at the effect of word length on reaction times to items with correct answers only. Use the appropriate random effects structure for this model. Bear in mind:</p>
+<ul>
+<li><p>You have participant-by-trial level data.</p></li>
+<li><p>Each word can only have a single word length assigned to it, but participants can see many words with the same word lengths.</p></li>
+<li><p>You can have random slopes for a factor if you have at least around 5-10 observations at each level of the factor (as a general rule of thumb) for your within-unit observations (e.g.&nbsp;5-10 observations per person).</p></li>
+<li><p>For now we will ignore the fact that participants will get better at the task as trials progress.</p></li>
+</ul>
+<p>Assign the result to <code>mod_1</code>.</p>
+<p><strong>First, get just the correct trials.</strong></p>
+<p><strong>Fit the model.</strong></p>
+<p><strong>Explain your choice of random effects structure.</strong></p>
+<p><strong>Report and interpret the fixed effects.</strong></p>
+<p><strong>Interpret the variances.</strong></p>
+</section>
+<section id="exercise-2.-continuous-fixed-effects-with-centred-predictors" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2.-continuous-fixed-effects-with-centred-predictors">Exercise 2. Continuous Fixed Effects with Centred Predictors</h2>
+<section id="a.-model-fitting-and-interpreting-fixed-effect-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="a.-model-fitting-and-interpreting-fixed-effect-estimates">A. Model fitting and interpreting fixed effect estimates</h3>
+<p>Refit your model but with word length centred and scaled so that the mean is 0 and the SD is 1. Check out the <code>scale()</code> function which makes centering predictors easy in R. Be sure to create a copy of your <code>length</code> variable and apply the new contrasts to this so we can reuse the old contrasts in another question. Does anything change in your output?</p>
+</section>
+<section id="b.-understanding-implications-for-fixed-and-random-effects" class="level3">
+<h3 class="anchored" data-anchor-id="b.-understanding-implications-for-fixed-and-random-effects">B. Understanding implications for fixed and random effects</h3>
+<p>Think about a case when you have multiple continuous predictors of different scales, e.g.&nbsp;word length ranging from 3-10 and age of participants in months ranging from 216 (18 years old) to 960 (80 years old). Why might it be useful to centre and scale these predictors so their means are 0 and they have a standard deviation of 1?</p>
+</section>
+</section>
+<section id="exercise-3.-categorical-fixed-effects" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3.-categorical-fixed-effects">Exercise 3. Categorical Fixed Effects</h2>
+<section id="a.-treatment-default-coded-fixed-effects" class="level3">
+<h3 class="anchored" data-anchor-id="a.-treatment-default-coded-fixed-effects">A. Treatment (default) Coded Fixed Effects</h3>
+<p>Fit a model assessing the impact of native language on log reaction times. Justify your random effects structure and interpret the results.</p>
+</section>
+<section id="b.-sum-coded-fixed-effects" class="level3">
+<h3 class="anchored" data-anchor-id="b.-sum-coded-fixed-effects">B. Sum-Coded Fixed Effects</h3>
+<p>Refit the model from exercise 3A now with sum-coded fixed effects. Does anything change in comparison to exercise 3A? Be sure to create a copy of your <code>native_language</code> variable and apply the new contrasts to this so we can reuse the old contrasts in another question.</p>
+</section>
+</section>
+<section id="exercise-4.-categorical-and-continuous-fixed-effects" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4.-categorical-and-continuous-fixed-effects">Exercise 4. Categorical and Continuous Fixed Effects</h2>
+<section id="a.-uncentred-continuous-and-treatment-coded-categorical-effects" class="level3">
+<h3 class="anchored" data-anchor-id="a.-uncentred-continuous-and-treatment-coded-categorical-effects">A. Uncentred Continuous and Treatment coded Categorical Effects</h3>
+<p>Fit a model for the main effects and interaction between the uncentred effect of word length and native language (not scaled and not centred). Interpret the output. Pay attention to explaining the fixed effects intercept and slope terms. Don’t do any follow up tests to this model.</p>
+</section>
+<section id="b.-sum-coded-categorical-and-continuous-fixed-effects" class="level3">
+<h3 class="anchored" data-anchor-id="b.-sum-coded-categorical-and-continuous-fixed-effects">B. Sum-Coded Categorical and Continuous Fixed Effects</h3>
+<p>Refit the model from exercise 5 with a centred effect of word length. What changes in regards to the fixed effects? Why?</p>
+</section>
+<section id="c.-sum-coded-categorical-and-centred-continuous-fixed-effects" class="level3">
+<h3 class="anchored" data-anchor-id="c.-sum-coded-categorical-and-centred-continuous-fixed-effects">C. Sum-Coded Categorical and Centred Continuous Fixed Effects</h3>
+<p>Refit the model from exercise 4B but with a centred effect of word length and a scaled and centred effect of native language. What changes in the fixed effects? Why?</p>
+</section>
+</section>
+<section id="exercise-5.-model-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5.-model-comparison">Exercise 5. Model Comparison</h2>
+<section id="a.-comparing-candidate-models-with-likelihood-ratio-tests" class="level3">
+<h3 class="anchored" data-anchor-id="a.-comparing-candidate-models-with-likelihood-ratio-tests">A. Comparing Candidate Models with Likelihood Ratio Tests</h3>
+<p>Make alternative candidate models which looks at fixed effects with (1) just an intercept, (2) effects of length centred, (3) effects of language centred and scaled, (4) both main effects. Compare these with the full model in Exercise 7A using a likelihood ratio test. Which model is preferred?</p>
+</section>
+<section id="b.-understanding-warnings." class="level3">
+<h3 class="anchored" data-anchor-id="b.-understanding-warnings.">B. Understanding warnings.</h3>
+<p>You might have gotten a warning about models being refitted with ML instead of REML. Why did this warning occur and what did lme4 do?</p>
+</section>
+</section>
+<section id="exercise-6.-comparing-the-summary-and-anova-methods" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.-comparing-the-summary-and-anova-methods">Exercise 6. Comparing the <code>summary()</code> and <code>anova()</code> methods</h2>
+<p>Returning to the model fitted in 4c, compare the fixed effects parameter estimates using <code>summary()</code> to the output from <code>anova()</code>. How do the <em>p</em>-values compare? Can you explain any similarities or differences? Finally, when might it be inappropriate to use the output from <code>summary()</code> to evaluate main effects?</p>
+</section>
+</section>
+<section id="advanced" class="level1">
+<h1>Advanced</h1>
+<section id="exercise-7.-moderation-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7.-moderation-predictions">Exercise 7. Moderation Predictions</h2>
+<section id="a.-moderation-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="a.-moderation-estimates">A. Moderation Estimates</h3>
+<p>Returning again to the model from 4C the interaction between the continuous variable <code>length</code> (centred) and the categorical variable <code>native_language</code> (sum-coded) can be thought of as moderation in the sense that the effect of native language is moderated (or of a different magnitude) depending upon the length of the word. We can inspect the how this effect changes across different word lengths using <code>emmeans()</code>. Here, you need to pass a list of length values to the <code>at</code> argument, e.g.&nbsp;<code>at = list(length = c(1, 2, 3)</code>. Typically you will want to pass either set values that are informative of your research question or even the values of the mean length, the mean length minus 1 standard deviation, and the mean length plus one standard deviation. Do this to see how the effect changes. Assign the result to <code>emm_7</code> and print the result.</p>
+</section>
+<section id="b.-plotting-moderation-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="b.-plotting-moderation-estimates">B. Plotting Moderation Estimates</h3>
+<p>Plot the estimates for the moderated predictions in 7A. Alternatively, use the <code>emmip()</code> function with the argument <code>cov.reduce = range</code> to get estimates across the range of predicted values or pass the same list of mean - SD, mean, and mean + SD as in 7A.</p>
+</section>
+</section>
+<section id="exercise-8.-models-with-2-levels" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8.-models-with-2-levels">Exercise 8. Models with &gt; 2 Levels</h2>
+<p>Download the following data from GitHub. This is data from Williams et al.&nbsp;(2020) which is an artificial language learning study. We taught people a made-up language either under a “standard” or “dialect” condition where participants either heard the same language “at home” and “in school” or different varieties of the language “at home” and “in school”. Crucially, some words had a dialect variant (<code>shifted_word</code>), some didn’t (<code>no_shift_word</code>), and some were entirely novel to the testing phase so that people had to decode them during testing but had rules that allowed them to be pronounced with the “standard” or “dialect” form of the language (<code>can_shift_word</code>). The outcome is the transformed length-normalised Levenshtein Edit Distance, a measure or graded accuracy where lower scores indicate better answers.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>levenik_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://raw.githubusercontent.com/gpwilliams/levenik/master/02_data/03_study-three/03_cleaned-data/ex_3_cleaned_data.csv"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only testing block for reading, excluding people who didn't complete it</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    block <span class="sc">==</span> <span class="st">"TEST"</span>, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    task <span class="sc">==</span> <span class="st">"R"</span>, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span>participant_number <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">144</span>, <span class="dv">177</span>, <span class="dv">273</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">item =</span> target) <span class="sc">|&gt;</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    participant_number, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    item,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    language_variety, </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    test_words, </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    dialect_words, </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    lenient_nLED</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">participant_number =</span> <span class="fu">as.factor</span>(participant_number),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">item =</span> <span class="fu">as.factor</span>(item),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">language_variety =</span> <span class="fu">as.factor</span>(language_variety),</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">dialect_words =</span> <span class="fu">as.factor</span>(dialect_words),    </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">asin_lenient_nLED =</span> <span class="fu">asin</span>(<span class="fu">sqrt</span>(lenient_nLED))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="a.-fit-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="a.-fit-the-model">A. Fit the Model</h3>
+<p>Fit a model with effects of <code>language_variety</code> and <code>dialect_words</code>, with sum coded contrasts. Interpret the fixed effects. If you encounter problems with model fit then refit the model with a reduced random effects structure. Investigate any significant effects with follow up tests. If you find a significant interaction between language variety and <code>dialect_words</code>, ensure that you calculate simple effects of dialect words within language_variety, i.e.&nbsp;using <code>~ dialect_words | language_variety</code>. Interpret the findings.</p>
+</section>
+<section id="b.-altering-contrasts-within-emmeans" class="level3">
+<h3 class="anchored" data-anchor-id="b.-altering-contrasts-within-emmeans">B. Altering contrasts within emmeans</h3>
+<p>In the paper we were interested in whether, within each language variety, words that appeared in training and testing (<code>no_shift_word</code> and <code>shifted_word</code>) differed to words that appeared only in testing (<code>can_shift_word)</code> to evaluate how well people can decode familiar and unfamiliar words. We also cared about whether the trained words differed to one another in difficulty to read if they had one pronunciation (i.e.&nbsp;standard only; <code>no_shift_word</code>) or two (i.e.&nbsp;standard and dialect; <code>shifted_word</code>). The above contrasts don’t code for this. Change these contrasts within <code>emmeans</code>.</p>
+<p>To do this you need to build a list of contrasts between the levels. For example, between condition 1 and 3 it would be:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">one_v_three =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(my_emmeans, my_contrasts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This effectively makes the contrast between the first and third conditions by setting the first to -1 and final to 1. Any conditions set to 0 are ignored.</p>
+</section>
+<section id="c.-refit-the-model-with-helmert-contrasts-for-dialect_words.-the-contrasts-have-been-coded-for-you." class="level3">
+<h3 class="anchored" data-anchor-id="c.-refit-the-model-with-helmert-contrasts-for-dialect_words.-the-contrasts-have-been-coded-for-you.">C. Refit the model with Helmert contrasts for dialect_words. The contrasts have been coded for you.</h3>
+<p>If we care about particular contrasts a-priori, we can code for these in our model using specific contrasts. Use the helmert coding below and fit a model looking at fixed effects of <code>language_variety</code> and <code>dialect_words</code> (including main effects and the interaction). Use the maximal converging random effects structure.</p>
+<p>How do the parameter estimates change? Why?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>levenik_data<span class="sc">$</span>dialect_words <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  levenik_data<span class="sc">$</span>dialect_words, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shifted_word"</span>, <span class="st">"no_shift_word"</span>, <span class="st">"can_shift_word"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(levenik_data<span class="sc">$</span>dialect_words) <span class="ot">&lt;-</span> <span class="fu">contr.helmert</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="d.-refit-the-helmert-contrast-model-with-nested-fixed-effects." class="level3">
+<h3 class="anchored" data-anchor-id="d.-refit-the-helmert-contrast-model-with-nested-fixed-effects.">D. Refit the Helmert contrast model with nested fixed effects.</h3>
+<p>We can code for nested fixed effects to again test for specific, simple contrasts. For example, if we want to test for a main effect of factor A and for simple contrasts within levels of A for factor B we can use this syntax for our fixed effects: <code>y ~ A/B</code>. Do this so you test for an effect of word type within language variety. Interpret the fixed effect parameter estimates.</p>
+</section>
+<section id="e.-compare-these-parameter-estimates-to-those-in-8b." class="level3">
+<h3 class="anchored" data-anchor-id="e.-compare-these-parameter-estimates-to-those-in-8b.">E. Compare these parameter estimates to those in 8B.</h3>
+<p>Compare the output in 8D to 8B. What’s the difference in <em>t</em>- and <em>p</em>-values?</p>
+</section>
+</section>
+<section id="exercise-9.-using-lme4lmer-lmertestlmer-and-afexmixed" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-9.-using-lme4lmer-lmertestlmer-and-afexmixed">Exercise 9. Using <code>lme4::lmer()</code>, <code>lmerTest::lmer()</code>, and <code>afex::mixed()</code></h2>
+<section id="a.-comparing-model-fits" class="level3">
+<h3 class="anchored" data-anchor-id="a.-comparing-model-fits">A. Comparing model fits</h3>
+<p>Refit the model from 8d, but ensure that you use the call <code>lme4::lmer()</code> rather than just <code>lmer()</code> and assign this to the result <code>mod_9a_1</code>. Refit the model with <code>lmerTest::lmer()</code> and assign the result to <code>mod_9a_2</code>. Refit the model with <code>afex::mixed()</code> and assign the result to <code>mod_9a_3</code>. What changes across the models? Why?</p>
+</section>
+<section id="b.-using-advanced-features-in-afexmixed" class="level3">
+<h3 class="anchored" data-anchor-id="b.-using-advanced-features-in-afexmixed">B. Using advanced features in <code>afex::mixed()</code></h3>
+<p>The <code>afex()</code> package makes working with categorical predictors easier, especially if you need to remove the correlations between random effects. This is especially useful when you have interactions between several slopes. Try to take the model fitted in 9A and remove the correlation between the intercept and slope by participants. Do the same for the model in 9C but look up how to use the double bar notation using <code>expand_re = TRUE</code>. Do you notice any issues with the first model?</p>
+</section>
+</section>
+<section id="exercise-10.-intraclass-correlation-coefficients" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-10.-intraclass-correlation-coefficients">Exercise 10. Intraclass Correlation Coefficients</h2>
+<p>Calculate the intraclass correlation coefficient for the model fitted in 8D as follows. This will report the intraclass correlation coefficient for the two grouping units in the random effects. This is a correlation coefficient ranging from 0-1 which explains how much variability in your outcome can be attributed to the grouping units, with 0 being no variation explained by the grouping units (i.e.&nbsp;residual variance explains all variability) and 1 being your grouping units explain all of the variance. Essentially, this value tells you how strongly observations in the same grouping unit resemble one another.</p>
+<p>Interpret the ICC for the model below. Can you explain the pattern of results?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>performance<span class="sc">::</span><span class="fu">icc</span>(YOUR_MODEL, <span class="at">by_group =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-11.-fixed-and-random-effects" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-11.-fixed-and-random-effects">Exercise 11. Fixed and Random Effects</h2>
+<section id="a.-random-slopes-without-fixed-slopes" class="level3">
+<h3 class="anchored" data-anchor-id="a.-random-slopes-without-fixed-slopes">A. Random Slopes without Fixed Slopes</h3>
+<p>Return to the lexical decision data set used in Exercises 1-7. Fit a model predicting reaction times with a fixed effect of native language (sum coded) with random intercepts by subjects and items. Assign this to <code>mod_11a_1</code>. Then fit the same model but add in random slopes by word length (centred). Assign this to <code>mod_11a_2</code>. Compare the outputs. With only a minor change to the model, including random slopes of word length per subject, the main effect of native language goes away. Why is this?</p>
+<p>Why might we not trust the results from <code>mod_11a_2</code>? It might help to look at the mean of the random effects</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract random effects for each participant from a model</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>get_ranefs <span class="ot">&lt;-</span> <span class="cf">function</span>(.mod) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  random_effects <span class="ot">&lt;-</span> <span class="fu">ranef</span>(.mod)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  random_effects_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(random_effects<span class="sc">$</span>subject)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  random_effects_df<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">rownames</span>(random_effects_df)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  random_effects_df <span class="sc">|&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">row_sum =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="sc">-</span>subject))) <span class="sc">|&gt;</span> </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">ranef =</span> row_sum) <span class="sc">|&gt;</span> </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(subject, ranef)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For the first model, with just random intercepts, the mean of the random effects estimates is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># be sure to remove |# eval: false so you can run this code chunk!</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">get_ranefs</span>(mod_11a_1)<span class="sc">$</span>ranef), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For the second model, now with random slopes (but no fixed effect) of length, the mean of the random effects estimates is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># be sure to remove |# eval: false so you can run this code chunk!</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">get_ranefs</span>(mod_11a_2)<span class="sc">$</span>ranef), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Why is this value a problem for the second model?</p>
+</section>
+<section id="b.-interactions-and-main-effects" class="level3">
+<h3 class="anchored" data-anchor-id="b.-interactions-and-main-effects">B. Interactions and Main Effects</h3>
+<p>Return to the lexical decision data set used in Exercises 1-7. Fit a model predicting reaction times with main effects of native language (sum coded) and length (centred) with a random intercept and slope by length (centred) for subjects and random intercepts for words. Assign this to <code>mod_11b_1</code>. Fit the same model but additionally include an interaction between the two fixed effects. Assign this to <code>mod_11b_2</code>. Inspect the fixed effects estimates.</p>
+<p>You might notice that in the first model there is no main effect of native language, while in the second model there is. Why is this the case? It might help to plot the predictions of the second model using this code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># be sure to remove |# eval: false so you can run this code chunk!</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">emmip</span>(mod_11b_2, <span class="sc">~</span> native_language_s <span class="sc">|</span> length_c, <span class="at">cov.reduce =</span> range)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,281 @@
+---
+title: "Multilevel Modelling"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-04-28"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Multilevel modelling with lme4 and friends."
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to using the core functions. The advanced exercises will focus more on understanding and making model choices.
+
+# Basics
+
+First off, load the libraries you'll need for the exercises. As always, load the `tidyverse` library for working with data. We'll also use `lme4` for fitting mixed effects models and, later, `afex` to see how it adds useful functionality to `lme4`. We'll use `emmeans` for estimating marginal means and pairwise tests of these means from the model estimates. `easystats` is used for standardised effect sizes and model checking. Finally, `languageR` is used for a dataset with continuous and categorical variables.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(lme4) # not strictly needed as it's imported by afex
+library(afex) # lme4 with addons
+library(emmeans) # estimating marginal means and pairwise tests
+library(easystats) # for effect sizes, model checking, etc.
+library(languageR) # for one of the data sets
+library(janitor) # for cleaning names
+library(performance) # for ICC
+```
+
+We'll use the `lexdec` dataset from `languageR`.
+
+```{r}
+lexdec <- as_tibble(lexdec) |>  
+  janitor::clean_names() |> 
+  select(subject, trial, word, frequency, length, native_language, rt, correct)
+```
+
+This contains data from a lexical decision experiment where participants view words or non-words that are structured to adhere to the rules of English. Participants had to press a button to indicate the word was a real word or not. We've extracted just the reaction times and whether participants got the trials correct or not. This data is structured on the participant-by-trial level and we have additional data such as the participants' native languages (English or Other), the length (number of letters) in the word, the frequency of the words per million (larger values indicate more common words).
+
+## Exercise 1. Continuous Fixed Effects
+
+Fit a model looking at the effect of word length on reaction times to items with correct answers only. Use the appropriate random effects structure for this model. Bear in mind:
+
+-   You have participant-by-trial level data.
+
+-   Each word can only have a single word length assigned to it, but participants can see many words with the same word lengths.
+
+-   You can have random slopes for a factor if you have at least around 5-10 observations at each level of the factor (as a general rule of thumb) for your within-unit observations (e.g. 5-10 observations per person).
+
+-   For now we will ignore the fact that participants will get better at the task as trials progress.
+
+Assign the result to `mod_1`.
+
+**First, get just the correct trials.**
+
+**Fit the model.**
+
+**Explain your choice of random effects structure.**
+
+**Report and interpret the fixed effects.**
+
+**Interpret the variances.**
+
+## Exercise 2. Continuous Fixed Effects with Centred Predictors
+
+### A. Model fitting and interpreting fixed effect estimates
+
+Refit your model but with word length centred and scaled so that the mean is 0 and the SD is 1. Check out the `scale()` function which makes centering predictors easy in R. Be sure to create a copy of your `length` variable and apply the new contrasts to this so we can reuse the old contrasts in another question. Does anything change in your output?
+
+### B. Understanding implications for fixed and random effects
+
+Think about a case when you have multiple continuous predictors of different scales, e.g. word length ranging from 3-10 and age of participants in months ranging from 216 (18 years old) to 960 (80 years old). Why might it be useful to centre and scale these predictors so their means are 0 and they have a standard deviation of 1?
+
+## Exercise 3. Categorical Fixed Effects
+
+### A. Treatment (default) Coded Fixed Effects
+
+Fit a model assessing the impact of native language on log reaction times. Justify your random effects structure and interpret the results.
+
+### B. Sum-Coded Fixed Effects
+
+Refit the model from exercise 3A now with sum-coded fixed effects. Does anything change in comparison to exercise 3A? Be sure to create a copy of your `native_language` variable and apply the new contrasts to this so we can reuse the old contrasts in another question.
+
+## Exercise 4. Categorical and Continuous Fixed Effects
+
+### A. Uncentred Continuous and Treatment coded Categorical Effects
+
+Fit a model for the main effects and interaction between the uncentred effect of word length and native language (not scaled and not centred). Interpret the output. Pay attention to explaining the fixed effects intercept and slope terms. Don't do any follow up tests to this model.
+
+### B. Sum-Coded Categorical and Continuous Fixed Effects
+
+Refit the model from exercise 5 with a centred effect of word length. What changes in regards to the fixed effects? Why?
+
+### C. Sum-Coded Categorical and Centred Continuous Fixed Effects
+
+Refit the model from exercise 4B but with a centred effect of word length and a scaled and centred effect of native language. What changes in the fixed effects? Why?
+
+## Exercise 5. Model Comparison
+
+### A. Comparing Candidate Models with Likelihood Ratio Tests
+
+Make alternative candidate models which looks at fixed effects with (1) just an intercept, (2) effects of length centred, (3) effects of language centred and scaled, (4) both main effects. Compare these with the full model in Exercise 7A using a likelihood ratio test. Which model is preferred?
+
+### B. Understanding warnings.
+
+You might have gotten a warning about models being refitted with ML instead of REML. Why did this warning occur and what did lme4 do?
+
+## Exercise 6. Comparing the `summary()` and `anova()` methods
+
+Returning to the model fitted in 4c, compare the fixed effects parameter estimates using `summary()` to the output from `anova()`. How do the *p*-values compare? Can you explain any similarities or differences? Finally, when might it be inappropriate to use the output from `summary()` to evaluate main effects?
+
+# Advanced
+
+## Exercise 7. Moderation Predictions
+
+### A. Moderation Estimates
+
+Returning again to the model from 4C the interaction between the continuous variable `length` (centred) and the categorical variable `native_language` (sum-coded) can be thought of as moderation in the sense that the effect of native language is moderated (or of a different magnitude) depending upon the length of the word. We can inspect the how this effect changes across different word lengths using `emmeans()`. Here, you need to pass a list of length values to the `at` argument, e.g. `at = list(length = c(1, 2, 3)`. Typically you will want to pass either set values that are informative of your research question or even the values of the mean length, the mean length minus 1 standard deviation, and the mean length plus one standard deviation. Do this to see how the effect changes. Assign the result to `emm_7` and print the result.
+
+### B. Plotting Moderation Estimates
+
+Plot the estimates for the moderated predictions in 7A. Alternatively, use the `emmip()` function with the argument `cov.reduce = range` to get estimates across the range of predicted values or pass the same list of mean - SD, mean, and mean + SD as in 7A.
+
+## Exercise 8. Models with \> 2 Levels
+
+Download the following data from GitHub. This is data from Williams et al. (2020) which is an artificial language learning study. We taught people a made-up language either under a "standard" or "dialect" condition where participants either heard the same language "at home" and "in school" or different varieties of the language "at home" and "in school". Crucially, some words had a dialect variant (`shifted_word`), some didn't (`no_shift_word`), and some were entirely novel to the testing phase so that people had to decode them during testing but had rules that allowed them to be pronounced with the "standard" or "dialect" form of the language (`can_shift_word`). The outcome is the transformed length-normalised Levenshtein Edit Distance, a measure or graded accuracy where lower scores indicate better answers.
+
+```{r}
+#| message: false
+levenik_data <- read_csv(
+  "https://raw.githubusercontent.com/gpwilliams/levenik/master/02_data/03_study-three/03_cleaned-data/ex_3_cleaned_data.csv"
+  ) |> 
+  # keep only testing block for reading, excluding people who didn't complete it
+  filter(
+    block == "TEST", 
+    task == "R", 
+    !participant_number %in% c(144, 177, 273)
+  ) |> 
+  rename(item = target) |> 
+  select(
+    participant_number, 
+    item,
+    language_variety, 
+    test_words, 
+    dialect_words, 
+    lenient_nLED
+  ) |> 
+  mutate(
+    participant_number = as.factor(participant_number),
+    item = as.factor(item),
+    language_variety = as.factor(language_variety),
+    dialect_words = as.factor(dialect_words),    
+    asin_lenient_nLED = asin(sqrt(lenient_nLED))
+  )
+```
+
+### A. Fit the Model
+
+Fit a model with effects of `language_variety` and `dialect_words`, with sum coded contrasts. Interpret the fixed effects. If you encounter problems with model fit then refit the model with a reduced random effects structure. Investigate any significant effects with follow up tests. If you find a significant interaction between language variety and `dialect_words`, ensure that you calculate simple effects of dialect words within language_variety, i.e. using `~ dialect_words | language_variety`. Interpret the findings.
+
+### B. Altering contrasts within emmeans
+
+In the paper we were interested in whether, within each language variety, words that appeared in training and testing (`no_shift_word` and `shifted_word`) differed to words that appeared only in testing (`can_shift_word)` to evaluate how well people can decode familiar and unfamiliar words. We also cared about whether the trained words differed to one another in difficulty to read if they had one pronunciation (i.e. standard only; `no_shift_word`) or two (i.e. standard and dialect; `shifted_word`). The above contrasts don't code for this. Change these contrasts within `emmeans`.
+
+To do this you need to build a list of contrasts between the levels. For example, between condition 1 and 3 it would be:
+
+```{r}
+#| eval: false
+my_contrasts <- list(one_v_three = c(-1, 0, 1))
+contrast(my_emmeans, my_contrasts)
+```
+
+This effectively makes the contrast between the first and third conditions by setting the first to -1 and final to 1. Any conditions set to 0 are ignored.
+
+### C. Refit the model with Helmert contrasts for dialect_words. The contrasts have been coded for you.
+
+If we care about particular contrasts a-priori, we can code for these in our model using specific contrasts. Use the helmert coding below and fit a model looking at fixed effects of `language_variety` and `dialect_words` (including main effects and the interaction). Use the maximal converging random effects structure.
+
+How do the parameter estimates change? Why?
+
+```{r}
+levenik_data$dialect_words <- factor(
+  levenik_data$dialect_words, 
+  levels = c(
+    "shifted_word", "no_shift_word", "can_shift_word"
+  )
+)
+contrasts(levenik_data$dialect_words) <- contr.helmert(3)
+```
+
+### D. Refit the Helmert contrast model with nested fixed effects.
+
+We can code for nested fixed effects to again test for specific, simple contrasts. For example, if we want to test for a main effect of factor A and for simple contrasts within levels of A for factor B we can use this syntax for our fixed effects: `y ~ A/B`. Do this so you test for an effect of word type within language variety. Interpret the fixed effect parameter estimates.
+
+### E. Compare these parameter estimates to those in 8B.
+
+Compare the output in 8D to 8B. What's the difference in *t*- and *p*-values?
+
+## Exercise 9. Using `lme4::lmer()`, `lmerTest::lmer()`, and `afex::mixed()`
+
+### A. Comparing model fits
+
+Refit the model from 8d, but ensure that you use the call `lme4::lmer()` rather than just `lmer()` and assign this to the result `mod_9a_1`. Refit the model with `lmerTest::lmer()` and assign the result to `mod_9a_2`. Refit the model with `afex::mixed()` and assign the result to `mod_9a_3`. What changes across the models? Why?
+
+### B. Using advanced features in `afex::mixed()`
+
+The `afex()` package makes working with categorical predictors easier, especially if you need to remove the correlations between random effects. This is especially useful when you have interactions between several slopes. Try to take the model fitted in 9A and remove the correlation between the intercept and slope by participants. Do the same for the model in 9C but look up how to use the double bar notation using `expand_re = TRUE`. Do you notice any issues with the first model?
+
+## Exercise 10. Intraclass Correlation Coefficients
+
+Calculate the intraclass correlation coefficient for the model fitted in 8D as follows. This will report the intraclass correlation coefficient for the two grouping units in the random effects. This is a correlation coefficient ranging from 0-1 which explains how much variability in your outcome can be attributed to the grouping units, with 0 being no variation explained by the grouping units (i.e. residual variance explains all variability) and 1 being your grouping units explain all of the variance. Essentially, this value tells you how strongly observations in the same grouping unit resemble one another.
+
+Interpret the ICC for the model below. Can you explain the pattern of results?
+
+```{r}
+#| eval: false
+performance::icc(YOUR_MODEL, by_group = TRUE)
+```
+
+## Exercise 11. Fixed and Random Effects
+
+### A. Random Slopes without Fixed Slopes
+
+Return to the lexical decision data set used in Exercises 1-7. Fit a model predicting reaction times with a fixed effect of native language (sum coded) with random intercepts by subjects and items. Assign this to `mod_11a_1`. Then fit the same model but add in random slopes by word length (centred). Assign this to `mod_11a_2`. Compare the outputs. With only a minor change to the model, including random slopes of word length per subject, the main effect of native language goes away. Why is this?
+
+Why might we not trust the results from `mod_11a_2`? It might help to look at the mean of the random effects
+
+```{r}
+# Extract random effects for each participant from a model
+get_ranefs <- function(.mod) {
+  random_effects <- ranef(.mod)
+  random_effects_df <- data.frame(random_effects$subject)
+  random_effects_df$subject <- rownames(random_effects_df)
+  
+  random_effects_df |>
+    rowwise() |> 
+    mutate(row_sum = sum(c_across(-subject))) |> 
+    ungroup() |> 
+    rename(ranef = row_sum) |> 
+    select(subject, ranef)
+}
+```
+
+For the first model, with just random intercepts, the mean of the random effects estimates is:
+
+```{r}
+#| eval: false
+# be sure to remove |# eval: false so you can run this code chunk!
+round(mean(get_ranefs(mod_11a_1)$ranef), 2)
+```
+
+For the second model, now with random slopes (but no fixed effect) of length, the mean of the random effects estimates is:
+
+```{r}
+#| eval: false
+# be sure to remove |# eval: false so you can run this code chunk!
+round(mean(get_ranefs(mod_11a_2)$ranef), 2)
+```
+
+Why is this value a problem for the second model?
+
+### B. Interactions and Main Effects
+
+Return to the lexical decision data set used in Exercises 1-7. Fit a model predicting reaction times with main effects of native language (sum coded) and length (centred) with a random intercept and slope by length (centred) for subjects and random intercepts for words. Assign this to `mod_11b_1`. Fit the same model but additionally include an interaction between the two fixed effects. Assign this to `mod_11b_2`. Inspect the fixed effects estimates.
+
+You might notice that in the first model there is no main effect of native language, while in the second model there is. Why is this the case? It might help to plot the predictions of the second model using this code:
+
+```{r}
+#| eval: false
+# be sure to remove |# eval: false so you can run this code chunk!
+emmip(mod_11b_2, ~ native_language_s | length_c, cov.reduce = range)
+```
