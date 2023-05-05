@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.3.340">
+
+  <meta name="author" content="Glenn Williams">
+  <meta name="dcterms.date" content="2023-05-05">
+  <title>Data Simulation and Power</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Data Simulation and Power</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Glenn Williams 
+</div>
+</div>
+</div>
+
+  <p class="date">2023-05-05</p>
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<div class="r-fit-text">
+<p>Today’s session is on data simulation with a focus on using it to perform power and sensitivity analyses:</p>
+<ul>
+<li><p>Understanding univariate random variables and how to generate simulated data from a univariate distribution.</p></li>
+<li><p>Understanding multivariate random variables and to generate simulated data from a multivariate distribution.</p></li>
+<li><p>How to use the data grid in combination with set parameters and a linear model to simulate predictors and outcomes.</p></li>
+<li><p>How to iterate the data simulation and model fitting process to obtain a power analysis for one or many effects.</p></li>
+<li><p>How to alter your workflow to perform a sensitivity analysis where an a-priori power analysis wasn’t possible.</p></li>
+<li><p>How to extend data generation to a multilevel modelling framework.</p></li>
+</ul>
+</div>
+</section>
+<section id="getting-started" class="title-slide slide level1 center">
+<h1>Getting Started</h1>
+<ul>
+<li><p>Go to <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p></li>
+<li><p>Click <code>Code</code> &gt; Download ZIP.</p></li>
+<li><p>Unzip the files.</p></li>
+<li><p>Open the file <code>ds-psych_course.RProj</code></p></li>
+<li><p>Create a Quarto document and save it within <code>08_data-simulation-and-power</code>. Name it anything you like.</p></li>
+</ul>
+<p>You can copy the code form here on out and everything should work.</p>
+</section>
+
+<section>
+<section id="power-and-power-analysis" class="title-slide slide level1 center">
+<h1>Power and Power Analysis</h1>
+
+</section>
+<section id="why-power-analysis-by-simulation" class="slide level2">
+<h2>Why Power Analysis By Simulation?</h2>
+<ul>
+<li><p>Power analyses help you to conduct a study such that you’re likely to detect effects if present in the population.</p></li>
+<li><p>There are a number of power analysis apps that are written for specific data structures and/or models. However, these are often inflexible.</p></li>
+<li><p>What if you want to power for multiple effects simultaneously? Or allow for missing data in your data generation process? Writing your own data generation process and simulation code allows you to power for any design/model you like.</p></li>
+</ul>
+</section>
+<section id="loading-packages" class="slide level2">
+<h2>Loading Packages</h2>
+<p>Load our essential packages, <code>tidyverse</code> for data wrangling and presentation and <code>here</code> for working with file paths. The core packages today are <code>lme4</code> for mixed effects models and <code>afex</code> which builds on <code>lme4</code> but adds more functionality.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(afex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section>
+<section>
+<section id="probability-and-random-variables" class="title-slide slide level1 center">
+<h1>Probability and Random Variables</h1>
+
+</section>
+<section id="pdf-cdf-inverse-cdf-and-random-generation" class="slide level2">
+<h2>PDF, CDF, Inverse CDF, and Random Generation</h2>
+<ul>
+<li>R comes with inbuilt functions for working with distributions.</li>
+<li>These are short forms of the distribution name with one of <code>p</code>, <code>d</code>, <code>q</code>, or <code>r</code> prefixed.</li>
+<li>We’ll primarily use <code>d_()</code> functions to understand the probability density (or mass) functions and the <code>r_()</code> functions to generate random data from a distribution.</li>
+</ul>
+</section>
+<section id="pdf-cdf-inverse-cdf-and-random-generation-1" class="slide level2">
+<h2>PDF, CDF, Inverse CDF, and Random Generation</h2>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
+<section id="generating-simulated-univariate-data" class="slide level2">
+<h2>Generating Simulated Univariate Data</h2>
+<p>Generate random data from a normal distribution with these parameters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check the means and SDs align:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 171.5837 210.2753 190.1323 186.0983 161.9353</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 184.005</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">sd</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 18.52983</code></pre>
+</div>
+</div>
+</section>
+<section id="generating-simulated-univariate-data-1" class="slide level2">
+<h2>Generating Simulated Univariate Data</h2>
+<p>Sample again but increase the sample size, <code>n</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">200</span>, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check the means and SDs align:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 199.879</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">sd</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 38.682</code></pre>
+</div>
+</div>
+<p><strong>The law of large numbers</strong>: small samples from random variables have volatile estimates. Large samples converge on stable estimates.</p>
+</section>
+<section id="visualising-simulated-univariate-data" class="slide level2">
+<h2>Visualising Simulated Univariate Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>sim_dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">y =</span> y)</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="fu">ggplot</span>(sim_dat, <span class="fu">aes</span>(<span class="at">x =</span> y)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">geom_density</span>(<span class="at">colour =</span> <span class="st">"#ffa07a"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
+<section id="some-other-distrubutions" class="slide level2">
+<h2>Some Other Distrubutions</h2>
+<p>There are many more distributions in <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html">base-R stats</a> and in <code>extraDistr</code>.</p>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<section id="ensuring-computational-reproducibility" class="slide level2">
+<h2>Ensuring Computational Reproducibility</h2>
+<ul>
+<li>Computers are <strong>deterministic</strong>, so no operations in them can ever be truly random.</li>
+<li>(Is anything truly random? Or does that reflect a state of ignorance? Philosophy…)</li>
+<li>Anyway, computers. Random number generators work by using a <strong>seed</strong>, e.g.&nbsp;date and time, to initialise the RNG.</li>
+<li>Setting a seed means you’ll <strong>get the same results repeatedly</strong>.</li>
+</ul>
+</section>
+<section id="ensuring-computational-reproducibility-1" class="slide level2">
+<h2>Ensuring Computational Reproducibility</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">set.seed</span>(<span class="dv">1892</span>)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 201.3599</code></pre>
+</div>
+</div>
+<p>Do it again…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">set.seed</span>(<span class="dv">1892</span>)</span>
+<span id="cb17-2"><a href="#cb17-2"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 201.3599</code></pre>
+</div>
+</div>
+</section>
+<section id="testing-simulated-data" class="slide level2">
+<h2>Testing Simulated Data</h2>
+<p>Let’s do a one-sample t-test to see if our data is significantly different to <span class="math inline">\(\mu\)</span> = 190.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>broom<span class="sc">::</span><span class="fu">tidy</span>(<span class="fu">t.test</span>(y, <span class="at">mu =</span> <span class="dv">190</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  estimate statistic p.value parameter conf.low conf.high method     alternative
+     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1     201.      2.89 0.00471        99     194.      209. One Sampl… two.sided  </code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="iteration" class="title-slide slide level1 center">
+<h1>Iteration</h1>
+
+</section>
+<section id="iteration-1" class="slide level2">
+<h2>Iteration</h2>
+<p>In R we have two options for iteration:</p>
+<ul>
+<li><strong>Loops</strong>: define a process that should be repeated until a condition is met.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">print</span>(<span class="st">"hi"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "hi"
+[1] "hi"
+[1] "hi"</code></pre>
+</div>
+</div>
+<ul>
+<li><strong>Map</strong>: appply a given function to each element in a collection, e.g.&nbsp;a list. In R, we have several mapping and iteration functions in <code>purrr</code>, part of the <code>tidyverse</code>. We’ll look at this in a moment.</li>
+</ul>
+</section>
+<section id="iteration-for-power-analysis" class="slide level2">
+<h2>Iteration for Power Analysis</h2>
+<p>Starting with a loop:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">set.seed</span>(<span class="dv">1892</span>)</span>
+<span id="cb23-2"><a href="#cb23-2"></a>iterations <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a>output <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">"list"</span>, <span class="at">length =</span> iterations)</span>
+<span id="cb23-4"><a href="#cb23-4"></a></span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>iterations) {</span>
+<span id="cb23-6"><a href="#cb23-6"></a>  y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span>
+<span id="cb23-7"><a href="#cb23-7"></a>  output[[i]] <span class="ot">&lt;-</span> <span class="fu">t.test</span>(y, <span class="at">mu =</span> <span class="dv">190</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb23-8"><a href="#cb23-8"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb23-9"><a href="#cb23-9"></a>}</span>
+<span id="cb23-10"><a href="#cb23-10"></a>simulations <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(output)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="working-with-simulated-data" class="slide level2">
+<h2>Working with Simulated Data</h2>
+<ul>
+<li>Calculate what proportion of the <em>p</em>-values are below the <span class="math inline">\(\alpha\)</span>-level of .05.</li>
+<li>This is your power for the study design and test.</li>
+<li>With 100 participants, assuming a <span class="math inline">\(\mu\)</span> of 200 and <span class="math inline">\(\sigma\)</span> of 40, testing against the true value of the mean of 190 we have approx. 70% power.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">mean</span>(simulations<span class="sc">$</span>p.value <span class="sc">&lt;</span> .<span class="dv">05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.701</code></pre>
+</div>
+</div>
+</section>
+<section id="flexible-iteration" class="slide level2">
+<h2>Flexible Iteration</h2>
+<p>We didn’t quite hit a target of 90% power. How can we improve on this?</p>
+<ul>
+<li>Increase the <strong>precision</strong> of measurements (not always an option).</li>
+<li>Increase the <strong>sample size</strong> (an option here).</li>
+</ul>
+<p>Let’s explore a range of sample sizes. First, let’s start making things a bit more easier to work with.</p>
+</section>
+<section id="functional-programming" class="slide level2">
+<h2>Functional Programming</h2>
+<p>If you want to repeat a process several times over, we need to adhere to <strong>DRY principle</strong>. We also might want to break tasks into chunks to make things easier to manage. <strong>Functions</strong> help with both.</p>
+<p>Notice we can pass parameters to the function, like the sample size here.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>sim_data <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">100</span>) {</span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">200</span>, <span class="at">sd =</span> <span class="dv">40</span>)</span>
+<span id="cb26-3"><a href="#cb26-3"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="fu">sim_data</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] 202.12290 156.77759 148.68703 156.92794 172.35414 224.39772 223.26367
+  [8] 222.46831 170.63125 220.67973 241.02525 235.98565 227.35576 303.93885
+ [15] 211.32863 230.89383 205.54988 218.71417 183.25334 222.22325 250.45077
+ [22] 244.33467 128.42386 261.99214 215.91468 212.49719  96.21624 212.80300
+ [29] 185.69115 248.90266 192.64676 136.67635 220.05116 153.79877 316.18656
+ [36] 256.51805 197.13738  97.12939 185.96775 216.97158 197.77605 143.18373
+ [43] 235.36764 197.46067 170.71935 191.07925 147.61687 253.14869 199.25710
+ [50] 231.19388 228.02083 253.16038 258.29213 214.26326 234.01436 250.54757
+ [57] 152.93374 188.93594 227.44140 165.01162 183.22344 201.89796 183.92737
+ [64] 242.62067 170.91797 215.41897 169.76287 131.40693 209.60688 233.96526
+ [71] 177.78527 260.17163 216.39401 226.96306 198.27265 209.84496 117.22578
+ [78] 275.49311 230.54800 139.94167 167.16366 221.48241 253.97960 239.83908
+ [85] 206.54903 297.58160 199.50894 189.75836 202.11724 141.09153 199.88605
+ [92] 226.05499 174.06471 152.60516 231.66715 176.16737 212.62571 174.54513
+ [99] 159.24757 226.81748</code></pre>
+</div>
+</div>
+</section>
+<section id="functional-programming-1" class="slide level2">
+<h2>Functional Programming</h2>
+<p>If we want to have a function called within a function, we either have to make sure the top-level function can have all arguments in the bottom-level function, like so:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>sim_fit <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">50</span>) {</span>
+<span id="cb29-2"><a href="#cb29-2"></a>  y <span class="ot">&lt;-</span> <span class="fu">sim_data</span>(n)</span>
+<span id="cb29-3"><a href="#cb29-3"></a>  <span class="fu">t.test</span>(y, <span class="at">mu =</span> <span class="dv">190</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb29-4"><a href="#cb29-4"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb29-5"><a href="#cb29-5"></a>}</span>
+<span id="cb29-6"><a href="#cb29-6"></a></span>
+<span id="cb29-7"><a href="#cb29-7"></a><span class="fu">sim_fit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  estimate statistic p.value parameter conf.low conf.high method     alternative
+     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1     196.      1.09   0.279        49     185.      208. One Sampl… two.sided  </code></pre>
+</div>
+</div>
+</section>
+<section id="functional-programming-2" class="slide level2">
+<h2>Functional Programming</h2>
+<p>Or, we can instead pass elipses (<code>...</code>) which means any arguments we pass to the top-level function are passed to the bottom-level function. If we don’t pass any arguments, the defaults are used.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>sim_fit <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb31-2"><a href="#cb31-2"></a>  y <span class="ot">&lt;-</span> <span class="fu">sim_data</span>(...)</span>
+<span id="cb31-3"><a href="#cb31-3"></a>  <span class="fu">t.test</span>(y, <span class="at">mu =</span> <span class="dv">190</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb31-4"><a href="#cb31-4"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb31-5"><a href="#cb31-5"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">sim_fit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  estimate statistic p.value parameter conf.low conf.high method     alternative
+     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1     202.      3.38 0.00104        99     195.      210. One Sampl… two.sided  </code></pre>
+</div>
+</div>
+</section>
+<section id="altering-function-parameters" class="slide level2">
+<h2>Altering Function Parameters</h2>
+<p>With this structure we can vary the parameters in the top-level function, <code>sim_fit()</code> and it’s passed to the bottom-level function, <code>sim_data()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">sim_fit</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  estimate statistic p.value parameter conf.low conf.high method     alternative
+     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1     195.     0.808   0.440         9     181.      210. One Sampl… two.sided  </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a><span class="fu">sim_fit</span>(<span class="at">n =</span> <span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  estimate statistic p.value parameter conf.low conf.high method     alternative
+     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      
+1     204.      2.55  0.0140        49     193.      215. One Sampl… two.sided  </code></pre>
+</div>
+</div>
+</section>
+<section id="functional-iteration" class="slide level2">
+<h2>Functional Iteration</h2>
+<ul>
+<li><p>We want to run 1000 simulations of data, fit the model to the data, then save the output.</p></li>
+<li><p>Using <code>purrr::pmap()</code> executes your function, passing any parameters from the first argument to the function. It runs for however many rows you have in the parameters.</p></li>
+</ul>
+</section>
+<section id="functional-iteration-with-the-purrmap-family-of-functions." class="slide level2">
+<h2>Functional Iteration with the <code>purr::map()</code> Family of Functions.</h2>
+<ul>
+<li>Here, we have a 1000 run tibble each with n = 100, so we will simulate 1000 data sets with n = 100 and fit a model to each data set.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>parameters <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb38-2"><a href="#cb38-2"></a>  <span class="at">n =</span> <span class="fu">rep</span>(<span class="dv">100</span>, <span class="dv">1000</span>)</span>
+<span id="cb38-3"><a href="#cb38-3"></a>)</span>
+<span id="cb38-4"><a href="#cb38-4"></a></span>
+<span id="cb38-5"><a href="#cb38-5"></a>simulations <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">pmap_df</span>(parameters, sim_fit)</span>
+<span id="cb38-6"><a href="#cb38-6"></a>simulations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,000 × 8
+   estimate statistic  p.value parameter conf.low conf.high method   alternative
+      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      
+ 1     201.      2.60 0.0108          99     193.      209. One Sam… two.sided  
+ 2     199.      2.20 0.0305          99     191.      208. One Sam… two.sided  
+ 3     196.      1.53 0.130           99     188.      204. One Sam… two.sided  
+ 4     203.      3.23 0.00170         99     195.      211. One Sam… two.sided  
+ 5     203.      3.13 0.00230         99     195.      212. One Sam… two.sided  
+ 6     199.      2.11 0.0372          99     191.      208. One Sam… two.sided  
+ 7     203.      3.38 0.00103         99     195.      210. One Sam… two.sided  
+ 8     205.      3.63 0.000457        99     197.      213. One Sam… two.sided  
+ 9     194.      1.07 0.286           99     186.      202. One Sam… two.sided  
+10     200.      2.31 0.0232          99     191.      208. One Sam… two.sided  
+# ℹ 990 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="functional-iteration-1" class="slide level2">
+<h2>Functional Iteration</h2>
+<p>Before we iterate the process across several sample sizes, we must capture the sample size in our model output. Let’s alter the <code>sim_fit()</code> function slightly to do so.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>sim_fit <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {</span>
+<span id="cb40-2"><a href="#cb40-2"></a>  y <span class="ot">&lt;-</span> <span class="fu">sim_data</span>(...)</span>
+<span id="cb40-3"><a href="#cb40-3"></a>  <span class="co"># fit model</span></span>
+<span id="cb40-4"><a href="#cb40-4"></a>  output <span class="ot">&lt;-</span> <span class="fu">t.test</span>(y, <span class="at">mu =</span> <span class="dv">190</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="#cb40-5"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb40-6"><a href="#cb40-6"></a>  </span>
+<span id="cb40-7"><a href="#cb40-7"></a>  <span class="co"># add parameters to the model</span></span>
+<span id="cb40-8"><a href="#cb40-8"></a>  parameters <span class="ot">&lt;-</span> <span class="fu">list</span>(...)</span>
+<span id="cb40-9"><a href="#cb40-9"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">names</span>(parameters)) {</span>
+<span id="cb40-10"><a href="#cb40-10"></a>    output[i] <span class="ot">&lt;-</span> parameters[i]</span>
+<span id="cb40-11"><a href="#cb40-11"></a>  }</span>
+<span id="cb40-12"><a href="#cb40-12"></a>  </span>
+<span id="cb40-13"><a href="#cb40-13"></a>  <span class="co"># return the output</span></span>
+<span id="cb40-14"><a href="#cb40-14"></a>  output</span>
+<span id="cb40-15"><a href="#cb40-15"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="generating-parameters" class="slide level2">
+<h2>Generating Parameters</h2>
+<ul>
+<li>We will now try out 16 different sample sizes, ranging from 10 participants to 160 in increments of 10.</li>
+<li>We want 1000 rows for each sample size.</li>
+<li>We can do this manually, but it’s a pain as we get more parameters in the simulation.</li>
+<li>Using <code>crossing()</code> gives you all combinations of the supplied vectors.</li>
+</ul>
+</section>
+<section id="generating-parameters-1" class="slide level2">
+<h2>Generating Parameters</h2>
+<p>Here, we remove the iterations column once we’ve created the tibble as this can’t be passed to our function as an argument.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>parameters <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
+<span id="cb41-2"><a href="#cb41-2"></a>  <span class="at">iterations =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
+<span id="cb41-3"><a href="#cb41-3"></a>  <span class="at">n =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">160</span>, <span class="at">by =</span> <span class="dv">10</span>)</span>
+<span id="cb41-4"><a href="#cb41-4"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb41-5"><a href="#cb41-5"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>iterations)</span>
+<span id="cb41-6"><a href="#cb41-6"></a></span>
+<span id="cb41-7"><a href="#cb41-7"></a><span class="fu">glimpse</span>(parameters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 16,000
+Columns: 1
+$ n &lt;dbl&gt; 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 16…</code></pre>
+</div>
+</div>
+</section>
+<section id="simulate-data" class="slide level2">
+<h2>Simulate Data</h2>
+<p>Simulate data and fit a model 1000 times for each sample size.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>simulations <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">pmap_df</span>(parameters, sim_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>What’s the power look like for each sample size? 160 looks pretty good.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>sim_power <span class="ot">&lt;-</span> simulations <span class="sc">|&gt;</span> </span>
+<span id="cb44-2"><a href="#cb44-2"></a>  <span class="fu">group_by</span>(n) <span class="sc">|&gt;</span> </span>
+<span id="cb44-3"><a href="#cb44-3"></a>  <span class="fu">summarise</span>(<span class="at">power =</span> <span class="fu">mean</span>(p.value <span class="sc">&lt;</span> .<span class="dv">05</span>))</span>
+<span id="cb44-4"><a href="#cb44-4"></a></span>
+<span id="cb44-5"><a href="#cb44-5"></a>sim_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(sim_power, <span class="fu">aes</span>(<span class="at">x =</span> n, <span class="at">y =</span> power)) <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">formula =</span> <span class="st">"y ~ x"</span>, <span class="at">colour =</span> <span class="st">"#ffa07a"</span>) <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb44-8"><a href="#cb44-8"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span> .<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb44-9"><a href="#cb44-9"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb44-10"><a href="#cb44-10"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="simulate-data-1" class="slide level2">
+<h2>Simulate Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a>sim_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-28-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="sensitivity-analysis" class="title-slide slide level1 center">
+<h1>Sensitivity Analysis</h1>
+<p>What if we’ve already conducted our study? Post-hoc power analysis is always a bad idea, but sensitivity analysis can tell you which effects your study was sensitive to detect with given probabilities.</p>
+</section>
+<section id="adding-flexibility-to-the-functions" class="slide level2">
+<h2>Adding Flexibility to the Functions</h2>
+<p>We just need to make the <code>sim_data()</code> function allow for different means to be passed to the data generation process.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>sim_data <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">200</span>) {</span>
+<span id="cb46-2"><a href="#cb46-2"></a>  <span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> mean, <span class="at">sd =</span> <span class="dv">40</span>)</span>
+<span id="cb46-3"><a href="#cb46-3"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Update the parameters to now vary the mean effect size. Remember we have a default <code>n</code> of 100.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>parameters <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb47-2"><a href="#cb47-2"></a>  <span class="at">mean =</span> <span class="fu">rep</span>(<span class="fu">seq</span>(<span class="dv">160</span>, <span class="dv">220</span>, <span class="at">length.out =</span> <span class="dv">20</span>), <span class="dv">1000</span>)</span>
+<span id="cb47-3"><a href="#cb47-3"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="simulate-for-sensitivity" class="slide level2">
+<h2>Simulate for Sensitivity</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>simulations <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">pmap_df</span>(parameters, sim_fit)</span>
+<span id="cb48-2"><a href="#cb48-2"></a>simulations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20,000 × 9
+   estimate statistic  p.value parameter conf.low conf.high method   alternative
+      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      
+ 1     163.    -6.66  1.56e- 9        99     155.      171. One Sam… two.sided  
+ 2     164.    -7.41  4.38e-11        99     157.      171. One Sam… two.sided  
+ 3     164.    -6.63  1.82e- 9        99     156.      172. One Sam… two.sided  
+ 4     166.    -6.07  2.38e- 8        99     158.      174. One Sam… two.sided  
+ 5     172.    -4.67  9.54e- 6        99     164.      180. One Sam… two.sided  
+ 6     176.    -3.46  8.01e- 4        99     167.      184. One Sam… two.sided  
+ 7     179.    -2.62  1.02e- 2        99     171.      187. One Sam… two.sided  
+ 8     176.    -3.50  6.94e- 4        99     169.      184. One Sam… two.sided  
+ 9     185.    -1.16  2.50e- 1        99     177.      194. One Sam… two.sided  
+10     192.     0.506 6.14e- 1        99     184.      200. One Sam… two.sided  
+# ℹ 19,990 more rows
+# ℹ 1 more variable: mean &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="inspect-the-simulations" class="slide level2">
+<h2>Inspect the Simulations</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>sensitivity_result <span class="ot">&lt;-</span> simulations <span class="sc">|&gt;</span> </span>
+<span id="cb50-2"><a href="#cb50-2"></a>  <span class="fu">group_by</span>(mean) <span class="sc">|&gt;</span> </span>
+<span id="cb50-3"><a href="#cb50-3"></a>  <span class="fu">summarise</span>(<span class="at">power =</span> <span class="fu">mean</span>(p.value <span class="sc">&lt;</span> .<span class="dv">05</span>))</span>
+<span id="cb50-4"><a href="#cb50-4"></a></span>
+<span id="cb50-5"><a href="#cb50-5"></a>sensitivity_result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 2
+    mean power
+   &lt;dbl&gt; &lt;dbl&gt;
+ 1  160  1    
+ 2  163. 1    
+ 3  166. 1    
+ 4  169. 1    
+ 5  173. 0.994
+ 6  176. 0.938
+ 7  179. 0.805
+ 8  182. 0.467
+ 9  185. 0.213
+10  188. 0.076
+11  192. 0.057
+12  195. 0.223
+13  198. 0.501
+14  201. 0.764
+15  204. 0.958
+16  207. 0.995
+17  211. 1    
+18  214. 1    
+19  217. 1    
+20  220  1    </code></pre>
+</div>
+</div>
+</section>
+<section id="inspect-the-simulations-1" class="slide level2">
+<h2>Inspect the Simulations</h2>
+<p>Remember, this is for a one-sample t-test where <span class="math inline">\(\mu\)</span> = 190. Our test isn’t sensitive to values ranging from around 180-200.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a><span class="fu">ggplot</span>(sensitivity_result, <span class="fu">aes</span>(<span class="at">x =</span> mean, <span class="at">y =</span> power)) <span class="sc">+</span></span>
+<span id="cb52-2"><a href="#cb52-2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb52-3"><a href="#cb52-3"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-33-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="simulating-two-random-variables" class="title-slide slide level1 center">
+<h1>Simulating Two Random Variables</h1>
+<p>Often we want to simulate data that are correlated with one another. Understanding the maths behind this will make it easier to do so.</p>
+</section>
+<section id="variance" class="slide level2">
+<h2>Variance</h2>
+<p>The variance of a random variable measures the spread of the values of the variable. For a bivariate normal distribution with variables X and Y this is denotes as <span class="math inline">\(\sigma_x\)</span> and <span class="math inline">\(\sigma_y\)</span> which describes the variance for each variable.</p>
+</section>
+<section id="covariance" class="slide level2">
+<h2>Covariance</h2>
+<p>The covariance between two random variables measures how much the variables vary together. In the case of a bivariate normal distribution between variables X and Y this is denoated at <span class="math inline">\(Cov(X, Y)\)</span>.</p>
+<ul>
+<li><p>Measures how much the values of X and Y deviate from their means in the same direction.</p></li>
+<li><p>If <strong>positive</strong>: The variables tend to move in the same direction.</p></li>
+<li><p>If <strong>negative</strong>: The variables tend to move in opposite directions.</p></li>
+</ul>
+</section>
+<section id="correlation" class="slide level2">
+<h2>Correlation</h2>
+<p>The correlation between two random variables measures the strength and direction of the linear relationship between them. In the case of a bivariate normal distribution, the correlation between variables X and Y is denoted as <span class="math inline">\(\rho\)</span></p>
+<ul>
+<li>If 1: Indicates a perfect <strong>positive relationship</strong>.</li>
+<li>If 0: Indicates <strong>no relationship</strong>.</li>
+<li>If -1: Indicates a perfect <strong>negative relationship</strong>.</li>
+</ul>
+<p><span class="math inline">\(\rho = \frac{Cov(X, Y)}{\sigma_x\sigma_y}\)</span></p>
+</section>
+<section id="the-variance-covariance-matrix" class="slide level2">
+<h2>The Variance-Covariance Matrix</h2>
+<p>The variance-covariance matrix (also known as the covariance matrix) is a square matrix that contains the variances (<em>SD</em> squared; <span class="math inline">\(\sigma^2\)</span>) of the individual variables along the diagonal and the covariances between each pair of variables off the diagonal. For the bivariate case this is:</p>
+<p><span class="math inline">\(\Sigma = \begin{pmatrix} \sigma_x^2, \rho\sigma_x^2\sigma_y^2 \\ \rho\sigma_x^2\sigma_y^2, \sigma_y^2 \end{pmatrix}\)</span></p>
+</section>
+<section id="joint-distributions" class="slide level2">
+<h2>Joint Distributions</h2>
+<p>If X and Y are two normal random variables the joint distribution between X and Y is defined as:</p>
+<p><span class="math inline">\(\begin{bmatrix}X_i \\ Y_i \end{bmatrix} \sim \mathcal{N} \begin{pmatrix}\begin{bmatrix} \mu_x \\ \mu_y\end{bmatrix},\Sigma\end{pmatrix}\)</span></p>
+</section></section>
+<section>
+<section id="generating-simulated-multivariate-data" class="title-slide slide level1 center">
+<h1>Generating Simulated Multivariate Data</h1>
+<p>For multivariate data, such as the bivariate case, we can simulate data using the multivariate version of the distribution. For <code>rnorm()</code> this is <code>MASS:mvrnorm()</code>.</p>
+</section>
+<section id="making-the-variance-covariance-matrix" class="slide level2">
+<h2>Making the variance-covariance matrix</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>x_mean <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb53-2"><a href="#cb53-2"></a>y_mean <span class="ot">&lt;-</span> <span class="dv">75</span></span>
+<span id="cb53-3"><a href="#cb53-3"></a>x_sd <span class="ot">&lt;-</span> <span class="dv">35</span></span>
+<span id="cb53-4"><a href="#cb53-4"></a>y_sd <span class="ot">&lt;-</span> <span class="dv">55</span></span>
+<span id="cb53-5"><a href="#cb53-5"></a>corr <span class="ot">&lt;-</span> .<span class="dv">6</span></span>
+<span id="cb53-6"><a href="#cb53-6"></a></span>
+<span id="cb53-7"><a href="#cb53-7"></a>varcorr <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb53-8"><a href="#cb53-8"></a>  <span class="fu">c</span>(x_sd<span class="sc">^</span><span class="dv">2</span>, x_sd <span class="sc">*</span> y_sd <span class="sc">*</span> corr, x_sd <span class="sc">*</span> y_sd <span class="sc">*</span> corr, y_sd<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb53-9"><a href="#cb53-9"></a>  <span class="at">ncol =</span> <span class="dv">2</span></span>
+<span id="cb53-10"><a href="#cb53-10"></a>)</span>
+<span id="cb53-11"><a href="#cb53-11"></a>varcorr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,] 1225 1155
+[2,] 1155 3025</code></pre>
+</div>
+</div>
+</section>
+<section id="making-the-variance-covariance-matrix-1" class="slide level2">
+<h2>Making the variance-covariance matrix</h2>
+<p>We can improve readability by making a covariance object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a>x_mean <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb55-2"><a href="#cb55-2"></a>y_mean <span class="ot">&lt;-</span> <span class="dv">75</span></span>
+<span id="cb55-3"><a href="#cb55-3"></a>x_sd <span class="ot">&lt;-</span> <span class="dv">35</span></span>
+<span id="cb55-4"><a href="#cb55-4"></a>y_sd <span class="ot">&lt;-</span> <span class="dv">55</span></span>
+<span id="cb55-5"><a href="#cb55-5"></a>corr <span class="ot">&lt;-</span> .<span class="dv">6</span></span>
+<span id="cb55-6"><a href="#cb55-6"></a>covariance <span class="ot">&lt;-</span> x_sd <span class="sc">*</span> y_sd <span class="sc">*</span> corr</span>
+<span id="cb55-7"><a href="#cb55-7"></a></span>
+<span id="cb55-8"><a href="#cb55-8"></a>varcorr <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb55-9"><a href="#cb55-9"></a>  <span class="fu">c</span>(x_sd<span class="sc">^</span><span class="dv">2</span>, covariance, covariance, y_sd<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb55-10"><a href="#cb55-10"></a>  <span class="at">ncol =</span> <span class="dv">2</span></span>
+<span id="cb55-11"><a href="#cb55-11"></a>)</span>
+<span id="cb55-12"><a href="#cb55-12"></a>varcorr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,] 1225 1155
+[2,] 1155 3025</code></pre>
+</div>
+</div>
+</section>
+<section id="generating-simulated-multivariate-data-1" class="slide level2">
+<h2>Generating Simulated Multivariate Data</h2>
+<h3 id="sampling-from-the-multivariate-normal">Sampling from the Multivariate Normal</h3>
+<p>Pass the sample size, means, and variance-covariance matrix to the multivariate version of the <code>rnorm()</code> function from the <code>MASS</code> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a><span class="fu">set.seed</span>(<span class="dv">1892</span>)</span>
+<span id="cb57-2"><a href="#cb57-2"></a></span>
+<span id="cb57-3"><a href="#cb57-3"></a>samples <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">mvrnorm</span>(</span>
+<span id="cb57-4"><a href="#cb57-4"></a>  <span class="at">n =</span> <span class="dv">200</span>,</span>
+<span id="cb57-5"><a href="#cb57-5"></a>  <span class="at">mu =</span> <span class="fu">c</span>(<span class="at">x =</span> x_mean, <span class="at">y =</span> y_mean),</span>
+<span id="cb57-6"><a href="#cb57-6"></a>  <span class="at">Sigma =</span> varcorr</span>
+<span id="cb57-7"><a href="#cb57-7"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-the-data" class="slide level2">
+<h2>Inspect the Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="fu">head</span>(samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             x         y
+[1,] 104.20106 209.89219
+[2,]  55.89214 117.95543
+[3,]  55.42891  23.37336
+[4,]  71.04200  98.71505
+[5,]  32.57352 104.81872
+[6,]  69.97122  39.22667</code></pre>
+</div>
+</div>
+</section>
+<section id="inspect-the-data-1" class="slide level2">
+<h2>Inspect the Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>samples_df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(samples)</span>
+<span id="cb60-2"><a href="#cb60-2"></a></span>
+<span id="cb60-3"><a href="#cb60-3"></a><span class="fu">ggplot</span>(samples_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb60-4"><a href="#cb60-4"></a>  <span class="fu">geom_point</span>(<span class="at">colour =</span> <span class="st">"#95d5d0"</span>) <span class="sc">+</span></span>
+<span id="cb60-5"><a href="#cb60-5"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-38-1.png" width="960" class="r-stretch"></section>
+<section id="inspect-the-densities" class="slide level2">
+<h2>Inspect the Densities</h2>
+<ul>
+<li>We can make a 2D density plot to see where the most common values are for the relationship between X and Y.</li>
+<li>Think of it as a hill. The darker region is the peak of the hill, where values are most common.</li>
+</ul>
+</section>
+<section id="inspect-the-densities-1" class="slide level2">
+<h2>Inspect the Densities</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a><span class="fu">ggplot</span>(samples_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb61-2"><a href="#cb61-2"></a>  <span class="fu">stat_density_2d</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">after_stat</span>(level)), <span class="at">geom =</span> <span class="st">"polygon"</span>) <span class="sc">+</span></span>
+<span id="cb61-3"><a href="#cb61-3"></a>  <span class="fu">scale_fill_continuous</span>(<span class="at">low=</span><span class="st">"lavenderblush"</span>, <span class="at">high=</span><span class="st">"#ffa07a"</span>) <span class="sc">+</span> </span>
+<span id="cb61-4"><a href="#cb61-4"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-39-1.png" width="960" class="r-stretch"></section>
+<section id="generating-simulated-multivariate-data-2" class="slide level2">
+<h2>Generating Simulated Multivariate Data</h2>
+<h3 id="sampling-from-the-multivariate-normal-1">Sampling from the multivariate normal</h3>
+<p>Check the means and SDs. Looks good!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb62-2"><a href="#cb62-2"></a>  <span class="at">means =</span> <span class="fu">c</span>(<span class="fu">mean</span>(samples[,<span class="dv">1</span>]), <span class="fu">mean</span>(samples[,<span class="dv">2</span>])),</span>
+<span id="cb62-3"><a href="#cb62-3"></a>  <span class="at">sds =</span> <span class="fu">c</span>(<span class="fu">sd</span>(samples[,<span class="dv">1</span>]), <span class="fu">sd</span>(samples[,<span class="dv">2</span>])),</span>
+<span id="cb62-4"><a href="#cb62-4"></a>  <span class="at">corr =</span> <span class="fu">cor</span>(samples[,<span class="dv">1</span>], samples[,<span class="dv">2</span>])</span>
+<span id="cb62-5"><a href="#cb62-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  means   sds  corr
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  47.4  34.4 0.558
+2  78.5  55.3 0.558</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="linear-regression" class="title-slide slide level1 center">
+<h1>Linear Regression</h1>
+<p>We can generate data using the linear regression framework. This is useful if you want to simulate an outcome from some known predictors.</p>
+</section>
+<section id="check-our-data" class="slide level2">
+<h2>Check our data</h2>
+<ul>
+<li>Fit a model to our simulated data.</li>
+<li>We need the residual standard error, intercept and slope estimates.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a>samples_df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(samples)</span>
+<span id="cb64-2"><a href="#cb64-2"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> samples_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y ~ x, data = samples_df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-143.923  -29.456    1.863   31.039  115.893 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 36.00592    5.54131   6.498 6.46e-10 ***
+x            0.89541    0.09463   9.463  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 45.97 on 198 degrees of freedom
+Multiple R-squared:  0.3114,    Adjusted R-squared:  0.3079 
+F-statistic: 89.54 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="the-linear-model" class="slide level2">
+<h2>The Linear Model</h2>
+<p>Outcomes come from a fixed intercept, a fixed slope, a predictor, and some normally distributed error.</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_i = \alpha + \beta X_i + \epsilon_i \\
+\epsilon_i \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="simulating-from-model-parameters" class="slide level2">
+<h2>Simulating from Model Parameters</h2>
+<p>What if we had a good idea of the linear model parameters? Simulate using the linear model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span> <span class="co"># observations</span></span>
+<span id="cb66-2"><a href="#cb66-2"></a>alpha <span class="ot">&lt;-</span> <span class="fl">34.40</span> <span class="co"># intercept</span></span>
+<span id="cb66-3"><a href="#cb66-3"></a>beta <span class="ot">&lt;-</span> <span class="fl">0.79</span> <span class="co"># slope</span></span>
+<span id="cb66-4"><a href="#cb66-4"></a>sigma <span class="ot">&lt;-</span> <span class="fl">45.97</span> <span class="co"># residual SD</span></span>
+<span id="cb66-5"><a href="#cb66-5"></a></span>
+<span id="cb66-6"><a href="#cb66-6"></a><span class="co"># simulate predictor</span></span>
+<span id="cb66-7"><a href="#cb66-7"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, x_mean, x_sd) <span class="co"># mean = 50, sd = 35</span></span>
+<span id="cb66-8"><a href="#cb66-8"></a></span>
+<span id="cb66-9"><a href="#cb66-9"></a><span class="co"># simulate outcome</span></span>
+<span id="cb66-10"><a href="#cb66-10"></a>err <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="at">sd =</span> sigma)</span>
+<span id="cb66-11"><a href="#cb66-11"></a>y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta<span class="sc">*</span>x <span class="sc">+</span> err </span>
+<span id="cb66-12"><a href="#cb66-12"></a></span>
+<span id="cb66-13"><a href="#cb66-13"></a><span class="co"># alternatively:</span></span>
+<span id="cb66-14"><a href="#cb66-14"></a><span class="co"># y &lt;- rnorm(n, mean = alpha + beta*x, sd = sigma)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-the-data-2" class="slide level2">
+<h2>Inspect the Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb67-2"><a href="#cb67-2"></a><span class="fu">head</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+      x      y
+  &lt;dbl&gt;  &lt;dbl&gt;
+1 28.2    6.15
+2 49.9  -25.4 
+3 78.1   67.8 
+4 33.2  115.  
+5  7.41 -50.5 
+6  1.12   1.90</code></pre>
+</div>
+</div>
+</section>
+<section id="simulate-from-model-parameters" class="slide level2">
+<h2>Simulate from Model Parameters</h2>
+<h3 id="fit-the-model">Fit the Model</h3>
+<p>Looks very close to the same parameters we got from the bivariate data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x, sim_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y ~ x, data = sim_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-116.680  -29.656    1.607   31.013   98.749 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   27.743      5.320   5.215 4.61e-07 ***
+x              0.853      0.092   9.272  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 44.6 on 198 degrees of freedom
+Multiple R-squared:  0.3027,    Adjusted R-squared:  0.2992 
+F-statistic: 85.96 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="multiple-linear-regression" class="title-slide slide level1 center">
+<h1>Multiple Linear Regression</h1>
+
+</section>
+<section id="the-linear-model-1" class="slide level2">
+<h2>The Linear Model</h2>
+<p>Outcomes come from a fixed intercept, a fixed slope for one predictor, a fixed slope for another predictor, and some normally distributed error.</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_i = \alpha + \beta_1 X_{1i} + \beta_2 X_{2i} + \epsilon_i \\
+\epsilon_i \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="add-another-continuous-predictor" class="slide level2">
+<h2>Add another Continuous Predictor</h2>
+<p>Notice we now have <code>beta_1</code> and <code>beta_2</code> parameters with associated <code>x_1</code> and <code>x_2</code> variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span> <span class="co"># observations</span></span>
+<span id="cb71-2"><a href="#cb71-2"></a>alpha <span class="ot">&lt;-</span> <span class="fl">34.40</span> <span class="co"># intercept</span></span>
+<span id="cb71-3"><a href="#cb71-3"></a>beta_1 <span class="ot">&lt;-</span> <span class="fl">1.06</span> <span class="co"># slope for X1</span></span>
+<span id="cb71-4"><a href="#cb71-4"></a>beta_2 <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">2.54</span> <span class="co"># slope for X2</span></span>
+<span id="cb71-5"><a href="#cb71-5"></a>sigma <span class="ot">&lt;-</span> <span class="fl">45.97</span> <span class="co"># residual SD</span></span>
+<span id="cb71-6"><a href="#cb71-6"></a></span>
+<span id="cb71-7"><a href="#cb71-7"></a>x_1_mean <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb71-8"><a href="#cb71-8"></a>x_2_mean <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb71-9"><a href="#cb71-9"></a>x_1_sd <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb71-10"><a href="#cb71-10"></a>x_2_sd <span class="ot">&lt;-</span> <span class="dv">35</span></span>
+<span id="cb71-11"><a href="#cb71-11"></a>corr <span class="ot">&lt;-</span> .<span class="dv">3</span></span>
+<span id="cb71-12"><a href="#cb71-12"></a></span>
+<span id="cb71-13"><a href="#cb71-13"></a>covariance <span class="ot">&lt;-</span> x_1_sd <span class="sc">*</span> x_2_sd <span class="sc">*</span> corr</span>
+<span id="cb71-14"><a href="#cb71-14"></a>varcorr <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb71-15"><a href="#cb71-15"></a>  <span class="fu">c</span>(x_1_sd<span class="sc">^</span><span class="dv">2</span>, covariance, covariance, x_2_sd<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb71-16"><a href="#cb71-16"></a>  <span class="at">ncol =</span> <span class="dv">2</span></span>
+<span id="cb71-17"><a href="#cb71-17"></a>)</span>
+<span id="cb71-18"><a href="#cb71-18"></a></span>
+<span id="cb71-19"><a href="#cb71-19"></a><span class="co"># simulate predictors</span></span>
+<span id="cb71-20"><a href="#cb71-20"></a>predictors <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">mvrnorm</span>(</span>
+<span id="cb71-21"><a href="#cb71-21"></a>  <span class="at">n =</span> n,</span>
+<span id="cb71-22"><a href="#cb71-22"></a>  <span class="at">mu =</span> <span class="fu">c</span>(<span class="at">x_1 =</span> x_1_mean, <span class="at">x_2 =</span> x_2_mean),</span>
+<span id="cb71-23"><a href="#cb71-23"></a>  <span class="at">Sigma =</span> varcorr</span>
+<span id="cb71-24"><a href="#cb71-24"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb71-25"><a href="#cb71-25"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb71-26"><a href="#cb71-26"></a>x_1 <span class="ot">&lt;-</span> predictors<span class="sc">$</span>x_1</span>
+<span id="cb71-27"><a href="#cb71-27"></a>x_2 <span class="ot">&lt;-</span> predictors<span class="sc">$</span>x_2</span>
+<span id="cb71-28"><a href="#cb71-28"></a></span>
+<span id="cb71-29"><a href="#cb71-29"></a><span class="co"># simulate outcome</span></span>
+<span id="cb71-30"><a href="#cb71-30"></a>err <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="at">sd =</span> sigma)</span>
+<span id="cb71-31"><a href="#cb71-31"></a>y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta_1<span class="sc">*</span>x_1 <span class="sc">+</span> beta_2<span class="sc">*</span>x_2 <span class="sc">+</span> err</span>
+<span id="cb71-32"><a href="#cb71-32"></a></span>
+<span id="cb71-33"><a href="#cb71-33"></a><span class="co"># alternatively:</span></span>
+<span id="cb71-34"><a href="#cb71-34"></a><span class="co"># y &lt;- rnorm(n, mean = alpha + beta_1*x_1 + beta_2*x_2, sd = sigma)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-simulated-data" class="slide level2">
+<h2>Inspect Simulated Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x_1 =</span> x_1, <span class="at">x_2 =</span> x_2, <span class="at">y =</span> y)</span>
+<span id="cb72-2"><a href="#cb72-2"></a><span class="fu">head</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+    x_1   x_2      y
+  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1  33.4 -7.19 170.  
+2  33.3  7.21 -12.7 
+3  62.9 75.6  -68.9 
+4  64.3 57.4   -9.44
+5  65.4 20.4  -97.6 
+6  31.1 -8.39  50.2 </code></pre>
+</div>
+</div>
+</section>
+<section id="fit-the-model-1" class="slide level2">
+<h2>Fit the Model</h2>
+<p>Looks good!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x_1 <span class="sc">+</span> x_2, sim_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y ~ x_1 + x_2, data = sim_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-145.353  -31.899    4.338   29.553  123.397 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 33.41219    8.96790   3.726 0.000254 ***
+x_1          0.92497    0.17578   5.262  3.7e-07 ***
+x_2         -2.26334    0.09911 -22.836  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 46.36 on 197 degrees of freedom
+Multiple R-squared:  0.7301,    Adjusted R-squared:  0.7273 
+F-statistic: 266.4 on 2 and 197 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="categorical-predictors" class="title-slide slide level1 center">
+<h1>Categorical Predictors</h1>
+<p>Remember categorical predictors are defined by contrasts, so we assign values to conditions, e.g.&nbsp;-1/1.</p>
+</section>
+<section id="simulating-from-categorical-predictors" class="slide level2">
+<h2>Simulating from Categorical Predictors</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span> <span class="co"># observations</span></span>
+<span id="cb76-2"><a href="#cb76-2"></a>alpha <span class="ot">&lt;-</span> <span class="fl">34.40</span> <span class="co"># intercept</span></span>
+<span id="cb76-3"><a href="#cb76-3"></a>beta <span class="ot">&lt;-</span> <span class="dv">20</span> <span class="co"># slope</span></span>
+<span id="cb76-4"><a href="#cb76-4"></a>sigma <span class="ot">&lt;-</span> <span class="fl">45.97</span> <span class="co"># residual SD</span></span>
+<span id="cb76-5"><a href="#cb76-5"></a></span>
+<span id="cb76-6"><a href="#cb76-6"></a><span class="co"># simulate predictor</span></span>
+<span id="cb76-7"><a href="#cb76-7"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="at">times =</span> n<span class="sc">/</span><span class="dv">2</span>), <span class="fu">rep</span>(<span class="dv">1</span>, <span class="at">times =</span> n<span class="sc">/</span><span class="dv">2</span>))</span>
+<span id="cb76-8"><a href="#cb76-8"></a></span>
+<span id="cb76-9"><a href="#cb76-9"></a><span class="co"># simulate outcome</span></span>
+<span id="cb76-10"><a href="#cb76-10"></a>err <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="at">sd =</span> sigma)</span>
+<span id="cb76-11"><a href="#cb76-11"></a>y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta<span class="sc">*</span>x <span class="sc">+</span> err </span>
+<span id="cb76-12"><a href="#cb76-12"></a></span>
+<span id="cb76-13"><a href="#cb76-13"></a><span class="co"># alternatively:</span></span>
+<span id="cb76-14"><a href="#cb76-14"></a><span class="co"># y &lt;- rnorm(n, mean = alpha + beta*x, sd = sigma)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-simulated-data-1" class="slide level2">
+<h2>Inspect Simulated Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb77-2"><a href="#cb77-2"></a><span class="fu">head</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+      x     y
+  &lt;dbl&gt; &lt;dbl&gt;
+1    -1  24.8
+2    -1 -48.8
+3    -1  27.5
+4    -1  13.0
+5    -1  48.4
+6    -1  54.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1"></a><span class="fu">tail</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+      x      y
+  &lt;dbl&gt;  &lt;dbl&gt;
+1     1  56.7 
+2     1 -32.0 
+3     1   2.92
+4     1  56.3 
+5     1  87.0 
+6     1  28.2 </code></pre>
+</div>
+</div>
+</section>
+<section id="fit-the-model-2" class="slide level2">
+<h2>Fit the Model</h2>
+<p>Looks good!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x, sim_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y ~ x, data = sim_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-108.165  -27.199   -0.793   27.709  131.590 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   32.320      3.126  10.338  &lt; 2e-16 ***
+x             12.581      3.126   4.024 8.14e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 44.21 on 198 degrees of freedom
+Multiple R-squared:  0.0756,    Adjusted R-squared:  0.07093 
+F-statistic: 16.19 on 1 and 198 DF,  p-value: 8.139e-05</code></pre>
+</div>
+</div>
+</section></section>
+<section id="mixed-effects-models" class="title-slide slide level1 center">
+<h1>Mixed Effects Models</h1>
+<p>Mixed effects models are just extensions of the linear model. Let’s simulate data with crossed random effects of subjects and items.</p>
+</section>
+
+<section>
+<section id="between-subjects-and-within-items" class="title-slide slide level1 center">
+<h1>Between-Subjects and Within-Items</h1>
+
+</section>
+<section id="explore-a-template-study" class="slide level2">
+<h2>Explore a Template Study</h2>
+<p>We’ll use the language learning data from Williams et al.&nbsp;(2020). Notice we will drop some factors and levels to make it easier so we have a 2 <span class="math inline">\(\times\)</span> 2 study within one within-subjects but between-items factor, <code>dialect_words</code>, and one within-items but between-subjects factor, <code>language_variety.</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1"></a>levenik_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb83-2"><a href="#cb83-2"></a>  <span class="st">"https://raw.githubusercontent.com/gpwilliams/levenik/master/02_data/03_study-three/03_cleaned-data/ex_3_cleaned_data.csv"</span></span>
+<span id="cb83-3"><a href="#cb83-3"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb83-4"><a href="#cb83-4"></a>  <span class="co"># keep only testing block for reading, excluding people who didn't complete it</span></span>
+<span id="cb83-5"><a href="#cb83-5"></a>  <span class="fu">filter</span>(</span>
+<span id="cb83-6"><a href="#cb83-6"></a>    block <span class="sc">==</span> <span class="st">"TEST"</span>, </span>
+<span id="cb83-7"><a href="#cb83-7"></a>    task <span class="sc">==</span> <span class="st">"R"</span>, </span>
+<span id="cb83-8"><a href="#cb83-8"></a>    <span class="sc">!</span>participant_number <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">144</span>, <span class="dv">177</span>, <span class="dv">273</span>),</span>
+<span id="cb83-9"><a href="#cb83-9"></a>    dialect_words <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"no_shift_word"</span>, <span class="st">"shifted_word"</span>)</span>
+<span id="cb83-10"><a href="#cb83-10"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb83-11"><a href="#cb83-11"></a>  <span class="fu">rename</span>(<span class="at">item =</span> target) <span class="sc">|&gt;</span> </span>
+<span id="cb83-12"><a href="#cb83-12"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(</span>
+<span id="cb83-13"><a href="#cb83-13"></a>    participant_number, </span>
+<span id="cb83-14"><a href="#cb83-14"></a>    item,</span>
+<span id="cb83-15"><a href="#cb83-15"></a>    language_variety, </span>
+<span id="cb83-16"><a href="#cb83-16"></a>    lenient_nLED</span>
+<span id="cb83-17"><a href="#cb83-17"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb83-18"><a href="#cb83-18"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb83-19"><a href="#cb83-19"></a>    <span class="at">participant_number =</span> <span class="fu">as.factor</span>(participant_number),</span>
+<span id="cb83-20"><a href="#cb83-20"></a>    <span class="at">item =</span> <span class="fu">as.factor</span>(item),</span>
+<span id="cb83-21"><a href="#cb83-21"></a>    <span class="at">language_variety =</span> <span class="fu">as.factor</span>(language_variety),</span>
+<span id="cb83-22"><a href="#cb83-22"></a>    <span class="at">asin_lenient_nLED =</span> <span class="fu">asin</span>(<span class="fu">sqrt</span>(lenient_nLED))</span>
+<span id="cb83-23"><a href="#cb83-23"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-linear-model-2" class="slide level2">
+<h2>The Linear Model</h2>
+<p>Outcomes come from a fixed intercept with offsets (random intercepts) for subjects and items, a fixed slope for language variety with offsets by items (random slope), and some normally distributed error.</p>
+<p><span class="math display">\[
+\begin{aligned}
+Y_{si} = \beta_0 +\tau_{0s} + \omega_{0i} + (\beta_1 + \omega_{1i})X_{i} +  \epsilon_{si} \\
+\epsilon_{si} \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="get-model-estimates" class="slide level2">
+<h2>Get Model Estimates</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1"></a>mod <span class="ot">&lt;-</span> afex<span class="sc">::</span><span class="fu">mixed</span>(</span>
+<span id="cb84-2"><a href="#cb84-2"></a>  asin_lenient_nLED <span class="sc">~</span> language_variety <span class="sc">+</span> </span>
+<span id="cb84-3"><a href="#cb84-3"></a>    (<span class="dv">1</span> <span class="sc">|</span> participant_number) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> language_variety <span class="sc">|</span> item), </span>
+<span id="cb84-4"><a href="#cb84-4"></a>  <span class="at">data =</span> levenik_data</span>
+<span id="cb84-5"><a href="#cb84-5"></a>)</span>
+<span id="cb84-6"><a href="#cb84-6"></a><span class="fu">summary</span>(mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: asin_lenient_nLED ~ language_variety + (1 | participant_number) +  
+    (1 + language_variety | item)
+   Data: data
+
+REML criterion at convergence: 3776.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.5528 -0.6308 -0.1156  0.6531  4.2782 
+
+Random effects:
+ Groups             Name              Variance  Std.Dev. Corr
+ participant_number (Intercept)       0.1107117 0.33273      
+ item               (Intercept)       0.0095846 0.09790      
+                    language_variety1 0.0001447 0.01203  0.40
+ Residual                             0.1110378 0.33322      
+Number of obs: 4883, groups:  participant_number, 163; item, 30
+
+Fixed effects:
+                   Estimate Std. Error        df t value Pr(&gt;|t|)    
+(Intercept)         0.47183    0.03196 146.98613  14.763   &lt;2e-16 ***
+language_variety1  -0.04205    0.02659 161.83618  -1.582    0.116    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+            (Intr)
+langg_vrty1 0.024 </code></pre>
+</div>
+</div>
+</section>
+<section id="define-parameters" class="slide level2">
+<h2>Define Parameters</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1"></a><span class="co"># sample sizes ----</span></span>
+<span id="cb86-2"><a href="#cb86-2"></a></span>
+<span id="cb86-3"><a href="#cb86-3"></a>n_subj <span class="ot">&lt;-</span> <span class="dv">162</span></span>
+<span id="cb86-4"><a href="#cb86-4"></a>n_standard_subj <span class="ot">&lt;-</span> n_subj<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb86-5"><a href="#cb86-5"></a>n_dialect_subj <span class="ot">&lt;-</span> n_subj<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb86-6"><a href="#cb86-6"></a>n_items <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb86-7"><a href="#cb86-7"></a></span>
+<span id="cb86-8"><a href="#cb86-8"></a><span class="co"># fixed effects ----</span></span>
+<span id="cb86-9"><a href="#cb86-9"></a></span>
+<span id="cb86-10"><a href="#cb86-10"></a>beta_0 <span class="ot">&lt;-</span> <span class="fl">0.47</span> <span class="co"># intercept</span></span>
+<span id="cb86-11"><a href="#cb86-11"></a>beta_1 <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.04</span> <span class="co"># slope</span></span>
+<span id="cb86-12"><a href="#cb86-12"></a></span>
+<span id="cb86-13"><a href="#cb86-13"></a><span class="co"># random effects ----</span></span>
+<span id="cb86-14"><a href="#cb86-14"></a></span>
+<span id="cb86-15"><a href="#cb86-15"></a>tau_0 <span class="ot">&lt;-</span> <span class="fl">0.33</span> <span class="co"># by-subject SD for intercept</span></span>
+<span id="cb86-16"><a href="#cb86-16"></a>omega_0 <span class="ot">&lt;-</span> <span class="fl">0.09</span> <span class="co"># by-item SD for intercept</span></span>
+<span id="cb86-17"><a href="#cb86-17"></a>omega_1 <span class="ot">&lt;-</span> <span class="fl">0.012</span> <span class="co"># by-item SD for slope</span></span>
+<span id="cb86-18"><a href="#cb86-18"></a>rho <span class="ot">&lt;-</span> .<span class="dv">40</span> <span class="co"># correlation between by-item intercept and slope SD</span></span>
+<span id="cb86-19"><a href="#cb86-19"></a></span>
+<span id="cb86-20"><a href="#cb86-20"></a><span class="co"># residual standard deviation ----</span></span>
+<span id="cb86-21"><a href="#cb86-21"></a>sigma <span class="ot">&lt;-</span> <span class="fl">0.33</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sample-subjects" class="slide level2">
+<h2>Sample Subjects</h2>
+<p>By-participant random intercepts are normally distributed [<code>rnorm()</code>] around the fixed effect intercept.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1"></a>subjects <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb87-2"><a href="#cb87-2"></a>  <span class="at">subject_id =</span> <span class="fu">paste0</span>(<span class="st">"S"</span>, <span class="dv">1</span><span class="sc">:</span>n_subj),</span>
+<span id="cb87-3"><a href="#cb87-3"></a>  <span class="at">language_variety =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"standard"</span>, <span class="st">"dialect"</span>), <span class="fu">c</span>(n_standard_subj, n_dialect_subj)),</span>
+<span id="cb87-4"><a href="#cb87-4"></a>  <span class="at">T_0s =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> n_subj, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> tau_0)</span>
+<span id="cb87-5"><a href="#cb87-5"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb87-6"><a href="#cb87-6"></a>  <span class="fu">mutate</span>(<span class="at">language_variety_num =</span> <span class="fu">case_when</span>(</span>
+<span id="cb87-7"><a href="#cb87-7"></a>    language_variety <span class="sc">==</span> <span class="st">"standard"</span> <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb87-8"><a href="#cb87-8"></a>    language_variety <span class="sc">==</span> <span class="st">"dialect"</span> <span class="sc">~</span> <span class="dv">1</span></span>
+<span id="cb87-9"><a href="#cb87-9"></a>  )) <span class="sc">|&gt;</span> </span>
+<span id="cb87-10"><a href="#cb87-10"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(subject_id, language_variety, language_variety_num, <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-subjects" class="slide level2">
+<h2>Inspect Subjects</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1"></a><span class="fu">head</span>(subjects)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  subject_id language_variety language_variety_num    T_0s
+  &lt;chr&gt;      &lt;chr&gt;                           &lt;dbl&gt;   &lt;dbl&gt;
+1 S1         standard                           -1 -0.278 
+2 S2         standard                           -1  0.0226
+3 S3         standard                           -1 -0.704 
+4 S4         standard                           -1 -0.193 
+5 S5         standard                           -1 -0.620 
+6 S6         standard                           -1  0.0673</code></pre>
+</div>
+</div>
+</section>
+<section id="sample-items" class="slide level2">
+<h2>Sample Items</h2>
+<p>By-items random intercepts and slopes are multivariate normally distributed [<code>mvrnorm()</code>] around the fixed effect estimates with our given correlation (<code>rho</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1"></a>covariance <span class="ot">&lt;-</span> rho <span class="sc">*</span> omega_0 <span class="sc">*</span> omega_1</span>
+<span id="cb90-2"><a href="#cb90-2"></a>vcov_matrix <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb90-3"><a href="#cb90-3"></a>  <span class="fu">c</span>(omega_0<span class="sc">^</span><span class="dv">2</span>, covariance, covariance, omega_1<span class="sc">^</span><span class="dv">2</span>), </span>
+<span id="cb90-4"><a href="#cb90-4"></a>  <span class="at">nrow =</span> <span class="dv">2</span></span>
+<span id="cb90-5"><a href="#cb90-5"></a>)</span>
+<span id="cb90-6"><a href="#cb90-6"></a></span>
+<span id="cb90-7"><a href="#cb90-7"></a>item_ranefs <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">mvrnorm</span>(</span>
+<span id="cb90-8"><a href="#cb90-8"></a>  <span class="at">n =</span> n_items,</span>
+<span id="cb90-9"><a href="#cb90-9"></a>  <span class="at">mu =</span> <span class="fu">c</span>(<span class="at">O_0i =</span> <span class="dv">0</span>, <span class="at">O_1i =</span> <span class="dv">0</span>),</span>
+<span id="cb90-10"><a href="#cb90-10"></a>  <span class="at">Sigma =</span> vcov_matrix</span>
+<span id="cb90-11"><a href="#cb90-11"></a>)</span>
+<span id="cb90-12"><a href="#cb90-12"></a></span>
+<span id="cb90-13"><a href="#cb90-13"></a>items <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb90-14"><a href="#cb90-14"></a>  <span class="at">item_id =</span> <span class="fu">paste0</span>(<span class="st">"I"</span>, <span class="dv">1</span><span class="sc">:</span>n_items),</span>
+<span id="cb90-15"><a href="#cb90-15"></a>  <span class="at">O_0i =</span> item_ranefs[,<span class="dv">1</span>],</span>
+<span id="cb90-16"><a href="#cb90-16"></a>  <span class="at">O_1i =</span> item_ranefs[,<span class="dv">2</span>]</span>
+<span id="cb90-17"><a href="#cb90-17"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inspect-items" class="slide level2">
+<h2>Inspect Items</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1"></a><span class="fu">head</span>(items)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  item_id    O_0i     O_1i
+  &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 I1       0.0286 -0.00296
+2 I2       0.0825 -0.00612
+3 I3       0.0430  0.0158 
+4 I4      -0.143   0.00126
+5 I5      -0.0878  0.0127 
+6 I6      -0.0189  0.00247</code></pre>
+</div>
+</div>
+</section>
+<section id="make-subject-by-item-trials" class="slide level2">
+<h2>Make Subject-by-Item Trials</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1"></a>trials <span class="ot">&lt;-</span> <span class="fu">crossing</span>(subjects, items) </span>
+<span id="cb93-2"><a href="#cb93-2"></a>trials <span class="ot">&lt;-</span> trials <span class="sc">|&gt;</span>  </span>
+<span id="cb93-3"><a href="#cb93-3"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb93-4"><a href="#cb93-4"></a>    <span class="at">e_si =</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(trials), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> sigma)</span>
+<span id="cb93-5"><a href="#cb93-5"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb93-6"><a href="#cb93-6"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(subject_id, item_id, language_variety, <span class="fu">everything</span>())</span>
+<span id="cb93-7"><a href="#cb93-7"></a></span>
+<span id="cb93-8"><a href="#cb93-8"></a><span class="co"># inspect it</span></span>
+<span id="cb93-9"><a href="#cb93-9"></a><span class="fu">head</span>(trials)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  subject_id item_id language_variety language_variety_num   T_0s    O_0i
+  &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;                           &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+1 S1         I1      standard                           -1 -0.278  0.0286
+2 S1         I10     standard                           -1 -0.278 -0.186 
+3 S1         I11     standard                           -1 -0.278 -0.0897
+4 S1         I12     standard                           -1 -0.278 -0.0151
+5 S1         I13     standard                           -1 -0.278 -0.131 
+6 S1         I14     standard                           -1 -0.278  0.0818
+# ℹ 2 more variables: O_1i &lt;dbl&gt;, e_si &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="create-the-outcome" class="slide level2">
+<h2>Create the Outcome</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1"></a>sim_data <span class="ot">&lt;-</span> trials <span class="sc">|&gt;</span> </span>
+<span id="cb95-2"><a href="#cb95-2"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb95-3"><a href="#cb95-3"></a>    <span class="at">asin_lenient_nLED =</span> beta_0 <span class="sc">+</span> T_0s <span class="sc">+</span> O_0i <span class="sc">+</span> (beta_1 <span class="sc">+</span> O_1i) <span class="sc">*</span> language_variety_num <span class="sc">+</span> e_si,</span>
+<span id="cb95-4"><a href="#cb95-4"></a>    <span class="at">language_variety =</span> <span class="fu">as.factor</span>(language_variety)</span>
+<span id="cb95-5"><a href="#cb95-5"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb95-6"><a href="#cb95-6"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(subject_id, item_id, language_variety, asin_lenient_nLED)</span>
+<span id="cb95-7"><a href="#cb95-7"></a></span>
+<span id="cb95-8"><a href="#cb95-8"></a><span class="co"># set contrast codes: be careful they match up!</span></span>
+<span id="cb95-9"><a href="#cb95-9"></a><span class="fu">contrasts</span>(sim_data<span class="sc">$</span>language_variety) <span class="ot">&lt;-</span> <span class="fu">contr.sum</span>(<span class="dv">2</span>)</span>
+<span id="cb95-10"><a href="#cb95-10"></a></span>
+<span id="cb95-11"><a href="#cb95-11"></a><span class="fu">head</span>(sim_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  subject_id item_id language_variety asin_lenient_nLED
+  &lt;chr&gt;      &lt;chr&gt;   &lt;fct&gt;                        &lt;dbl&gt;
+1 S1         I1      standard                   -0.115 
+2 S1         I10     standard                   -0.0272
+3 S1         I11     standard                    0.0198
+4 S1         I12     standard                    0.170 
+5 S1         I13     standard                    0.263 
+6 S1         I14     standard                    0.0932</code></pre>
+</div>
+</div>
+</section>
+<section id="fit-the-model-3" class="slide level2">
+<h2>Fit the Model</h2>
+<p>Looks close to our original estimates!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1"></a>sim_mod <span class="ot">&lt;-</span> afex<span class="sc">::</span><span class="fu">mixed</span>(</span>
+<span id="cb97-2"><a href="#cb97-2"></a>  asin_lenient_nLED <span class="sc">~</span> language_variety <span class="sc">+</span> </span>
+<span id="cb97-3"><a href="#cb97-3"></a>    (<span class="dv">1</span> <span class="sc">|</span> subject_id) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> language_variety <span class="sc">|</span> item_id),</span>
+<span id="cb97-4"><a href="#cb97-4"></a>  <span class="at">data =</span> sim_data</span>
+<span id="cb97-5"><a href="#cb97-5"></a>)</span>
+<span id="cb97-6"><a href="#cb97-6"></a><span class="fu">summary</span>(sim_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: asin_lenient_nLED ~ language_variety + (1 | subject_id) + (1 +  
+    language_variety | item_id)
+   Data: data
+
+REML criterion at convergence: 3575.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.0873 -0.6642 -0.0076  0.6661  3.5997 
+
+Random effects:
+ Groups     Name              Variance  Std.Dev. Corr
+ subject_id (Intercept)       0.1071665 0.32736      
+ item_id    (Intercept)       0.0087972 0.09379      
+            language_variety1 0.0001886 0.01373  0.52
+ Residual                     0.1069348 0.32701      
+Number of obs: 4860, groups:  subject_id, 162; item_id, 30
+
+Fixed effects:
+                   Estimate Std. Error        df t value Pr(&gt;|t|)    
+(Intercept)         0.44774    0.03125 150.30570  14.326   &lt;2e-16 ***
+language_variety1  -0.04238    0.02626 161.41417  -1.614    0.109    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+            (Intr)
+langg_vrty1 0.027 </code></pre>
+</div>
+</div>
+</section>
+<section id="simulation-for-power-analysis" class="slide level2">
+<h2>Simulation for Power Analysis</h2>
+<ul>
+<li>We just have to put all the data simulation steps into one data simulation function.</li>
+<li>We then do the model fitting in another function, allowing the argument from the data simulation to be passed to the model fitting function.</li>
+<li>We then create a tibble of our parameters to be iterated upon, passing potentially smaller or larger sample sizes or smaller or larger parameters.</li>
+<li><strong>We will do this in the exercises</strong>.</li>
+</ul>
+</section>
+<section id="some-advice-on-power-analysis" class="slide level2">
+<h2>Some Advice on Power Analysis</h2>
+<ul>
+<li>There are a lot of parameters involved in simulating subject-by-trial level data. Having <strong>existing data</strong> to get a ballpark figure of estimates is likely to make your predictions more realistic.</li>
+<li>However, be careful basing everything on previous work, especially from pilot data, as small samples and published work have <strong>biased effect sizes</strong>.</li>
+<li>Try to power for your <strong>smallest effect size of interest</strong> for the parameter you care about.</li>
+<li>If you’re unsure what parameters to set for a model (e.g.&nbsp;what correlation should I predict?), <strong>let them vary</strong>!</li>
+</ul>
+</section>
+<section id="exercises" class="slide level2">
+<h2>Exercises</h2>
+<p>Please complete the exercises at <a href="https://github.com/gpwilliams/ds-psych_course" class="uri">https://github.com/gpwilliams/ds-psych_course</a>.</p>
+<div class="footer footer-default">
+
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

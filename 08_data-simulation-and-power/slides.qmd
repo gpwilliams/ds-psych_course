@@ -1,0 +1,1002 @@
+---
+title: "Data Simulation and Power"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+editor: visual
+---
+
+## Overview
+
+::: r-fit-text
+Today's session is on data simulation with a focus on using it to perform power and sensitivity analyses:
+
+-   Understanding univariate random variables and how to generate simulated data from a univariate distribution.
+
+-   Understanding multivariate random variables and to generate simulated data from a multivariate distribution.
+
+-   How to use the data grid in combination with set parameters and a linear model to simulate predictors and outcomes.
+
+-   How to iterate the data simulation and model fitting process to obtain a power analysis for one or many effects.
+
+-   How to alter your workflow to perform a sensitivity analysis where an a-priori power analysis wasn't possible.
+
+-   How to extend data generation to a multilevel modelling framework. 
+
+:::
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `08_data-simulation-and-power`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+# Power and Power Analysis
+
+## Why Power Analysis By Simulation?
+
+-   Power analyses help you to conduct a study such that you're likely to detect effects if present in the population.
+
+-   There are a number of power analysis apps that are written for specific data structures and/or models. However, these are often inflexible.
+
+-   What if you want to power for multiple effects simultaneously? Or allow for missing data in your data generation process? Writing your own data generation process and simulation code allows you to power for any design/model you like. 
+
+## Loading Packages
+
+Load our essential packages, `tidyverse` for data wrangling and presentation and `here` for working with file paths. The core packages today are `lme4` for mixed effects models and `afex` which builds on `lme4` but adds more functionality.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(lme4)
+library(afex)
+```
+
+# Probability and Random Variables
+
+## PDF, CDF, Inverse CDF, and Random Generation
+
+-   R comes with inbuilt functions for working with distributions.
+-   These are short forms of the distribution name with one of `p`, `d`, `q`, or `r` prefixed.
+-   We'll primarily use `d_()` functions to understand the probability density (or mass) functions and the `r_()` functions to generate random data from a distribution.
+
+## PDF, CDF, Inverse CDF, and Random Generation
+
+```{r}
+#| echo: false
+library(patchwork)
+
+set.seed(123) # for reproducibility
+x <- seq(-4, 4, length.out = 100)
+df <- data.frame(x = x)
+
+# dnorm ----
+
+dnorm_plot <- ggplot(df, aes(x)) + 
+  stat_function(
+    fun = dnorm, 
+    args = list(mean = 0, sd = 1),
+    colour = "#ffa07a",
+    linewidth = 2
+  ) +
+  scale_colour_manual() +
+  labs(title = "Standard Normal PDF", x = "x", y = "Density") +
+  theme_bw()
+
+# rnorm ----
+df$r <- rnorm(n = 100, mean = 0, sd = 1)
+rnorm_plot <- ggplot(df, aes(r)) + 
+  geom_histogram(
+    aes(y = ..density..), 
+    bins = 30, 
+    fill = "lavenderblush", 
+    colour = "black"
+  ) +
+  stat_function(
+    fun = dnorm, 
+    args = list(mean = 0, sd = 1), 
+    colour = "#ffa07a",
+    linewidth = 2
+  ) +
+  labs(
+    title = "Histogram of 100\nStandard Normal Random Numbers", 
+    x = "x", 
+    y = "Density"
+  ) +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+dnorm_plot + rnorm_plot
+```
+
+## Generating Simulated Univariate Data
+
+Generate random data from a normal distribution with these parameters:
+
+```{r}
+y <- rnorm(n = 5, mean = 200, sd = 40)
+```
+
+Check the means and SDs align:
+
+```{r}
+y
+mean(y)
+sd(y)
+```
+
+## Generating Simulated Univariate Data
+
+Sample again but increase the sample size, `n`.
+
+```{r}
+y <- rnorm(n = 200, mean = 200, sd = 40)
+```
+
+Check the means and SDs align:
+
+```{r}
+mean(y)
+sd(y)
+```
+
+**The law of large numbers**: small samples from random variables have volatile estimates. Large samples converge on stable estimates.
+
+## Visualising Simulated Univariate Data
+
+```{r}
+sim_dat <- tibble(y = y)
+ggplot(sim_dat, aes(x = y)) +
+  geom_density(colour = "#ffa07a", linewidth = 2) +
+  theme_bw()
+```
+
+## Some Other Distrubutions
+
+There are many more distributions in [base-R stats](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html) and in `extraDistr`.
+
+```{r}
+#| echo: false
+set.seed(1892)
+
+x_n <- 1e5
+k_n <- 500
+j_n <- 50
+x <- seq(0, 1, length.out = x_n) # vector of quantiles
+k <- seq(0, 49, length.out = k_n)
+j <- seq(0, 100, length.out = j_n)
+
+dist_names <- c(
+  rep("Beta", x_n),
+  rep("Binomial", k_n), 
+  rep("Cauchy", j_n), 
+  rep("Normal", x_n), 
+  rep("Poisson", j_n),
+  rep("Student t", x_n)
+)
+
+dist_data <- tibble(
+  method = dist_names,
+  y = c(
+    rbeta(x, shape1 = 5, shape2 = 20),
+    rbinom(k, size = 1, prob = 0.5),
+    rcauchy(j, location = 0, scale = 1),
+    rnorm(x, mean = 0, sd = 1),
+    rpois(j, lambda = 0.7),
+    rt(x, df = 20, ncp = 0)
+  )
+)
+
+ggplot(dist_data, aes(x = y)) +
+  geom_density(colour = "#ffa07a", linewidth = 1.5) +
+  facet_wrap(~method, scales = "free") +
+  labs(title = "Densities of Random Draws from Various Distributions") +
+  theme_bw()
+```
+
+## Ensuring Computational Reproducibility
+
+- Computers are **deterministic**, so no operations in them can ever be truly random.
+- (Is anything truly random? Or does that reflect a state of ignorance? Philosophy...)
+- Anyway, computers. Random number generators work by using a **seed**, e.g. date and time, to initialise the RNG.
+- Setting a seed means you'll **get the same results repeatedly**.
+
+## Ensuring Computational Reproducibility
+
+```{r}
+set.seed(1892)
+y <- rnorm(n = 100, mean = 200, sd = 40)
+mean(y)
+```
+
+Do it again...
+
+```{r}
+set.seed(1892)
+y <- rnorm(n = 100, mean = 200, sd = 40)
+mean(y)
+```
+
+## Testing Simulated Data
+
+Let's do a one-sample t-test to see if our data is significantly different to $\mu$ = 190.
+
+```{r}
+broom::tidy(t.test(y, mu = 190))
+```
+# Iteration
+
+## Iteration
+
+In R we have two options for iteration:
+
+-   **Loops**: define a process that should be repeated until a condition is met.
+
+```{r}
+for(i in 1:3) {
+  print("hi")
+}
+```
+
+-   **Map**: appply a given function to each element in a collection, e.g. a list. In R, we have several mapping and iteration functions in `purrr`, part of the `tidyverse`. We'll look at this in a moment.
+
+## Iteration for Power Analysis
+
+Starting with a loop:
+
+```{r}
+set.seed(1892)
+iterations <- 1000
+output <- vector(mode = "list", length = iterations)
+
+for(i in 1:iterations) {
+  y <- rnorm(n = 100, mean = 200, sd = 40)
+  output[[i]] <- t.test(y, mu = 190) |> 
+    broom::tidy()
+}
+simulations <- bind_rows(output)
+```
+
+## Working with Simulated Data
+
+-   Calculate what proportion of the *p*-values are below the $\alpha$-level of .05. 
+-   This is your power for the study design and test.
+-   With 100 participants, assuming a $\mu$ of 200 and $\sigma$ of 40, testing against the true value of the mean of 190 we have approx. 70% power.
+
+```{r}
+mean(simulations$p.value < .05)
+```
+
+## Flexible Iteration
+
+We didn't quite hit a target of 90% power. How can we improve on this?
+
+-   Increase the **precision** of measurements (not always an option).
+-   Increase the **sample size** (an option here).
+
+Let's explore a range of sample sizes. First, let's start making things a bit more easier to work with.
+
+## Functional Programming
+
+If you want to repeat a process several times over, we need to adhere to **DRY principle**. We also might want to break tasks into chunks to make things easier to manage. **Functions** help with both.
+
+Notice we can pass parameters to the function, like the sample size here.
+
+```{r}
+sim_data <- function(n = 100) {
+  rnorm(n = n, mean = 200, sd = 40)
+}
+```
+
+```{r}
+sim_data()
+```
+
+## Functional Programming
+
+If we want to have a function called within a function, we either have to make sure the top-level function can have all arguments in the bottom-level function, like so:
+
+```{r}
+sim_fit <- function(n = 50) {
+  y <- sim_data(n)
+  t.test(y, mu = 190) |> 
+    broom::tidy()
+}
+
+sim_fit()
+```
+
+## Functional Programming
+
+Or, we can instead pass elipses (`...`) which means any arguments we pass to the top-level function are passed to the bottom-level function. If we don't pass any arguments, the defaults are used.
+
+```{r}
+sim_fit <- function(...) {
+  y <- sim_data(...)
+  t.test(y, mu = 190) |> 
+    broom::tidy()
+}
+```
+
+```{r}
+sim_fit()
+```
+
+## Altering Function Parameters
+
+With this structure we can vary the parameters in the top-level function, `sim_fit()` and it's passed to the bottom-level function, `sim_data()`.
+
+```{r}
+sim_fit(n = 10)
+```
+```{r}
+sim_fit(n = 50)
+```
+## Functional Iteration
+
+-   We want to run 1000 simulations of data, fit the model to the data, then save the output.
+
+-   Using `purrr::pmap()` executes your function, passing any parameters from the first argument to the function. It runs for however many rows you have in the parameters.
+
+## Functional Iteration with the `purr::map()` Family of Functions.
+
+-   Here, we have a 1000 run tibble each with n = 100, so we will simulate 1000 data sets with n = 100 and fit a model to each data set.
+
+```{r}
+parameters <- tibble(
+  n = rep(100, 1000)
+)
+
+simulations <- purrr::pmap_df(parameters, sim_fit)
+simulations
+```
+
+## Functional Iteration
+
+Before we iterate the process across several sample sizes, we must capture the sample size in our model output. Let's alter the `sim_fit()` function slightly to do so.
+
+```{r}
+sim_fit <- function(...) {
+  y <- sim_data(...)
+  # fit model
+  output <- t.test(y, mu = 190) |> 
+    broom::tidy()
+  
+  # add parameters to the model
+  parameters <- list(...)
+  for(i in names(parameters)) {
+    output[i] <- parameters[i]
+  }
+  
+  # return the output
+  output
+}
+```
+
+## Generating Parameters
+
+-   We will now try out 16 different sample sizes, ranging from 10 participants to 160 in increments of 10. 
+-   We want 1000 rows for each sample size.
+-   We can do this manually, but it's a pain as we get more parameters in the simulation.
+-   Using `crossing()` gives you all combinations of the supplied vectors.
+
+## Generating Parameters
+
+Here, we remove the iterations column once we've created the tibble as this can't be passed to our function as an argument.
+
+```{r}
+parameters <- crossing(
+  iterations = 1:1000,
+  n = seq(10, 160, by = 10)
+) |> 
+  dplyr::select(-iterations)
+
+glimpse(parameters)
+```
+
+## Simulate Data
+
+Simulate data and fit a model 1000 times for each sample size.
+
+```{r}
+simulations <- purrr::pmap_df(parameters, sim_fit)
+```
+
+What's the power look like for each sample size? 160 looks pretty good.
+
+```{r}
+sim_power <- simulations |> 
+  group_by(n) |> 
+  summarise(power = mean(p.value < .05))
+
+sim_plot <- ggplot(sim_power, aes(x = n, y = power)) +
+  geom_smooth(se = FALSE, method = "loess", formula = "y ~ x", colour = "#ffa07a") +
+  geom_point() +
+  scale_y_continuous(breaks = seq(0, 1, by = .1)) +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_bw()
+```
+
+## Simulate Data
+
+```{r}
+sim_plot
+```
+
+# Sensitivity Analysis
+
+What if we've already conducted our study? Post-hoc power analysis is always a bad idea, but sensitivity analysis can tell you which effects your study was sensitive to detect with given probabilities.
+
+## Adding Flexibility to the Functions
+
+We just need to make the `sim_data()` function allow for different means to be passed to the data generation process.
+
+```{r}
+sim_data <- function(n = 100, mean = 200) {
+  rnorm(n = n, mean = mean, sd = 40)
+}
+```
+
+Update the parameters to now vary the mean effect size. Remember we have a default `n` of 100.
+
+```{r}
+parameters <- tibble(
+  mean = rep(seq(160, 220, length.out = 20), 1000)
+)
+```
+
+## Simulate for Sensitivity
+
+```{r}
+simulations <- purrr::pmap_df(parameters, sim_fit)
+simulations
+```
+
+
+## Inspect the Simulations
+
+```{r}
+sensitivity_result <- simulations |> 
+  group_by(mean) |> 
+  summarise(power = mean(p.value < .05))
+
+sensitivity_result
+```
+
+## Inspect the Simulations
+
+Remember, this is for a one-sample t-test where $\mu$ = 190. Our test isn't sensitive to values ranging from around 180-200.
+
+```{r}
+ggplot(sensitivity_result, aes(x = mean, y = power)) +
+  geom_point() +
+  geom_line() +
+  theme_bw()
+```
+
+# Simulating Two Random Variables
+
+Often we want to simulate data that are correlated with one another. Understanding the maths behind this will make it easier to do so.
+
+## Variance
+
+The variance of a random variable measures the spread of the values of the variable. For a bivariate normal distribution with variables X and Y this is denotes as $\sigma_x$ and $\sigma_y$ which describes the variance for each variable.
+
+## Covariance
+
+The covariance between two random variables measures how much the variables vary together. In the case of a bivariate normal distribution between variables X and Y this is denoated at $Cov(X, Y)$. 
+
+- Measures how much the values of X and Y deviate from their means in the same direction. 
+
+- If **positive**: The variables tend to move in the same direction.
+
+- If **negative**: The variables tend to move in opposite directions.
+
+## Correlation
+
+The correlation between two random variables measures the strength and direction of the linear relationship between them. In the case of a bivariate normal distribution, the correlation between variables X and Y is denoted as $\rho$
+
+- If 1: Indicates a perfect **positive relationship**.
+- If 0: Indicates **no relationship**.
+- If -1: Indicates a perfect **negative relationship**.
+
+$\rho = \frac{Cov(X, Y)}{\sigma_x\sigma_y}$
+
+## The Variance-Covariance Matrix
+
+The variance-covariance matrix (also known as the covariance matrix) is a square matrix that contains the variances (*SD* squared; $\sigma^2$) of the individual variables along the diagonal and the covariances between each pair of variables off the diagonal. For the bivariate case this is:
+
+$\Sigma = \begin{pmatrix} \sigma_x^2, \rho\sigma_x^2\sigma_y^2 \\ \rho\sigma_x^2\sigma_y^2, \sigma_y^2 \end{pmatrix}$
+
+## Joint Distributions
+
+If X and Y are two normal random variables the joint distribution between X and Y is defined as:
+
+$\begin{bmatrix}X_i \\ Y_i \end{bmatrix} \sim \mathcal{N} \begin{pmatrix}\begin{bmatrix} \mu_x \\ \mu_y\end{bmatrix},\Sigma\end{pmatrix}$
+
+# Generating Simulated Multivariate Data
+
+For multivariate data, such as the bivariate case, we can simulate data using the multivariate version of the distribution. For `rnorm()` this is `MASS:mvrnorm()`.
+
+## Making the variance-covariance matrix
+
+```{r}
+x_mean <- 50
+y_mean <- 75
+x_sd <- 35
+y_sd <- 55
+corr <- .6
+
+varcorr <- matrix(
+  c(x_sd^2, x_sd * y_sd * corr, x_sd * y_sd * corr, y_sd^2),
+  ncol = 2
+)
+varcorr
+```
+
+## Making the variance-covariance matrix
+
+We can improve readability by making a covariance object.
+
+```{r}
+x_mean <- 50
+y_mean <- 75
+x_sd <- 35
+y_sd <- 55
+corr <- .6
+covariance <- x_sd * y_sd * corr
+
+varcorr <- matrix(
+  c(x_sd^2, covariance, covariance, y_sd^2),
+  ncol = 2
+)
+varcorr
+```
+
+## Generating Simulated Multivariate Data
+
+### Sampling from the Multivariate Normal
+
+Pass the sample size, means, and variance-covariance matrix to the multivariate version of the `rnorm()` function from the `MASS` package.
+
+```{r}
+set.seed(1892)
+
+samples <- MASS::mvrnorm(
+  n = 200,
+  mu = c(x = x_mean, y = y_mean),
+  Sigma = varcorr
+)
+```
+
+## Inspect the Data
+
+```{r}
+head(samples)
+```
+
+## Inspect the Data
+
+```{r}
+samples_df <- as_tibble(samples)
+
+ggplot(samples_df, aes(x = x, y = y)) +
+  geom_point(colour = "#95d5d0") +
+  theme_bw()
+```
+## Inspect the Densities
+
+-   We can make a 2D density plot to see where the most common values are for the relationship between X and Y. 
+-   Think of it as a hill. The darker region is the peak of the hill, where values are most common.
+
+## Inspect the Densities
+
+```{r}
+ggplot(samples_df, aes(x = x, y = y)) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon") +
+  scale_fill_continuous(low="lavenderblush", high="#ffa07a") + 
+  theme_bw()
+```
+
+## Generating Simulated Multivariate Data
+
+### Sampling from the multivariate normal
+
+Check the means and SDs. Looks good!
+
+```{r}
+tibble(
+  means = c(mean(samples[,1]), mean(samples[,2])),
+  sds = c(sd(samples[,1]), sd(samples[,2])),
+  corr = cor(samples[,1], samples[,2])
+)
+```
+
+# Linear Regression
+
+We can generate data using the linear regression framework. This is useful if you want to simulate an outcome from some known predictors.
+
+## Check our data
+
+-   Fit a model to our simulated data. 
+-   We need the residual standard error, intercept and slope estimates.
+
+```{r}
+samples_df <- as_tibble(samples)
+summary(lm(y ~ x, data = samples_df))
+```
+
+## The Linear Model
+
+Outcomes come from a fixed intercept, a fixed slope, a predictor, and some normally distributed error.
+
+$$
+\begin{aligned}
+Y_i = \alpha + \beta X_i + \epsilon_i \\
+\epsilon_i \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+$$
+
+## Simulating from Model Parameters
+
+What if we had a good idea of the linear model parameters? Simulate using the linear model.
+
+```{r}
+n <- 200 # observations
+alpha <- 34.40 # intercept
+beta <- 0.79 # slope
+sigma <- 45.97 # residual SD
+
+# simulate predictor
+x <- rnorm(n, x_mean, x_sd) # mean = 50, sd = 35
+
+# simulate outcome
+err <- rnorm(n, 0, sd = sigma)
+y <- alpha + beta*x + err 
+
+# alternatively:
+# y <- rnorm(n, mean = alpha + beta*x, sd = sigma)
+```
+
+## Inspect the Data
+
+```{r}
+sim_data <- tibble(x = x, y = y)
+head(sim_data)
+```
+
+## Simulate from Model Parameters
+### Fit the Model
+
+Looks very close to the same parameters we got from the bivariate data.
+
+```{r}
+summary(lm(y ~ x, sim_data))
+```
+
+# Multiple Linear Regression
+
+## The Linear Model
+
+Outcomes come from a fixed intercept, a fixed slope for one predictor, a fixed slope for another predictor, and some normally distributed error.
+
+$$
+\begin{aligned}
+Y_i = \alpha + \beta_1 X_{1i} + \beta_2 X_{2i} + \epsilon_i \\
+\epsilon_i \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+$$
+
+## Add another Continuous Predictor
+
+Notice we now have `beta_1` and `beta_2` parameters with associated `x_1` and `x_2` variables.
+
+```{r}
+n <- 200 # observations
+alpha <- 34.40 # intercept
+beta_1 <- 1.06 # slope for X1
+beta_2 <- -2.54 # slope for X2
+sigma <- 45.97 # residual SD
+
+x_1_mean <- 50
+x_2_mean <- 20
+x_1_sd <- 20
+x_2_sd <- 35
+corr <- .3
+
+covariance <- x_1_sd * x_2_sd * corr
+varcorr <- matrix(
+  c(x_1_sd^2, covariance, covariance, x_2_sd^2),
+  ncol = 2
+)
+
+# simulate predictors
+predictors <- MASS::mvrnorm(
+  n = n,
+  mu = c(x_1 = x_1_mean, x_2 = x_2_mean),
+  Sigma = varcorr
+) |> 
+  as_tibble()
+x_1 <- predictors$x_1
+x_2 <- predictors$x_2
+
+# simulate outcome
+err <- rnorm(n, 0, sd = sigma)
+y <- alpha + beta_1*x_1 + beta_2*x_2 + err
+
+# alternatively:
+# y <- rnorm(n, mean = alpha + beta_1*x_1 + beta_2*x_2, sd = sigma)
+```
+
+## Inspect Simulated Data
+
+```{r}
+sim_data <- tibble(x_1 = x_1, x_2 = x_2, y = y)
+head(sim_data)
+```
+
+## Fit the Model
+
+Looks good!
+
+```{r}
+summary(lm(y ~ x_1 + x_2, sim_data))
+```
+
+# Categorical Predictors
+
+Remember categorical predictors are defined by contrasts, so we assign values to conditions, e.g. -1/1.
+
+## Simulating from Categorical Predictors
+
+```{r}
+n <- 200 # observations
+alpha <- 34.40 # intercept
+beta <- 20 # slope
+sigma <- 45.97 # residual SD
+
+# simulate predictor
+x <- c(rep(-1, times = n/2), rep(1, times = n/2))
+
+# simulate outcome
+err <- rnorm(n, 0, sd = sigma)
+y <- alpha + beta*x + err 
+
+# alternatively:
+# y <- rnorm(n, mean = alpha + beta*x, sd = sigma)
+```
+
+## Inspect Simulated Data
+
+```{r}
+sim_data <- tibble(x = x, y = y)
+head(sim_data)
+tail(sim_data)
+```
+
+## Fit the Model
+
+Looks good!
+
+```{r}
+summary(lm(y ~ x, sim_data))
+```
+
+# Mixed Effects Models
+
+Mixed effects models are just extensions of the linear model. Let's simulate data with crossed random effects of subjects and items.
+
+# Between-Subjects and Within-Items
+
+## Explore a Template Study
+
+We'll use the language learning data from Williams et al. (2020). Notice we will drop some factors and levels to make it easier so we have a 2 $\times$ 2 study within one within-subjects but between-items factor, `dialect_words`, and one within-items but between-subjects factor, `language_variety.`
+
+```{r}
+#| message: false
+levenik_data <- read_csv(
+  "https://raw.githubusercontent.com/gpwilliams/levenik/master/02_data/03_study-three/03_cleaned-data/ex_3_cleaned_data.csv"
+  ) |> 
+  # keep only testing block for reading, excluding people who didn't complete it
+  filter(
+    block == "TEST", 
+    task == "R", 
+    !participant_number %in% c(144, 177, 273),
+    dialect_words %in% c("no_shift_word", "shifted_word")
+  ) |> 
+  rename(item = target) |> 
+  dplyr::select(
+    participant_number, 
+    item,
+    language_variety, 
+    lenient_nLED
+  ) |> 
+  mutate(
+    participant_number = as.factor(participant_number),
+    item = as.factor(item),
+    language_variety = as.factor(language_variety),
+    asin_lenient_nLED = asin(sqrt(lenient_nLED))
+  )
+```
+
+## The Linear Model
+
+Outcomes come from a fixed intercept with offsets (random intercepts) for subjects and items, a fixed slope for language variety with offsets by items (random slope), and some normally distributed error.
+
+$$
+\begin{aligned}
+Y_{si} = \beta_0 +\tau_{0s} + \omega_{0i} + (\beta_1 + \omega_{1i})X_{i} +  \epsilon_{si} \\
+\epsilon_{si} \sim \mathcal{N}(0, \sigma)
+\end{aligned}
+$$
+
+## Get Model Estimates
+
+```{r}
+mod <- afex::mixed(
+  asin_lenient_nLED ~ language_variety + 
+    (1 | participant_number) + (1 + language_variety | item), 
+  data = levenik_data
+)
+summary(mod)
+```
+
+## Define Parameters
+
+```{r}
+# sample sizes ----
+
+n_subj <- 162
+n_standard_subj <- n_subj/2
+n_dialect_subj <- n_subj/2
+n_items <- 30
+
+# fixed effects ----
+
+beta_0 <- 0.47 # intercept
+beta_1 <- -0.04 # slope
+
+# random effects ----
+
+tau_0 <- 0.33 # by-subject SD for intercept
+omega_0 <- 0.09 # by-item SD for intercept
+omega_1 <- 0.012 # by-item SD for slope
+rho <- .40 # correlation between by-item intercept and slope SD
+
+# residual standard deviation ----
+sigma <- 0.33
+```
+
+## Sample Subjects
+
+By-participant random intercepts are normally distributed [`rnorm()`] around the fixed effect intercept.
+
+```{r}
+subjects <- tibble(
+  subject_id = paste0("S", 1:n_subj),
+  language_variety = rep(c("standard", "dialect"), c(n_standard_subj, n_dialect_subj)),
+  T_0s = rnorm(n = n_subj, mean = 0, sd = tau_0)
+) |> 
+  mutate(language_variety_num = case_when(
+    language_variety == "standard" ~ -1,
+    language_variety == "dialect" ~ 1
+  )) |> 
+  dplyr::select(subject_id, language_variety, language_variety_num, everything())
+```
+
+## Inspect Subjects
+
+```{r}
+head(subjects)
+```
+
+## Sample Items
+
+By-items random intercepts and slopes are multivariate normally distributed [`mvrnorm()`] around the fixed effect estimates with our given correlation (`rho`).
+
+```{r}
+covariance <- rho * omega_0 * omega_1
+vcov_matrix <- matrix(
+  c(omega_0^2, covariance, covariance, omega_1^2), 
+  nrow = 2
+)
+
+item_ranefs <- MASS::mvrnorm(
+  n = n_items,
+  mu = c(O_0i = 0, O_1i = 0),
+  Sigma = vcov_matrix
+)
+
+items <- tibble(
+  item_id = paste0("I", 1:n_items),
+  O_0i = item_ranefs[,1],
+  O_1i = item_ranefs[,2]
+)
+```
+
+## Inspect Items
+
+```{r}
+head(items)
+```
+
+
+## Make Subject-by-Item Trials
+
+```{r}
+trials <- crossing(subjects, items) 
+trials <- trials |>  
+  mutate(
+    e_si = rnorm(nrow(trials), mean = 0, sd = sigma)
+  ) |> 
+  dplyr::select(subject_id, item_id, language_variety, everything())
+
+# inspect it
+head(trials)
+```
+
+## Create the Outcome
+
+```{r}
+sim_data <- trials |> 
+  mutate(
+    asin_lenient_nLED = beta_0 + T_0s + O_0i + (beta_1 + O_1i) * language_variety_num + e_si,
+    language_variety = as.factor(language_variety)
+  ) |> 
+  dplyr::select(subject_id, item_id, language_variety, asin_lenient_nLED)
+
+# set contrast codes: be careful they match up!
+contrasts(sim_data$language_variety) <- contr.sum(2)
+
+head(sim_data)
+```
+
+## Fit the Model
+
+Looks close to our original estimates!
+
+```{r}
+sim_mod <- afex::mixed(
+  asin_lenient_nLED ~ language_variety + 
+    (1 | subject_id) + (1 + language_variety | item_id),
+  data = sim_data
+)
+summary(sim_mod)
+```
+
+## Simulation for Power Analysis
+
+-   We just have to put all the data simulation steps into one data simulation function. 
+-   We then do the model fitting in another function, allowing the argument from the data simulation to be passed to the model fitting function.
+-   We then create a tibble of our parameters to be iterated upon, passing potentially smaller or larger sample sizes or smaller or larger parameters.
+-   **We will do this in the exercises**.
+
+## Some Advice on Power Analysis
+
+-   There are a lot of parameters involved in simulating subject-by-trial level data. Having **existing data** to get a ballpark figure of estimates is likely to make your predictions more realistic.
+-   However, be careful basing everything on previous work, especially from pilot data, as small samples and published work have **biased effect sizes**.
+-   Try to power for your **smallest effect size of interest** for the parameter you care about.
+-   If you're unsure what parameters to set for a model (e.g. what correlation should I predict?), **let them vary**!
+
+## Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
