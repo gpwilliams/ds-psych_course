@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Glenn Williams">
+<meta name="dcterms.date" content="2023-04-28">
+
+<title>Data Simulation and Power</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="questions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="questions_files/libs/quarto-html/quarto.js"></script>
+<script src="questions_files/libs/quarto-html/popper.min.js"></script>
+<script src="questions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="questions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="questions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="questions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="questions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="questions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="questions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Data Simulation and Power</h1>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Glenn Williams </p>
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Northumbria University
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 28, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">May 7, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="abstract-title">Abstract</div>
+      Making stuff up.
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instructions" id="toc-instructions" class="nav-link active" data-scroll-target="#instructions">Instructions</a></li>
+  <li><a href="#basics---single-level-data" id="toc-basics---single-level-data" class="nav-link" data-scroll-target="#basics---single-level-data">Basics - Single Level Data</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1.-linear-model-with-a-categorical-predictor" id="toc-exercise-1.-linear-model-with-a-categorical-predictor" class="nav-link" data-scroll-target="#exercise-1.-linear-model-with-a-categorical-predictor">Exercise 1. Linear Model with a Categorical Predictor</a></li>
+  <li><a href="#exercise-2.-varying-parameters" id="toc-exercise-2.-varying-parameters" class="nav-link" data-scroll-target="#exercise-2.-varying-parameters">Exercise 2. Varying Parameters</a></li>
+  <li><a href="#exercise-3.-adding-a-categorical-predictor-with-an-interaction" id="toc-exercise-3.-adding-a-categorical-predictor-with-an-interaction" class="nav-link" data-scroll-target="#exercise-3.-adding-a-categorical-predictor-with-an-interaction">Exercise 3. Adding a Categorical Predictor with an Interaction</a>
+  <ul class="collapse">
+  <li><a href="#a.-get-the-power-for-the-main-effect-of-task" id="toc-a.-get-the-power-for-the-main-effect-of-task" class="nav-link" data-scroll-target="#a.-get-the-power-for-the-main-effect-of-task">A. Get the power for the main effect of task</a></li>
+  <li><a href="#b.-get-the-power-for-the-main-effect-of-stimulus" id="toc-b.-get-the-power-for-the-main-effect-of-stimulus" class="nav-link" data-scroll-target="#b.-get-the-power-for-the-main-effect-of-stimulus">B. Get the power for the main effect of stimulus</a></li>
+  <li><a href="#c.-get-the-power-for-the-interaction" id="toc-c.-get-the-power-for-the-interaction" class="nav-link" data-scroll-target="#c.-get-the-power-for-the-interaction">C. Get the power for the interaction</a></li>
+  <li><a href="#d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only" id="toc-d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only" class="nav-link" data-scroll-target="#d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only">D. Get the power for the effect of stimulus for the naming task only</a></li>
+  </ul></li>
+  <li><a href="#exercise-4.-sensitivity-analysis-for-single-level-data" id="toc-exercise-4.-sensitivity-analysis-for-single-level-data" class="nav-link" data-scroll-target="#exercise-4.-sensitivity-analysis-for-single-level-data">Exercise 4. Sensitivity Analysis for Single-Level Data</a></li>
+  </ul></li>
+  <li><a href="#advanced---multilevel-data" id="toc-advanced---multilevel-data" class="nav-link" data-scroll-target="#advanced---multilevel-data">Advanced - Multilevel Data</a>
+  <ul class="collapse">
+  <li><a href="#exercise-5.-crossed-random-effect-with-1-categorical-predictor" id="toc-exercise-5.-crossed-random-effect-with-1-categorical-predictor" class="nav-link" data-scroll-target="#exercise-5.-crossed-random-effect-with-1-categorical-predictor">Exercise 5. Crossed Random Effect with 1 Categorical Predictor</a></li>
+  <li><a href="#exercise-6.-crossed-random-effects-with-2-categorical-predictors" id="toc-exercise-6.-crossed-random-effects-with-2-categorical-predictors" class="nav-link" data-scroll-target="#exercise-6.-crossed-random-effects-with-2-categorical-predictors">Exercise 6. Crossed Random Effects with 2 Categorical Predictors</a>
+  <ul class="collapse">
+  <li><a href="#a.-get-the-power-for-the-main-effect-of-task-1" id="toc-a.-get-the-power-for-the-main-effect-of-task-1" class="nav-link" data-scroll-target="#a.-get-the-power-for-the-main-effect-of-task-1">A. Get the power for the main effect of task</a></li>
+  <li><a href="#b.-get-the-power-for-the-main-effect-of-stimulus-1" id="toc-b.-get-the-power-for-the-main-effect-of-stimulus-1" class="nav-link" data-scroll-target="#b.-get-the-power-for-the-main-effect-of-stimulus-1">B. Get the power for the main effect of stimulus</a></li>
+  <li><a href="#c.-get-the-power-for-the-interaction-1" id="toc-c.-get-the-power-for-the-interaction-1" class="nav-link" data-scroll-target="#c.-get-the-power-for-the-interaction-1">C. Get the power for the interaction</a></li>
+  <li><a href="#d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only-1" id="toc-d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only-1" class="nav-link" data-scroll-target="#d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only-1">D. Get the power for the effect of stimulus for the naming task only</a></li>
+  </ul></li>
+  <li><a href="#exercise-7.-sensitivity-analysis-for-multilevel-data" id="toc-exercise-7.-sensitivity-analysis-for-multilevel-data" class="nav-link" data-scroll-target="#exercise-7.-sensitivity-analysis-for-multilevel-data">Exercise 7. Sensitivity Analysis for Multilevel Data</a></li>
+  <li><a href="#exercise-8.-comparing-multilevel-and-aggregated-analyses" id="toc-exercise-8.-comparing-multilevel-and-aggregated-analyses" class="nav-link" data-scroll-target="#exercise-8.-comparing-multilevel-and-aggregated-analyses">Exercise 8. Comparing Multilevel and Aggregated Analyses</a></li>
+  </ul></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a>
+  <ul class="collapse">
+  <li><a href="#section-1" id="toc-section-1" class="nav-link" data-scroll-target="#section-1"></a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="instructions" class="level1">
+<h1>Instructions</h1>
+<p>Complete the following exercises. The basics will get you used to simulating single-level data for use in a power analysis with various designs. The advanced section will focus on simulating multilevel data.</p>
+</section>
+<section id="basics---single-level-data" class="level1">
+<h1>Basics - Single Level Data</h1>
+<p>First off, load the libraries you’ll need for the exercises. As always, load the <code>tidyverse</code> library for working with data. We’ll also use <code>lme4</code> for fitting mixed effects models and, later, <code>afex</code> to see how it adds useful functionality to <code>lme4</code>. We’ll use <code>emmeans</code> for estimating marginal means and pairwise tests of these means from the model estimates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4) <span class="co"># not strictly needed as it's imported by afex</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(afex) <span class="co"># lme4 with addons</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans) <span class="co"># estimating marginal means and pairwise tests</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor) <span class="co"># for cleaning names</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Load the <code>fhch2010</code> data set from the <code>afex</code>.</p>
+<p>This data set is from an experiment where participants either name words out loud or make a lexical decision (clicking one button to indicate a word is a real word, e.g.&nbsp;fill, or another to indicate it is a non-word, e.g.&nbsp;xazz). The words themselves are defined in groups as being words or non-words. Along with this we have id, the participant’s ID number; item, the written form of the target stimulus; rt, or reaction time in seconds; and log_rt, the log transformed form of the rt column. (Note log transformation is often used for reaction times to make them more ‘normal’, though other methods for handling the skew in this sort of data can be used.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"fhch2010"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fhch_rt <span class="ot">&lt;-</span> fhch2010 <span class="sc">|&gt;</span> <span class="fu">filter</span>(correct <span class="sc">==</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(fhch_rt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 12,960
+Columns: 10
+$ id        &lt;fct&gt; N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, N1, …
+$ task      &lt;fct&gt; naming, naming, naming, naming, naming, naming, naming, nami…
+$ stimulus  &lt;fct&gt; word, word, word, nonword, nonword, word, nonword, nonword, …
+$ density   &lt;fct&gt; high, low, low, high, low, high, low, low, low, low, high, l…
+$ frequency &lt;fct&gt; low, high, high, high, high, high, low, high, low, high, low…
+$ length    &lt;fct&gt; 6, 6, 5, 5, 4, 4, 6, 5, 4, 6, 5, 5, 5, 4, 4, 5, 6, 4, 6, 6, …
+$ item      &lt;fct&gt; potted, engine, ideal, uares, xazz, fill, bounge, psems, jol…
+$ rt        &lt;dbl&gt; 1.091, 0.876, 0.710, 1.210, 0.843, 0.785, 0.662, 0.713, 0.75…
+$ log_rt    &lt;dbl&gt; 0.08709471, -0.13238919, -0.34249031, 0.19062036, -0.1707883…
+$ correct   &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, …</code></pre>
+</div>
+</div>
+<section id="exercise-1.-linear-model-with-a-categorical-predictor" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1.-linear-model-with-a-categorical-predictor">Exercise 1. Linear Model with a Categorical Predictor</h2>
+<p>Aggregate the <code>fhch_rt</code> data by <code>id</code> and <code>task</code>, creating mean <code>log_rt</code> scores labelled <code>mean_log_rt</code>. Assign this to the object <code>fhch_ex1_data</code>.</p>
+<p>Fit a linear model predicting <code>mean_log_rt</code> from task. Inspect the summary to get a good idea of estimates we could use for the power analysis.</p>
+<p>Below we have a function to simulate the data based on the parameters from the model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">45</span> <span class="co"># length(unique(fhch_agg$id))</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.198</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fl">0.214</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fl">0.194</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_naming =</span> <span class="dv">20</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_lexdec =</span> <span class="dv">25</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="sc">-</span><span class="fl">0.198</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">beta =</span> <span class="fl">0.214</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma =</span> <span class="fl">0.194</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  ) {</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> n_naming <span class="sc">+</span> n_lexdec</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># make subjects</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  subjects <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">task =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"naming"</span>, <span class="st">"lexdec"</span>), <span class="fu">c</span>(n_naming, n_lexdec)),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">X_i =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="fu">c</span>(n_naming, n_lexdec))</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># make the outcome</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  subjects<span class="sc">$</span>mean_log_rt <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta<span class="sc">*</span>subjects<span class="sc">$</span>X_i <span class="sc">+</span> </span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rnorm</span>(n, <span class="dv">0</span>, sigma)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># return the table</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  subjects</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Create the function <code>sim_fit()</code> that will simulate data using the <code>sim_data()</code> function from above, fit a linear model, and save the parameters that are passed to the function in the output. You can use the code from the book chapter/workshop slides to achieve this.</p>
+<p>Create a parameters tibble using the <code>crossing()</code> function. Set the iterations to be between 1 and 1000, the <code>n_naming</code> parameter to be 20 (like in the original data) and <code>n_lexdec</code> parameter to be 25 (like in the original data). Perform the model fitting based on the simulated data using these parameters.</p>
+<p>Generate the estimate of power for the <code>tasknaming</code> slope term.</p>
+</section>
+<section id="exercise-2.-varying-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2.-varying-parameters">Exercise 2. Varying Parameters</h2>
+<p>Your current power analysis is set only to the same number of participants in the original study. Update your code, allowing the number of participants in each condition to vary.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The changes needed here are minor, restricted only to the parameters tibble generated using <code>crossing()</code>.</p>
+</div>
+</div>
+</section>
+<section id="exercise-3.-adding-a-categorical-predictor-with-an-interaction" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3.-adding-a-categorical-predictor-with-an-interaction">Exercise 3. Adding a Categorical Predictor with an Interaction</h2>
+<p>Aggregate the <code>fhch_rt</code> data by <code>id</code>, <code>task</code>, and <code>stimulus</code>, creating mean <code>log_rt</code> scores labelled <code>mean_log_rt</code>. Assign this to the object <code>fhch_ex2_data</code>. We will perform a power analysis for the data involving a main effect and interaction between <code>task</code> and <code>simulus</code>. Fit a model on aggregated data involving the main effects and interaction of interest to get a good idea of the parameters you should set in your power analysis.</p>
+<p>Be careful when constructing your fake data sets. Before you only had one between-subjects factor. Now you have one between-subjects factor and one within-subjects factor.</p>
+<p>Update your <code>sim_data()</code>, <code>sim_fit()</code>, and parameters table to accommodate these changes.</p>
+<section id="a.-get-the-power-for-the-main-effect-of-task" class="level3">
+<h3 class="anchored" data-anchor-id="a.-get-the-power-for-the-main-effect-of-task">A. Get the power for the main effect of task</h3>
+</section>
+<section id="b.-get-the-power-for-the-main-effect-of-stimulus" class="level3">
+<h3 class="anchored" data-anchor-id="b.-get-the-power-for-the-main-effect-of-stimulus">B. Get the power for the main effect of stimulus</h3>
+</section>
+<section id="c.-get-the-power-for-the-interaction" class="level3">
+<h3 class="anchored" data-anchor-id="c.-get-the-power-for-the-interaction">C. Get the power for the interaction</h3>
+</section>
+<section id="d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only" class="level3">
+<h3 class="anchored" data-anchor-id="d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only">D. Get the power for the effect of stimulus for the naming task only</h3>
+<p>Update your code to power for the simple effect of stimulus within the naming task. This can be done by either setting specific contrasts in your code or by using sum contrasts and updating your code to incorporate <code>emmeans()</code> and <code>pairs()</code>, pushing the results from this to your output.</p>
+</section>
+</section>
+<section id="exercise-4.-sensitivity-analysis-for-single-level-data" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4.-sensitivity-analysis-for-single-level-data">Exercise 4. Sensitivity Analysis for Single-Level Data</h2>
+<p>Taking your code from Exercise 3D, perform a sensitivity analysis looking at a fixed n for participants but varying the effect size for the interaction effect. It is up to you what these parameters should be.</p>
+</section>
+</section>
+<section id="advanced---multilevel-data" class="level1">
+<h1>Advanced - Multilevel Data</h1>
+<p>For these exercises you will adapt your code to use multilevel data. As model fitting can take longer with complex models (i.e.&nbsp;with many random effects), feel free to adapt your iterations to only 100 per power analysis. For a real analysis you would still want 1000 to get stable results, but 100 is fine here to show you how this works while still getting a ballpark figure of power.</p>
+<section id="exercise-5.-crossed-random-effect-with-1-categorical-predictor" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5.-crossed-random-effect-with-1-categorical-predictor">Exercise 5. Crossed Random Effect with 1 Categorical Predictor</h2>
+<p>Update your code from Exercise 1 to now generate multilevel data (i.e.&nbsp;participants-by-items) with random intercepts by participants, random intercepts and slopes for task by item, and a fixed intercept and a slope by task.</p>
+</section>
+<section id="exercise-6.-crossed-random-effects-with-2-categorical-predictors" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.-crossed-random-effects-with-2-categorical-predictors">Exercise 6. Crossed Random Effects with 2 Categorical Predictors</h2>
+<p>Update your code from Exercise 3 to now generate multilevel data (i.e.&nbsp;participants-by-items) with random intercepts and slopes for stimulus by participants, random intercepts and slopes for task by item, and a fixed intercept and a slope by task.</p>
+<section id="a.-get-the-power-for-the-main-effect-of-task-1" class="level3">
+<h3 class="anchored" data-anchor-id="a.-get-the-power-for-the-main-effect-of-task-1">A. Get the power for the main effect of task</h3>
+</section>
+<section id="b.-get-the-power-for-the-main-effect-of-stimulus-1" class="level3">
+<h3 class="anchored" data-anchor-id="b.-get-the-power-for-the-main-effect-of-stimulus-1">B. Get the power for the main effect of stimulus</h3>
+</section>
+<section id="c.-get-the-power-for-the-interaction-1" class="level3">
+<h3 class="anchored" data-anchor-id="c.-get-the-power-for-the-interaction-1">C. Get the power for the interaction</h3>
+</section>
+<section id="d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only-1" class="level3">
+<h3 class="anchored" data-anchor-id="d.-get-the-power-for-the-effect-of-stimulus-for-the-naming-task-only-1">D. Get the power for the effect of stimulus for the naming task only</h3>
+<p>Update your code to power for the simple effect of stimulus within the naming task. This can be done by either setting specific contrasts in your code or by using sum contrasts and updating your code to incorporate <code>emmeans()</code> and <code>pairs()</code>, pushing the results from this to your output.</p>
+</section>
+</section>
+<section id="exercise-7.-sensitivity-analysis-for-multilevel-data" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7.-sensitivity-analysis-for-multilevel-data">Exercise 7. Sensitivity Analysis for Multilevel Data</h2>
+<p>Taking your code from Exercise 6D, perform a sensitivity analysis looking at a fixed n for participants but varying the effect size for the interaction effect. It is up to you what these parameters should be.</p>
+</section>
+<section id="exercise-8.-comparing-multilevel-and-aggregated-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8.-comparing-multilevel-and-aggregated-analyses">Exercise 8. Comparing Multilevel and Aggregated Analyses</h2>
+<p>Take your power analysis from Exercise 8A. In your model fitting function take the data and fit a multilevel model. Also aggregate the data by subjects and fit a single-level model. Ensure that you set the effect size for the main effect to zero. Compare the power for the two methods across varying effect sizes. What do you find in terms of the number of significant findings at effect size of zero?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You might want to output your results as a list of data frames.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="section" class="level1">
+<h1></h1>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1"></h2>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

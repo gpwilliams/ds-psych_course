@@ -1,0 +1,157 @@
+---
+title: "Data Simulation and Power"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-04-28"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Making stuff up."
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to simulating single-level data for use in a power analysis with various designs. The advanced section will focus on simulating multilevel data.
+
+# Basics - Single Level Data
+
+First off, load the libraries you'll need for the exercises. As always, load the `tidyverse` library for working with data. We'll also use `lme4` for fitting mixed effects models and, later, `afex` to see how it adds useful functionality to `lme4`. We'll use `emmeans` for estimating marginal means and pairwise tests of these means from the model estimates.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(lme4) # not strictly needed as it's imported by afex
+library(afex) # lme4 with addons
+library(emmeans) # estimating marginal means and pairwise tests
+library(janitor) # for cleaning names
+```
+
+Load the `fhch2010` data set from the `afex`.
+
+This data set is from an experiment where participants either name words out loud or make a lexical decision (clicking one button to indicate a word is a real word, e.g. fill, or another to indicate it is a non-word, e.g. xazz). The words themselves are defined in groups as being words or non-words. Along with this we have id, the participant's ID number; item, the written form of the target stimulus; rt, or reaction time in seconds; and log_rt, the log transformed form of the rt column. (Note log transformation is often used for reaction times to make them more 'normal', though other methods for handling the skew in this sort of data can be used.)
+
+```{r}
+data("fhch2010")
+fhch_rt <- fhch2010 |> filter(correct == TRUE)
+glimpse(fhch_rt)
+```
+
+## Exercise 1. Linear Model with a Categorical Predictor
+
+Aggregate the `fhch_rt` data by `id` and `task`, creating mean `log_rt` scores labelled `mean_log_rt`. Assign this to the object `fhch_ex1_data`.
+
+Fit a linear model predicting `mean_log_rt` from task. Inspect the summary to get a good idea of estimates we could use for the power analysis.
+
+Below we have a function to simulate the data based on the parameters from the model.
+
+```{r}
+n <- 45 # length(unique(fhch_agg$id))
+alpha <- -0.198
+beta <- 0.214
+sigma <- 0.194
+
+sim_data <- function(
+    n_naming = 20,
+    n_lexdec = 25,
+    alpha = -0.198,
+    beta = 0.214,
+    sigma = 0.194
+  ) {
+  n <- n_naming + n_lexdec
+  
+  # make subjects
+  subjects <- tibble(
+    id = 1:n,
+    task = rep(c("naming", "lexdec"), c(n_naming, n_lexdec)),
+    X_i = rep(c(0, 1), c(n_naming, n_lexdec))
+  )
+  
+  # make the outcome
+  subjects$mean_log_rt <- alpha + beta*subjects$X_i + 
+    rnorm(n, 0, sigma)
+  
+  # return the table
+  subjects
+}
+```
+
+Create the function `sim_fit()` that will simulate data using the `sim_data()` function from above, fit a linear model, and save the parameters that are passed to the function in the output. You can use the code from the book chapter/workshop slides to achieve this.
+
+Create a parameters tibble using the `crossing()` function. Set the iterations to be between 1 and 1000, the `n_naming` parameter to be 20 (like in the original data) and `n_lexdec` parameter to be 25 (like in the original data). Perform the model fitting based on the simulated data using these parameters.
+
+Generate the estimate of power for the `tasknaming` slope term.
+
+## Exercise 2. Varying Parameters
+
+Your current power analysis is set only to the same number of participants in the original study. Update your code, allowing the number of participants in each condition to vary.
+
+::: callout-tip
+The changes needed here are minor, restricted only to the parameters tibble generated using `crossing()`.
+:::
+
+## Exercise 3. Adding a Categorical Predictor with an Interaction
+
+Aggregate the `fhch_rt` data by `id`, `task`, and `stimulus`, creating mean `log_rt` scores labelled `mean_log_rt`. Assign this to the object `fhch_ex2_data`. We will perform a power analysis for the data involving a main effect and interaction between `task` and `simulus`. Fit a model on aggregated data involving the main effects and interaction of interest to get a good idea of the parameters you should set in your power analysis.
+
+Be careful when constructing your fake data sets. Before you only had one between-subjects factor. Now you have one between-subjects factor and one within-subjects factor.
+
+Update your `sim_data()`, `sim_fit()`, and parameters table to accommodate these changes.
+
+### A. Get the power for the main effect of task
+
+### B. Get the power for the main effect of stimulus
+
+### C. Get the power for the interaction
+
+### D. Get the power for the effect of stimulus for the naming task only
+
+Update your code to power for the simple effect of stimulus within the naming task. This can be done by either setting specific contrasts in your code or by using sum contrasts and updating your code to incorporate `emmeans()` and `pairs()`, pushing the results from this to your output.
+
+## Exercise 4. Sensitivity Analysis for Single-Level Data
+
+Taking your code from Exercise 3D, perform a sensitivity analysis looking at a fixed n for participants but varying the effect size for the interaction effect. It is up to you what these parameters should be.
+
+# Advanced - Multilevel Data
+
+For these exercises you will adapt your code to use multilevel data. As model fitting can take longer with complex models (i.e. with many random effects), feel free to adapt your iterations to only 100 per power analysis. For a real analysis you would still want 1000 to get stable results, but 100 is fine here to show you how this works while still getting a ballpark figure of power.
+
+## Exercise 5. Crossed Random Effect with 1 Categorical Predictor
+
+Update your code from Exercise 1 to now generate multilevel data (i.e. participants-by-items) with random intercepts by participants, random intercepts and slopes for task by item, and a fixed intercept and a slope by task.
+
+## Exercise 6. Crossed Random Effects with 2 Categorical Predictors
+
+Update your code from Exercise 3 to now generate multilevel data (i.e. participants-by-items) with random intercepts and slopes for stimulus by participants, random intercepts and slopes for task by item, and a fixed intercept and a slope by task.
+
+### A. Get the power for the main effect of task
+
+### B. Get the power for the main effect of stimulus
+
+### C. Get the power for the interaction
+
+### D. Get the power for the effect of stimulus for the naming task only
+
+Update your code to power for the simple effect of stimulus within the naming task. This can be done by either setting specific contrasts in your code or by using sum contrasts and updating your code to incorporate `emmeans()` and `pairs()`, pushing the results from this to your output.
+
+## Exercise 7. Sensitivity Analysis for Multilevel Data
+
+Taking your code from Exercise 6D, perform a sensitivity analysis looking at a fixed n for participants but varying the effect size for the interaction effect. It is up to you what these parameters should be.
+
+## Exercise 8. Comparing Multilevel and Aggregated Analyses
+
+Take your power analysis from Exercise 8A. In your model fitting function take the data and fit a multilevel model. Also aggregate the data by subjects and fit a single-level model. Ensure that you set the effect size for the main effect to zero. Compare the power for the two methods across varying effect sizes. What do you find in terms of the number of significant findings at effect size of zero?
+
+::: callout-tip
+You might want to output your results as a list of data frames.
+:::
+
+# 
+
+## 
