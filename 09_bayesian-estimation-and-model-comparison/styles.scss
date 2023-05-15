@@ -1,0 +1,20 @@
+/*-- scss:defaults --*/
+
+/*-- scss:defaults --*/
+
+$body-bg: #191919 !default;
+$body-color: #fff !default;
+$link-color: #42affa !default;
+$input-panel-bg: rgba(233, 236, 239, 0.2) !default;
+$presentation-heading-color: #95d5d0; //#ffa07a;
+
+/*-- scss:rules --*/
+
+b, strong {
+  color: #95d5d0;
+}
+
+.callout-caption b,
+.callout-caption strong {
+    color: black !important;
+}

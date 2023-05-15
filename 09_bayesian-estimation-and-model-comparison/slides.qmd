@@ -1,0 +1,665 @@
+---
+title: "Bayesian Estimation and Model Comparison"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+  cache: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+editor: visual
+---
+
+## Overview
+
+<div>
+
+Today's session is on Bayesian estimation and model comparison. By the end you will understand:
+
+-   Bayesian estimation and core concepts such as priors, likelihoods, and posteriors.
+
+-   How to specify a Bayesian model using `brms`.
+
+-   How to set priors and evaluate their appropriateness for your model.
+
+-   How to evaluate model diagnostics and model fit.
+
+-   How to compare candidate models using information criteria and cross-validation.
+
+</div>
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `09_bayesian-estimation-and-model-comparison`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+# Required Packages
+
+`tidyverse` and `here` are the usual suspects. We also have `brms` for fitting **B**ayesian **R**egression **M**odels in **S**tan. We use `cmdstanr` which fits models in `brms` using the `cmdstanr` backend which is faster than the default `rstan`. We use `tidybayes` for working with Bayesian models in a "tidy" framework for easy summarising and plotting using the `tidyverse` packages.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(brms)
+library(cmdstanr)
+library(tidybayes)
+library(afex) # for example data
+```
+
+# Sorting the Data
+
+Get the `fhch` data and put `rt` on the millisecond scale.
+
+```{r}
+data(fhch2010) 
+fhch <- fhch2010 |> 
+  mutate(rt = rt*1000)
+
+fhch
+```
+
+# Bayesian Statistics
+
+## Bayesian Estimation
+
+Broadly, Bayesian estimation is about using **prior information** with your **observed data** to determine the most plausible parameter estimates conditional on your model.
+
+There are three important elements:
+
+-   **Prior**: What are the plausible/expected values for a given parameter?
+
+-   **Likelihood**: What are the most likely values for a parameter **given your data**?
+
+-   **Posterior**: What are the most likely values for a parameter **given your** **prior and posterior**.
+
+## Priors and Posteriors
+
+Update prior plausibilities in light of data to produce posterior probabilities. Prior location and scale influences the posterior location and scale.
+
+![](resources/prior-plot.png){fig-align="center"}
+
+## Priors and Likelihoods
+
+We've seen how priors with different locations and scales shift the posterior. But with sufficient data the posterior is dominaned by the likelihood.
+
+![](resources/sample-plot.png){fig-align="center"}
+
+## Posteriors as New Priors
+
+We can use posteriors from previous studies/observations to form priors for new studies/observations.
+
+```{r}
+#| echo: false
+#| fig-align: center
+knitr::include_graphics(here(
+  "09_bayesian-estimation-and-model-comparison", 
+  "resources", 
+  "bayesian-updating.gif"
+))
+```
+
+## Posteriors as New Priors
+
+[Brand et al. (2019)](https://osf.io/preprints/socarxiv/67jh7/) explored posterior passing as a method of knowledge accumulation. You get answers with greater accuracy and consistency than other methods.
+
+```{r}
+#| echo: false
+#| fig-align: center
+knitr::include_graphics(here(
+  "09_bayesian-estimation-and-model-comparison", 
+  "resources", 
+  "brand_posterior-passing.gif"
+))
+```
+
+## Frequentist vs. Bayesian Statistics
+
+::: r-fit-text
+::: columns
+::: {.column width="45%"}
+1.  Finds the best model (amongst many others) to fit your data.
+
+2.  95%[^1] **confidence interval**: Using this method to calculate CI, 95% of CIs will contain the true parameter value in the long run.
+
+3.  **Naive models**: Assumes flat priors where all values (no matter how extreme) are equally likely.
+
+4.  Commonly concerned with hypothesis testing and point-estimates.
+:::
+
+::: {.column width="45%"}
+1.  Gives a distribution of models that are (more or less) likely given the data.
+
+2.  95% **credible interval**: 95% probability the CI contains the true parameter value.[^2]
+
+3.  (Can be) less naive models: Allows flat priors on parameters, as well as **weakly informative, regularising priors**, or even **strongly informative priors**.
+
+4.  Commonly concerned with parameter estimation and quantification of uncertainty.
+:::
+:::
+
+Bayesian estimation shines when we have some knowledge about the data generation process.
+:::
+
+[^1]: Other intervals are available in all major supermarkets.
+
+[^2]: Conditional on the model and data.
+
+# How Bayesian Estimation Works
+
+## How it Works
+
+:::{.r-fit-text}
+
+$$Posterior \propto Likelihood \times Prior$$
+
+Our main interest is in the posterior and predictions we can make from it.
+
+-   For simple models, the posterior can be determined analytically.
+
+-   For more complicated models, we can approximate the posterior.
+
+-   e.g. **Grid approximation**: Get a grid of values we're interested in and assign probabilities to these (i.e. a prior), collect data and determine the most likely values (i.e. the likelihood), and then combine both sources of information to get a posterior.
+
+*Grid approximation can be computationally expensive when we use complex models. Other methods are needed.*
+
+:::
+
+## MCMC Sampling
+
+:::{.r-fit-text}
+
+**Markov Chain Monte Carlo methods**: approximate the posterior distribution when calculation is difficult/impossible.
+
+1.  Define the **model and priors**.
+2.  **Initialise a chain** where each state corresponds to a value of an unknown variable.
+3.  Propose a **new state** in the chain.
+4.  **Accept or reject** the new state, often decided by determining if the probability of the new state is higher than the current one (i.e. more likely to be part of the posterior).
+5.  Repeat steps 3 and 4 many times to **explore the space of possible values** of the variable. The chain should spend more time in regions of high posterior probability.
+6.  Sample from the chain under the assumption we've reached a good **approximation of the posterior**.
+
+:::
+
+## MCMC Sampling of Parameter Space
+
+Consider the bivariate normal distribution with this density. Imagine it's a **skatepark**...
+
+![](resources/bivariate-plot.png){fig-align="center"}
+
+## MCMC Sampling of Parameter Space
+
+We can work this out analytically or via sampling. Imagine skating down the **skatepark**. You'll more often than not end up at the deeper points. Nicely, this method scales up.
+
+![](resources/gibbs-sampling.gif){fig-align="center"}
+
+# Bayesian Modelling in R using `brms`
+
+## A Bayesian Workflow
+
+::: r-fit-text
+-   Consider the **data generation process** for your study. Use this to determine:
+
+    -   An appropriate likelihood function (e.g. family = Gaussian, Binomial, Poisson, etc. with relevant links).
+    -   Appropriate priors on parameters in the model. Priors can be informed by expert opinion, previous findings, or relatively uninformative.
+
+-   Conduct a **prior predictive check** to see if your priors result in sensible predictions. Adjust priors and model specification if needed.
+
+-   Fit the model to your data and check **model diagnostics**. Adjust priors and model specification if needed.
+
+-   Conduct a **posterior predictive check** to see if model predictions are sensible. Adjust model specification and priors if needed.
+
+-   Check the **sensitivity** of the posterior to the prior. This is especially important if using Bayes factors. Adjust model specification and priors if needed.
+
+-   Make **model-based predictions** and quantify uncertainty in terms of parameter estimates.
+:::
+
+## Using `brms`
+
+-   Stan is a probabilistic programming language for statistical inference written in C++ that allows for flexible model creation and sampling.
+
+-   `brms` takes models fitted using R's formula method and implements then in the Stan sampler (hence why you needed additional programs for this). You can define **multilevel models** using the same `(1 | id)` method.
+
+-   We specify our linear model **formula**, any relevant **priors** (with sensible defaults), and the distribution family of the response variable.
+
+## A Linear Regression Example in `brms`
+
+-   We can choose different **backends**, e.g. "stanr" or "cmdstanr". The latter is faster but doesn't allow for calculation of Bayes factors using bridge sampling.
+
+-   We can select the number of **chains** we run to get samples and how many cores we use to sample from them. Having **cores** = samples means you sample in parallel, speeding things up.
+
+```{r}
+mod <- brm(
+  rt ~ 1 + stimulus + (1 | id), 
+  data = fhch,
+  family = gaussian(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4
+)
+```
+
+## Understanding the `brms` Output
+
+-   Rhat is a convergence diagnostic: If chains converge on an answer this will be close to 1. Don't use a sample if this is over 1.05.
+
+-   The higher the effective sample size (ESS) the better. You want this to be at least 100 per chain.
+
+-   Population is akin to a fixed effect, group-level akin to random.
+
+## Understanding the `brms` Output
+
+```{r}
+mod
+```
+
+## Comparing `lme4` and `brms`
+
+```{r}
+fixef(lmer(rt ~ 1 + stimulus + (1 | id), data = fhch))
+```
+
+```{r}
+mod
+```
+
+# Priors
+
+We previously used default priors. This is normally not a good idea.
+
+## Classes of Priors
+
+::: {.r-fit-text}
+
+-   **Flat Priors**: So-called "uninformative priors"[^3]. All values receive equal probability prior to fitting. Generally, a bad idea and doesn't reflect your beliefs.
+
+-   **Informative Priors**: Specific predictions based on prior experience (e.g. knowing effect sizes from the literature).
+
+-   **Weakly Informative Priors**: Vague predictions that act to "regularise" the data. Often, extreme effect sizes are downweighted, and smaller effect sizes receive more weighting. Many "default" priors in Bayesian analysis packages use these types of priors.
+
+[^3]: They are informative, though, as they still make a statement of belief.
+
+Both types of informative priors work well with small data sets. Priors can skew predictions (more so the stronger they are), but given enough data all priors are dominated by the likelihood.
+
+:::
+
+## Checking Your Priors
+
+You can find out what priors you had in your model and who set them using `prior_summary()`.
+
+This shows we used a flat prior on the beta, and default Student t priors on the intercept, by-participant intercepts, and the residual error (sigma).
+
+```{r}
+prior_summary(mod)
+```
+
+## Prior Specification
+
+Before fitting, we could see which priors we need to set using `get_prior()`, passing our formula and data set.
+
+```{r}
+get_prior(rt ~ 1 + stimulus + (1 | id), data = fhch)
+```
+
+## Setting Priors
+
+Use `set_prior()` with your prior specification as a string. Assign it to a particular class or even class and coefficient combination.
+
+```{r}
+# concatenate your priors
+priors <- c(
+  set_prior("normal(1000, 500)", class = "Intercept"),
+  set_prior("normal(0, 500)", class = "b"),
+  set_prior("normal(0, 1000)", class = "sd"),
+  set_prior("normal(0, 1000)", class = "sigma")
+)
+
+# fit your model
+mod2 <- brm(
+  rt ~ 1 + stimulus + (1 | id), 
+  data = fhch,
+  prior = priors,
+  family = gaussian(link = "identity"),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4
+)
+```
+
+## Setting Priors
+
+```{r}
+mod2
+```
+
+## Prior Predictive Checks
+
+-   You can work with your priors to simulate data and see the impact they have: What sort of observations do they produce. This can be tough.
+
+-   Instead, we can use `sample_prior = "only"` to get samples from the prior only (and not the posterior) and see how well it fits our data.
+
+```{r}
+mod2_prior <- brm(
+  rt ~ 1 + stimulus + (1 | id), 
+  data = fhch,
+  prior = priors,
+  family = gaussian(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4,
+  sample_prior = "only"
+)
+```
+
+## Prior Predictive Checks
+
+Use `pp_check()` to do a prior or posterior predictive check. Dark lines are your data, light lines model and prior based samples.
+
+```{r}
+pp_check(mod2_prior, ndraws = 100)
+```
+
+## Using a Different Family
+
+-   Our prior predictive check showed our model made samples ranging from -5000ms up to 5000ms in terms of reaction times. That doesn't seem right. Maybe a lognormal model would be better? To do this use `family = lognormal()`.
+
+-   Be aware that **the prior scale will change with the family**. They will all be on the log scale.
+
+-   Think about how they might combine to produce results.
+
+## Potential Priors
+
+What about an intercept with prior `normal(6.6, 0.3`) and a slope with prior `normal(0, 0.1)`?
+
+```{r}
+tibble(
+  intercept_min = exp(6.6 - 0.6),
+  intercept = exp(6.6),
+  intercept_max = exp(6.6 + 0.6),
+  beta_additive_max = intercept - exp(6.6 + 0.2)
+)
+```
+
+## Our Priors
+
+Set our priors on the log scale.
+
+```{r}
+lognormal_priors <- c(
+  set_prior("normal(6.6, 0.3)", class = "Intercept"),
+  set_prior("normal(0, 0.1)", class = "b"),
+  set_prior("normal(0, 0.1)", class = "sd"),
+  set_prior("normal(0, 0.2)", class = "sigma")
+)
+```
+
+## Using a Different Family
+
+```{r}
+mod3_prior <- brm(
+  rt ~ 1 + stimulus + (1 | id), 
+  data = fhch,
+  prior = lognormal_priors,
+  family = lognormal(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4,
+  sample_prior = "only"
+)
+```
+
+## Check the Priors
+
+This looks pretty good. We allow a broad range of values and it's centred where we'd expect. We get this through iteratively stating and checking priors. Be careful you aren't guided by your observed data though.
+
+```{r}
+pp_check(mod3_prior, ndraws = 100)
+```
+
+# Posteriors
+
+## Sample from the Posterior
+
+```{r}
+mod3 <- brm(
+  rt ~ 1 + stimulus + (1 | id), 
+  data = fhch,
+  prior = lognormal_priors,
+  family = lognormal(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4
+)
+```
+
+## Posterior Predictive Checks
+
+Use the same function as with your prior predictive checks, only on the model that samples from the posterior. This looks better than before but still isn't great. Maybe we need to adjust in some other way (adding predictors, shifting the distribution etc.). For now, we'll keep it as is.
+
+```{r}
+pp_check(mod3, ndraws = 100)
+```
+
+## Grouped Posterior Predictive Checks
+
+Our model isn't ideal at capturing the whole process. But how is it in terms of average group effects? This could still be improved but is fine(ish) for now.
+
+```{r}
+pp_check(mod3, ndraws = 100, group = "stimulus", type = "stat_grouped")
+```
+
+## Investigating Mixture of Chains
+
+Check how your other parameters were estimated and whether chains converged on reliable estimates with `plot()`. You want a **fuzzy caterpillar**.
+
+```{r}
+plot(mod3)
+```
+
+# Communicating Your Results
+
+## Summarising Findings
+
+You can work either work:
+
+-    Directly with the model-based predictions from the summary.
+
+-   With model-based predictions based on draws from the posterior. This is often the only option if you want to understand a complex model.
+
+## Working with Draws
+
+Remember, it's all just samples from a distribution. We had 4 chains of 1000 samples each.
+
+```{r}
+mod3 |> 
+  spread_draws(b_Intercept, b_stimulusnonword) |> 
+  head()
+```
+
+## Summarising Draws
+
+We can use summarising functions from `tidybayes` to help us, such as `median_qi()` which gives us the median and 95% credible interval.
+
+```{r}
+mod3 |> 
+  spread_draws(b_Intercept, b_stimulusnonword) |> 
+  median_qi()
+```
+
+## Summarising Draws
+
+Spreading draws for each variable is quite difficult to work with. We could instead gather them.
+
+```{r}
+mod3 |> 
+  gather_draws(b_Intercept, b_stimulusnonword) |> 
+  median_qi()
+```
+
+## Getting Group Predictions
+
+We can work directly with the posterior draws to get group estimates. Since we know the linear model and how it was coded we can do this by hand.
+
+```{r}
+mod3 |> 
+  spread_draws(b_Intercept, b_stimulusnonword) |> 
+  mutate(
+    word = b_Intercept,
+    non_word = b_Intercept + b_stimulusnonword
+  ) |> 
+  median_qi()
+```
+
+## Automating the Process
+
+- For complex models, knowing how to combine your intercept and slope is quite difficult. We can instead work with a data grid of the conditions from which we'd like to get estimates.
+
+- Here we get the **expectation** of the posterior using `add_epred_draws()` on the **back-transformed scale**. We set `re_formula = NULL` so we get group means without the random effects. This is like getting fixed effects only.
+
+## Automating the Process
+
+```{r}
+tibble(
+  stimulus = c("word", "nonword")
+) |> 
+  add_epred_draws(mod3, re_formula = NA) |> 
+  head()
+```
+
+## Getting Group Estimates
+
+Your same functions work with these automated estimates.
+
+```{r}
+tibble(
+  stimulus = c("word", "nonword")
+) |> 
+  add_epred_draws(mod3, re_formula = NA) |> 
+  median_qi()
+```
+
+## Visualising Estimates
+
+[`tidybayes`](http://mjskay.github.io/tidybayes/articles/tidy-brms.html) excels with uncertainty visualisation thanks to its sister package `ggdist`.
+
+```{r}
+#| eval: false
+tibble(
+  stimulus = c("word", "nonword")
+) |> 
+  add_epred_draws(mod3, re_formula = NA) |> 
+  ggplot(aes(y = stimulus, x = .epred)) +
+  stat_halfeye() +
+  labs(x = "Reaction Time [ms]")
+```
+
+## Visualising Estimates
+
+[`tidybayes`](http://mjskay.github.io/tidybayes/articles/tidy-brms.html) excels with uncertainty visualisation thanks to its sister package `ggdist`.
+
+```{r}
+#| echo: false
+tibble(
+  stimulus = c("word", "nonword")
+) |> 
+  add_epred_draws(mod3, re_formula = NA) |> 
+  ggplot(aes(y = stimulus, x = .epred)) +
+  stat_halfeye() +
+  labs(x = "Reaction Time [ms]")
+```
+
+
+# Model Comparison (Comparisons)
+
+To evaluate whether terms contribute well to model fit and accuracy in predictions we can compare them using information criteria or cross validation.
+
+## Information Criteria
+
+- **$R^2$** isn't a great way to evaluate how well your model accounts for data as it always increases as you add new variables, even if they're no good.
+- We ideally want a measure that penalizes for the number of predictors added.
+- There are a few, e.g. Akaike Information Criterion (**AIC**), Deviance Information Criterion (**DIC**), and Widely Applicable Information Criterion (**WAIC**). The latter makes the fewest assumptions about the posterior.
+
+## Cross Validation
+
+- We might also compare how well our model predicts out-of-sample observations. One way to do this is with **cross-validation**. But coming up with a training-testing split can be difficult, especially when we want maximal use of the data.
+
+- One way to get around this is with **LOO: leave-one-out cross-validation**. That's more simulation and more time.
+
+- PSIS-LOO is **pareto-smoothed** leave-one-out cross-validation which avoids the need for additional simulations.
+
+## Comparing the Comparisons
+
+Refit the model without the beta term in the priors or linear model.
+
+```{r}
+lognormal_priors_null <- c(
+  set_prior("normal(6.6, 0.3)", class = "Intercept"),
+  set_prior("normal(0, 0.1)", class = "sd"),
+  set_prior("normal(0, 0.2)", class = "sigma")
+)
+
+mod3_null <- brm(
+  rt ~ 1 + (1 | id), 
+  data = fhch,
+  prior = lognormal_priors_null,
+  family = lognormal(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4
+)
+```
+
+## Comparing the Comparisons
+
+Add the information criteria.
+
+```{r}
+mod3_null_waic <- waic(mod3_null)
+mod3_waic <- waic(mod3)
+```
+
+Compare the models based on the information criteria. Lower WAIC or higher ELPD-LOO is best. But differences only make sense if the *SE* isn't bigger than the difference.
+
+```{r}
+loo_compare(mod3_null_waic, mod3_waic) 
+```
+
+## Comparing the Comparisons
+
+Add the information criteria.
+
+```{r}
+mod3_null_loo <- loo(mod3_null)
+mod3_loo <- loo(mod3)
+```
+
+Compare the models based on the information criteria. Lower LOO-IC or higher ELPD-LOO is best. But differences only make sense if the *SE* isn't bigger than the difference.
+
+```{r}
+loo_compare(mod3_null_loo, mod3_loo) 
+```
+
+## Model Averaging
+
+- You don't need to always select the "best model". Sometimes there isn't one.
+
+- Instead, you might keep all of the information you know, along with your candidate models, and look at the predictions made from the host of models.
+
+- We might add this in to future sessions.
+
+# Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
