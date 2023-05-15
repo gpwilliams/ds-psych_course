@@ -1,0 +1,104 @@
+---
+title: "Bayesian Estimation and Model Comparison"
+author: 
+  - name: "Glenn Williams"
+    affiliations: 
+     - name: "Northumbria University"
+date: "2023-05-15"
+date-modified: "`r format(Sys.time(), '%Y %B, %d')`"
+title-block-banner: true
+abstract: "Put a Prior on it."
+format: 
+  html:
+    toc: true
+    toc_float: true
+    theme: minty
+editor: visual
+execute:
+  cache: true
+---
+
+# Instructions
+
+Complete the following exercises. The basics will get you used to fitting models and getting model predictions using brms with default priors. The advanced questions will get you to focus more on determining your priors with the help of prior predictive checks and evaluating your models based on the prior and posterior predictive checks.
+
+Load in the key packages.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(brms)
+library(cmdstanr)
+library(tidybayes)
+```
+
+# Basics
+
+Get the data from [Dunne, S., Williams, G. P., Bradbury, C., Keyes, T., Lane, A. R., Yang, K., & Ellison, A. (2023). Uncovering the social determinants of brain injury rehabilitation. *Journal of Health Psychology*, 13591053231166263.](https://journals.sagepub.com/doi/10.1177/13591053231166263)
+
+Load it in using this code and investigate the column names.
+
+```{r}
+#| message: false
+dat <- read_csv("https://raw.githubusercontent.com/gpwilliams/bi_loneliness/main/data/cleaned-results.csv") |> 
+  janitor::clean_names() |> 
+  drop_na(brs, wemwbs)
+
+glimpse(dat)
+```
+
+## Exercise 1. Comparing Linear Model Estimates
+
+### A. Fit the models
+
+Fit a linear model predicting mental wellbeing (`wemwbs`) from resilience (`brs`). Fit the same model using `brms` using default priors. Do you notice any differences in the estimates?
+
+### B. Evaluate the Posterior
+
+Conduct a posterior predictive check for the model using 100 draws. Do this again with a histogram of the mean values. Do the same again but this time try using a posterior predictive check of the `type` "stat_2d" for the minimum and maximum values in the data set.
+
+## Exercise 2. Summarising Draws
+
+Use tidybayes to get estimates of the median and 89% credible interval for the effect of `brs` on `wemwbs` for the highest and lowest possible BRS values of 1 and 5. Assign the result to `bi_draws`.
+
+### A. Get the median and 50, 80, and 90% credible intervals around the draws.
+
+**Explain the pattern of results.**
+
+### B. Recalculate Exercise 2B but use the 50, 80, and 90% highest density interval (HDI) instead of the credible interval.
+
+**Explain any differences to** `median_hdi()`.
+
+## Exercise 3. Visualising Draws
+
+Get draws across the range of values allowed by the BRS. This ranges from 6-30 divided by 6. Assign the result to `bi_draws_range`.
+
+### A. Plot the draws using the 50%, 80%, and 90% CI.
+
+Visualise the draws with `stat_lineribbon()`. Change the title of the legend to "Credible Interval", add in proper titles, and adapt the theme to whatever you prefer. Look into `stat_lineribbon()` to ensure your point interval is `median_ci`.
+
+### B. Make a Spaghetti Plot
+
+Instead of using `stat_lineribbon()` which summarises the draws using the `stat` functions in `tidybayes`, try using just `geom_line()` from `ggplot2`. See <http://mjskay.github.io/tidybayes/> for how you might do this. You will have to take a limited number of draws to do this, so **avoid reusing** `bi_draws_range`.
+
+## Exercise 4. Compare the model to a null model using PSIS-LOO.
+
+Ensure that you look at the `loo` estimates for each model before you compare them so you can see where the comparisons come from. Which model is preferred and why?
+
+## Exercise 5. Refit the Model with Appropriate Priors
+
+### A. Using Proper Priors
+
+Fit your model and sample from only the priors. Conduct a prior predictive check. If you're happy with your priors, fit the model. Justify your prior choice below.
+
+### B. Compare Priors
+
+Compare the model fitted with the default priors in Exercise 1 to your model with user-defined priors. Does much change at all? If so, why? If not, why not?
+
+### C. Check the Posterior of Your Model
+
+Conduct a posterior predictive check. Do things look OK?
+
+# Advanced
+
+TBA.
