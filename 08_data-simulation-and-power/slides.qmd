@@ -525,7 +525,7 @@ $\rho = \frac{Cov(X, Y)}{\sigma_x\sigma_y}$
 
 The variance-covariance matrix (also known as the covariance matrix) is a square matrix that contains the variances (*SD* squared; $\sigma^2$) of the individual variables along the diagonal and the covariances between each pair of variables off the diagonal. For the bivariate case this is:
 
-$\Sigma = \begin{pmatrix} \sigma_x^2, \rho\sigma_x^2\sigma_y^2 \\ \rho\sigma_x^2\sigma_y^2, \sigma_y^2 \end{pmatrix}$
+$\Sigma = \begin{pmatrix} \sigma_x^2, \rho\sigma_x\sigma_y \\ \rho\sigma_x\sigma_y, \sigma_y^2 \end{pmatrix}$
 
 ## Joint Distributions
 
