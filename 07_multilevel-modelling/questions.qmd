@@ -92,15 +92,15 @@ Refit the model from exercise 3A now with sum-coded fixed effects. Does anything
 
 ## Exercise 4. Categorical and Continuous Fixed Effects
 
-### A. Uncentred Continuous and Treatment coded Categorical Effects
+### A. Uncentred Continuous and Treatment Coded Categorical Effects
 
 Fit a model for the main effects and interaction between the uncentred effect of word length and native language (not scaled and not centred). Interpret the output. Pay attention to explaining the fixed effects intercept and slope terms. Don't do any follow up tests to this model.
 
-### B. Sum-Coded Categorical and Continuous Fixed Effects
+### B. Centred Continuous and Treatment Coded Categorical Effects
 
 Refit the model from exercise 5 with a centred effect of word length. What changes in regards to the fixed effects? Why?
 
-### C. Sum-Coded Categorical and Centred Continuous Fixed Effects
+### C. Centred Continuous and Sum Coded Categorical Effects
 
 Refit the model from exercise 4B but with a centred effect of word length and a scaled and centred effect of native language. What changes in the fixed effects? Why?
 
