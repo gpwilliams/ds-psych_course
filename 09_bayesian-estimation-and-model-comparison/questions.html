@@ -109,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">May 15, 2023</p>
+        <p class="date-modified">May 18, 2023</p>
       </div>
     </div>
       
@@ -154,7 +154,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#c.-check-the-posterior-of-your-model" id="toc-c.-check-the-posterior-of-your-model" class="nav-link" data-scroll-target="#c.-check-the-posterior-of-your-model">C. Check the Posterior of Your Model</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#advanced" id="toc-advanced" class="nav-link" data-scroll-target="#advanced">Advanced</a></li>
+  <li><a href="#advanced" id="toc-advanced" class="nav-link" data-scroll-target="#advanced">Advanced</a>
+  <ul class="collapse">
+  <li><a href="#exercise-6.-fitting-a-multilevel-model" id="toc-exercise-6.-fitting-a-multilevel-model" class="nav-link" data-scroll-target="#exercise-6.-fitting-a-multilevel-model">Exercise 6. Fitting a Multilevel Model</a>
+  <ul class="collapse">
+  <li><a href="#a.-a-default-bernoulli-model" id="toc-a.-a-default-bernoulli-model" class="nav-link" data-scroll-target="#a.-a-default-bernoulli-model">A. A Default Bernoulli Model</a></li>
+  <li><a href="#b.-posterior-predictive-checks" id="toc-b.-posterior-predictive-checks" class="nav-link" data-scroll-target="#b.-posterior-predictive-checks">B. Posterior Predictive Checks</a></li>
+  <li><a href="#c.-making-inferences-on-posterior-draws" id="toc-c.-making-inferences-on-posterior-draws" class="nav-link" data-scroll-target="#c.-making-inferences-on-posterior-draws">C. Making Inferences on Posterior Draws</a></li>
+  <li><a href="#d.-summarising-differences" id="toc-d.-summarising-differences" class="nav-link" data-scroll-target="#d.-summarising-differences">D. Summarising Differences</a></li>
+  </ul></li>
+  <li><a href="#exercise-7.-inappropriate-priors" id="toc-exercise-7.-inappropriate-priors" class="nav-link" data-scroll-target="#exercise-7.-inappropriate-priors">Exercise 7. Inappropriate Priors</a>
+  <ul class="collapse">
+  <li><a href="#a.-diagnosing-a-poor-model" id="toc-a.-diagnosing-a-poor-model" class="nav-link" data-scroll-target="#a.-diagnosing-a-poor-model">A. Diagnosing a Poor Model</a></li>
+  <li><a href="#b.-fixing-the-model" id="toc-b.-fixing-the-model" class="nav-link" data-scroll-target="#b.-fixing-the-model">B. Fixing the Model</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -167,11 +181,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Instructions</h1>
 <p>Complete the following exercises. The basics will get you used to fitting models and getting model predictions using brms with default priors. The advanced questions will get you to focus more on determining your priors with the help of prior predictive checks and evaluating your models based on the prior and posterior predictive checks.</p>
 <p>Load in the key packages.</p>
-<div class="cell" data-hash="questions_cache/html/unnamed-chunk-1_037e9e16740c6175b8951d8bfeeae965">
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-1_3d0d668bcf282658db6927767a200e21">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cmdstanr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="basics" class="level1">
@@ -268,7 +283,166 @@ $ pain                       &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 </section>
 <section id="advanced" class="level1">
 <h1>Advanced</h1>
-<p>TBA.</p>
+<p>Get the data from <a href="https://psyarxiv.com/b8zn6/">Williams, G. P., Panayotov, N., &amp; Kempe, V. (2020). How does dialect exposure affect learning to read and spell? An artificial orthography study. <em>Journal of Experimental Psychology: General</em>, <em>149</em>(12), 2344.</a> In this study we taught people a made-up language either under a “standard” or “dialect” condition where participants either heard the same language “at home” and “in school” or different varieties of the language “at home” and “in school”. Crucially, some words had a dialect variant (<code>shifted_word</code>), some didn’t (<code>no_shift_word</code>), and some were entirely novel to the testing phase so that people had to decode them during testing but had rules that allowed them to be pronounced with the “standard” or “dialect” form of the language (<code>can_shift_word</code>).</p>
+<p>In the study we use a more nuanced outcome as our primary measure of learning, the length-normalised Levenshtein edit distance. However, here we’ll use a binomial outcome: whether people got the word correct or not. For simplicity we’ll keep the analysis to the reading task only within the testing block.</p>
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-3_1fca457aeaf9ffc1e5c694c97ab70429">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data_url <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/gpwilliams/levenik/master/02_data/03_study-three/03_cleaned-data/ex_3_cleaned_data.csv"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>levenik_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(data_url) <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only testing block for reading, excluding people who didn't complete it</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    block <span class="sc">==</span> <span class="st">"TEST"</span>, </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    task <span class="sc">==</span> <span class="st">"R"</span>, </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span>participant_number <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">144</span>, <span class="dv">177</span>, <span class="dv">273</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">participant =</span> participant_number,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">item =</span> target</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    participant, </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    item,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    language_variety, </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    dialect_words, </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    lenient_correct</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">participant =</span> <span class="fu">as.factor</span>(participant),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">item =</span> <span class="fu">as.factor</span>(item),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">language_variety =</span> <span class="fu">as.factor</span>(language_variety),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">dialect_words =</span> <span class="fu">as.factor</span>(dialect_words)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(lenient_correct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-6.-fitting-a-multilevel-model" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.-fitting-a-multilevel-model">Exercise 6. Fitting a Multilevel Model</h2>
+<section id="a.-a-default-bernoulli-model" class="level3">
+<h3 class="anchored" data-anchor-id="a.-a-default-bernoulli-model">A. A Default Bernoulli Model</h3>
+<p>Fit a multilevel model to the data with <code>lenient_correct</code> as the outcome and with <code>language_variety</code>, <code>dialect_words</code>, and their interaction as fixed effects. Use crossed random effects of participants and items. It is up to you to determine the maximal random effects structure. Set sum-coded contrasts for your variables. Use default priors for now. Ensure that you use an appropriate family for your outcome, such as <code>bernoulli()</code> or <code>binomial()</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Bernoulli distribution is just a special case of the Binomial with a single trial. For trial level data the Bernoulli family will result in a faster fit than the Binomial with n = 1. Since we’re modelling data on the trial-level here, the Bernoulli is appropriate.</p>
+</div>
+</div>
+</section>
+<section id="b.-posterior-predictive-checks" class="level3">
+<h3 class="anchored" data-anchor-id="b.-posterior-predictive-checks">B. Posterior Predictive Checks</h3>
+<p>Conduct a posterior predictive check of the model. Do things look OK? What about a posterior predictive check of the mean responses?</p>
+</section>
+<section id="c.-making-inferences-on-posterior-draws" class="level3">
+<h3 class="anchored" data-anchor-id="c.-making-inferences-on-posterior-draws">C. Making Inferences on Posterior Draws</h3>
+<p>There are three methods for taking draws from a posterior that we might commonly use:</p>
+<ul>
+<li><p><strong>Posterior predictions</strong> [using <code>add_predicted_draws()</code>]: Random draws are taken from the posterior. <strong>By default predictions are on the original outcome scale.</strong> In this case, in 0s and 1s.</p></li>
+<li><p><strong>Posterior predictions of the linear predictor</strong> [using <code>add_linpred_draws()</code>]: Random draws are made up of linear predictions from the posterior. <strong>By default outcomes are on the link scale</strong>. In this case, in log odds (also called logits).</p></li>
+<li><p><strong>Posterior predictions from the expected value of the posterior predictive distribution</strong> [using <code>add_epred_draws()</code>]: Random draws are made up of expected values of the posterior. Crucially, this ignores the residual error in the model, so is akin to summarising the fixed effects estimates only. <strong>Outcomes are on the outcome scale</strong>. In this case, in probabilities.</p></li>
+</ul>
+<p>Compare the three methods of draws, making visualisations of each. For the posterior predictions (i.e.&nbsp;the 0, 1 outcomes) you may need to aggregate the data.</p>
+</section>
+<section id="d.-summarising-differences" class="level3">
+<h3 class="anchored" data-anchor-id="d.-summarising-differences">D. Summarising Differences</h3>
+<p>We’ve visualised the draws posterior in various ways above. But we might be interested in directly comparing certain contrasts to communicate the estimate and uncertainty in the estimate of a group difference. Use the <code>comapre_levels()</code> function from <code>tidybayes</code> to extract the difference between <code>language_variety</code>. Summarise these differences in terms of the mean and 90% credible interval.</p>
+</section>
+</section>
+<section id="exercise-7.-inappropriate-priors" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7.-inappropriate-priors">Exercise 7. Inappropriate Priors</h2>
+<section id="a.-diagnosing-a-poor-model" class="level3">
+<h3 class="anchored" data-anchor-id="a.-diagnosing-a-poor-model">A. Diagnosing a Poor Model</h3>
+<p>I have fitted the following model. This takes a while to run, so you can load it from file using the code chunk below the following one.</p>
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-4_b6fda21ef18b2f5d3686589958764d96">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ex7a_mod <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  lenient_correct <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> language_variety <span class="sc">*</span> dialect_words <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> language_variety <span class="sc">+</span> dialect_words <span class="sc">|</span> participant) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">+</span> language_variety <span class="sc">|</span> item),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> levenik_data,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">bernoulli</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"normal(40, 1)"</span>, <span class="at">class =</span> <span class="st">"Intercept"</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"normal(30, 1000)"</span>, <span class="at">class =</span> <span class="st">"b"</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"lkj(0.9)"</span>, <span class="at">class =</span> <span class="st">"L"</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"exponential(1)"</span>, <span class="at">class =</span> <span class="st">"sd"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"cmdstanr"</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> .<span class="dv">3</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># write to file</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(ex7a_mod, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"bayesian-estimation"</span>, <span class="st">"ex7a_mod.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Load the model:</p>
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-5_7de8012c2c61d42c4729598c33193a11">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ex7a_mod <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"bayesian-estimation"</span>, <span class="st">"ex7a_mod.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Investigate the parameter estimates. What’s wrong with this model?</p>
+<p>Investigate the plot of estimates and chains. What’s wrong?</p>
+</section>
+<section id="b.-fixing-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="b.-fixing-the-model">B. Fixing the Model</h3>
+<p>Fix any issues with the model. This can be focused on fixing inappropriate random effects and using more appropriate priors. Doing so will make the model (a) fit more quickly and (b) settle on sensible estimates with chains that mix well. Visualise any priors you intend to set. To visualise priors, you can use the <code>r_()</code> or <code>d_()</code> distribution functions, e.g.:</p>
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-6_cb2ddd8f04f8ef796ca782e810e4091d">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>random_draws <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">draw =</span> <span class="fu">rexp</span>(<span class="at">n =</span> <span class="fl">1e5</span>, <span class="at">rate =</span> <span class="fl">0.5</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(random_draws, <span class="fu">aes</span>(<span class="at">x =</span> draw)) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="questions_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Or use the ideal distribution.</p>
+<div class="cell" data-hash="questions_cache/html/unnamed-chunk-7_6d98abb86f90b992bb508c2cc371eebc">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define the range of values</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">by =</span> <span class="fl">0.1</span>)  <span class="co"># adjust the range as needed</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the density values</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>density <span class="ot">&lt;-</span> <span class="fu">dexp</span>(x, <span class="at">rate =</span> <span class="fl">0.5</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># create a tibble for the plot</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ideal_draws <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> x, <span class="at">density =</span> density)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># create the plot</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ideal_draws, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> density)) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="questions_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I set the <code>adapt_delta</code> to 0.3, away from the default 0.8. This increased the sensitivity of the algorithm to potential divergences. You can remove this line of code to return the <code>adapt_delta</code> to the default 0.8.</p>
+<section id="visualise-your-priors" class="level4">
+<h4 class="anchored" data-anchor-id="visualise-your-priors">Visualise Your Priors</h4>
+<p>Visualise your priors using one of the methods I used above.</p>
+</section>
+<section id="address-issues-with-model-specification" class="level4">
+<h4 class="anchored" data-anchor-id="address-issues-with-model-specification">Address Issues with Model Specification</h4>
+<p>Address any issues you saw with the model specification.</p>
+</section>
+<section id="conduct-a-prior-predictive-check-on-your-improved-model" class="level4">
+<h4 class="anchored" data-anchor-id="conduct-a-prior-predictive-check-on-your-improved-model">Conduct a Prior Predictive Check on Your Improved Model</h4>
+<p>Conduct a prior predictive check on your improved model.</p>
+</section>
+<section id="refit-the-model" class="level4">
+<h4 class="anchored" data-anchor-id="refit-the-model">Refit the Model</h4>
+<p>Refit the model using your new priors. How do things look?</p>
+</section>
+<section id="conduct-a-posterior-predictive-check" class="level4">
+<h4 class="anchored" data-anchor-id="conduct-a-posterior-predictive-check">Conduct a Posterior Predictive Check</h4>
+<p>Conduct a posterior predictive check of your improved model. How do things look?</p>
+</section>
+<section id="summarise-the-model" class="level4">
+<h4 class="anchored" data-anchor-id="summarise-the-model">Summarise the Model</h4>
+<p>Summarise the model predictions compared to the default prior model. Does anything change?</p>
+</section>
+</section>
+</section>
 </section>
 
 </main>
