@@ -1,0 +1,844 @@
+---
+title: "Understanding Null Results"
+author: "Glenn Williams"
+date-format: "YYYY-MM-DD"
+date: "`r format(Sys.time(), '%Y %B, %d')`"
+execute:
+  echo: true
+  cache: true
+format: 
+  revealjs:
+    theme: [styles.scss]
+    preview-links: auto
+    transition: slide
+    min-scale: 0.1
+    width: 1400
+editor: visual
+---
+
+## Overview
+
+::: {.r-fit-text}
+
+<div>
+
+Today's session is on understanding null results. By the end you will understand:
+
+-   The logic of Bayes factors and how they can be estimated using different methods.
+
+-   How to use Bayes factors to evaluate point and interval hypotheses.
+
+-   How Bayes factors are sensitive to prior and model specification and how to conduct a sensitivity analysis as a robustness check.
+
+-   An alternative to Bayes factors in the Bayesian framework: ROPE analysis for the posterior.
+
+-   An alternative to both Bayesian methods: frequentist equivalence testing.
+
+-   The importance of a-priori hypotheses in equivalence testing.
+
+</div>
+
+:::
+
+# Getting Started
+
+-   Go to <https://github.com/gpwilliams/ds-psych_course>.
+
+-   Click `Code` \> Download ZIP.
+
+-   Unzip the files.
+
+-   Open the file `ds-psych_course.RProj`
+
+-   Create a Quarto document and save it within `09_bayesian-estimation-and-model-comparison`. Name it anything you like.
+
+You can copy the code form here on out and everything should work.
+
+# Required Packages
+
+`tidyverse` and `here` are the usual suspects. We have `lme4` for fitting mixed effects models, `brms` for fitting **B**ayesian **R**egression **M**odels in **S**tan, `cmdstanr` to fit models in `brms` using the `cmdstanr` backend, `bayestestR` for Bayes factors and Bayesian equivalence tests, `bridgesampling` for another method of Bayes factor calculation, and `emmeans` for frequentist equivalence tests.
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(lme4)
+library(brms)
+library(cmdstanr)
+library(bayestestR) # part of easystats
+library(bridgesampling)
+library(emmeans)
+```
+
+# Background on the Data
+
+Let's simulate some data looking at the [Action Sentence Compatability Effect (ACE)](https://link.springer.com/article/10.3758/BF03196313) by Glenberg & Kaschak (2002).
+
+-   This study originally showed evidence that when the actions implied in a sentence (e.g. closing/opening a drawer) congruent with responses needed to indicate the sentence was sensible or not (e.g. pressing a button towards or away from the body), response times were faster than when they were incongruent.
+
+-   Following studies by [Papesh (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4662055/) and [Morey et al. (2021)](https://link.springer.com/article/10.3758/s13423-021-01927-8) failed to replicate this effect.
+
+## Accessing the Data
+
+The data is in `data/morey-et-al.csv`.
+
+Variables:
+
+-   **Cue direction**: towards or away from the body.
+-   **Sentence direction**: towards or away from the body.
+-   **Lift off accuracy**: response time to press the button after having lifted the hand off the keyboard.
+
+We'll use the cleaned data set from the Bergen lab.
+
+## Cleaning the Data
+
+```{r}
+dat <- read_csv(here("data", "morey-et-al.csv")) |> 
+  janitor::clean_names() |> 
+  filter(lab == "Bergen") |> 
+  select(ptid, item_number, cue_direction, sentence_direction, lift_off_latency) |> 
+  rename(
+    participant = ptid, 
+    item = item_number,
+    rt = lift_off_latency
+  ) |> 
+  mutate(
+    cue_direction = case_when(
+      cue_direction == 1 ~ "away",
+      cue_direction == 0 ~ "toward"
+    ),
+    sentence_direction = case_when(
+      sentence_direction == 1 ~ "away",
+      sentence_direction == 0 ~ "toward"
+    ),
+    # make everything that isnt RT a factor
+    across(
+      .cols = !rt,
+      .fns = as.factor
+    )
+  )
+```
+
+## Setting Factors
+
+This is factorial data with an interaction, so if we want to interpret slopes as main effects then we need to use **sum or deviation coding**. We'll use **deviation** as effects are on the scale you'd expect. We also want to specify participants and items deviation-coded factors.
+
+```{r}
+contrasts(dat$participant) <- contr.sum(length(unique(dat$participant)))/2 # 70
+contrasts(dat$item) <- contr.sum(length(unique(dat$item)))/2 # 32
+contrasts(dat$cue_direction) <- contr.sum(2)/2
+contrasts(dat$sentence_direction) <- contr.sum(2)/2
+```
+
+# Initial Analysis
+
+## Frequentist Analysis
+
+We have no significant effects for the main effects and their interaction.
+
+```{r}
+freq_mod <- lmer(
+  rt ~ 1 + cue_direction * sentence_direction + 
+    (1 | participant) + (1 | item),
+  data = dat
+)
+summary(freq_mod)
+```
+
+## Frequentist Analysis Note
+
+::: callout-note
+The maximal model is one with slopes for cue direction and sentence direction (including their interaction) by subjects and items. For simplicity and speed, we leave these out in this example. In a real analysis you would, however, include them if your model can converge with them present.
+:::
+
+## Interpreting the Frequentist Analysis
+
+-   We did not find a significant main effect of cue direction or sentence direction, and we did not find a significant interaction.
+
+-   ...
+
+-   This could be due to **low power** or there really being **no effect** (amongst other issues). But we can't say either way.
+
+-   A **sensitivity analysis** would help, but we can look at ways to interpret the null results.
+
+## Bayesian Analysis
+
+### Setting Priors
+
+If you don't know which parameters you need to set priors for, use `get_prior()` on your model formula, distribution family (and any associated link functions), and data set.
+
+```{r}
+get_prior(
+  rt ~ 1 + cue_direction * sentence_direction + 
+    (1 | participant) + (1 | item),
+  family = gaussian(),
+  data = dat
+)
+```
+
+## Bayesian Analysis
+
+Fit the model. We'll use relatively uninformative priors here.
+
+```{r}
+bayes_mod <- brm(
+  rt ~ 1 + cue_direction * sentence_direction + 
+    (1 | participant) + (1 | item),
+  data = dat,
+  prior = c(
+    prior(normal(2000, 300), class = "Intercept"),
+    prior(normal(0, 150), class = "b"),
+    prior(normal(0, 300), class = "sd"),
+    prior(normal(0, 300), class = "sigma")
+  ),
+  cores = 4,
+  chains = 4,
+  iter = 4000,
+  backend = "rstan",
+  sample_prior = "yes",
+  save_pars = save_pars(all = TRUE)
+)
+```
+
+## Interpreting the Bayesian Analysis
+
+The grand mean is about 2000ms ± approx. 100ms. Main effects and interactions span zero. Similar situation as before.
+
+```{r}
+summary(bayes_mod)
+```
+
+## Summarising Bayesian Parameters
+
+-   The `bayestestR` package has lots of nice functions for working with Bayesian models, including `describe_posterior()` which shows us the estimates, CI, and **probability of direction (pd).**
+
+-   *pd* varies between 50 to 100% and is the probability a parameter is strictly positive or negative; the proportion of the posterior distribution that is the same sign as the median.
+
+-   *pd* is correlated with the frequentist *p*-value; `2*(1-pd/100)` = 2-sided *p*-value. So a value of 97.5% is significant at the .05 level, 99.5% at the .001 level.
+
+## Summarising Bayesian Parameters
+
+```{r}
+describe_posterior(bayes_mod)
+```
+
+# Evaluating Null Results
+
+# Bayes Factors
+
+-   Bayes factors give us the relative evidence in support of one model **in comparison to another**.
+
+-   Often we compare an "alternative" model against a "null" model to argue for evidence in support of/against the alternative or null hypotheses.
+
+-   It's important to recognise Bayes factors are only measures of **relative** evidence, not **absolute** evidence.
+
+-   If you have two terrible models, you might get a Bayes factor pointing towards one model better better. But it doesn't mean it's correct.
+
+-   Bayes factors require properly specified, **informative priors**, and many, **many samples** to converge on stable estimates.
+
+## The Bayes Factor
+
+We can use Bayes rule to calculate the posterior probability of a model given the data by taking the prior of the model multiplied by the likelihood of the data given the model over the marginal likelihood.
+
+::: r-fit-text
+$$P(M | D) = \frac{P(M) \times P(D | M)}{P(D)}$$
+:::
+
+## The Bayes Factor
+
+We can do this for two models and then compare their posterior odds (computed by the prior odds of the models mulitplied by the likelihood ratio). This can be taken as a measure of how we should update our beliefs about which model is most appropriate given our data.
+
+::: r-fit-text
+$$\frac{P(M_1 | D)}{P(M_2 | D)} = \frac{P(M_1)}{P(M_2)} \times \frac{P(D | M_1)}{P(D | M_2)} $$
+:::
+
+## Interpreting the Bayes Factor
+
+The Bayes factor is a **continuous measure of evidence** in support of the model under which the data are most likely in contrast to another model. This is the case only for your given models, priors, and model specifications. Commonly denoted as:
+
+::: r-fit-text
+
+-   $BF_{01}$ = evidence in support of the **null hypothesis (0)** relative to the alternative (1).
+-   $BF_{10}$ = evidence in support of the **alternative hypothesis (1)** relative to the null (0).
+-   $BF_{12}$ = evidence in support of **alternative hypothesis 1** relative to alternative hypothesis 2.
+
+:::
+
+## Interpreting the Bayes Factor
+
+::: r-fit-text
+
+While measures of continuous evidence, we love to dichotomise in Psychology. So, here's [some guidelines from easystats](https://easystats.github.io/effectsize/reference/interpret_bf.html) for interpreting Bayes factors:
+
+:::
+
+| Jeffreys (1961)                  | Rafferty (1995)             |
+|----------------------------------|-----------------------------|
+| BF = 1 \[no evidence\]           | BF = 1 \[no evidence\]      |
+| 1 \< BF \<= 3 \[anecdotal\]      | 1 \< BF \<= 3 \[weak\]      |
+| 3 \< BF \<= 10 \[moderate\]      | 3 \< BF \<= 20 \[positive\] |
+| 10 \< BF \<= 30 \[strong\]       | 20 \< BF \<= 150 \[strong\] |
+| 30 \< BF \<= 100 \[very strong\] | BF \> 150 \[very strong\]   |
+| BF \> 100 \[extreme\]            |                             |
+
+::: r-fit-text
+Since Bayes factors are ratios they can be inverted. So, a $BF_{01}$ of 0.25 is a $BF_{10}$ of (1/0.25) = 4.
+:::
+
+## Kinds of Bayes Factors
+
+-   Like posteriors, Bayes factors can be computed analytically for very simple models. But this becomes untenable as models become more complex as we can't compute the marginal likelihood.
+
+-   We have two options:
+
+    -   The **Savage-Dickey density ratio:** fast and easy to compute, but restricted to nested models (e.g. models sharing all terms ± a single parameter) or comparisons between the prior and posterior for a point-null hypothesis.
+
+    -   B**ridge sampling**: more general and can handle non-nested models, but is very computationally demanding and requires a lot of samples. Currently only works with `rstan`, not `cmdstanr`, hence us using this backend.
+
+# The Savage-Dickey Density Ratio (SDDR)
+
+## SDDR
+
+The **Savage-Dickey density ratio** is the ratio of the density between the prior and posterior at a point-null.
+
+```{r}
+#| echo: false
+bf_params <- bayesfactor_parameters(
+  bayes_mod, 
+  parameters = "b_sentence_direction1",
+  null = 0,
+  verbose = FALSE
+)
+plot(bf_params) +
+  theme_bw()
+```
+
+## Calculating the SDDR
+
+-   `brms` has the inbuilt `hypothesis()` function to allow for calculation of Bayes factors. However, this can be hard to work with. We'll use the `bayesfactor_*()` functions from `bayestestR` instead.
+
+-   By default, `brms` doesn't save samples from the prior in the model to save on computing resources/space. So, models must have the argument `save_pars = save_pars(all = TRUE)` and `sample_prior = "yes"` in the call to `brms()`, otherwise the model will be refitted prior to calculation.
+
+-   Take your fitted model and use `bayesfactor_parameters()` to calculate the Bayes factor for all (or subsets of parameters) or `bayesfactor_models()` to calculate it for nested models.
+
+## `bayesfactor_parameters()`
+
+Let's get the Bayes factor for the interaction against a point null hypothesis. This tells us the Bayes factor for evidence **against the null hypothesis**, i.e. $BF_{10}$. This is 0.194, meaning the null hypothesis is approx. 5 times (i.e. 1/.194) more likely than the alternative for this comparison.
+
+```{r}
+set.seed(1892)
+
+bf_params <- bayesfactor_parameters(
+  bayes_mod, 
+  parameters = "b_sentence_direction1",
+  null = 0
+)
+bf_params
+```
+
+## Plotting The SDDR
+
+```{r}
+plot(bf_params)
+```
+
+*I'm sure I've seen that plot before...*
+
+## Directional Hypotheses
+
+We can similarly test directional hypotheses, such as the effect being strictly positive in this case. Here we get a $BF_{01}$ of 2.82.
+
+```{r}
+set.seed(1892)
+bayesfactor_parameters(
+  bayes_mod, 
+  parameters = "b_sentence_direction1",
+  null = 0,
+  direction = ">"
+)
+```
+
+# Interval Hypotheses
+
+## Interval Hypotheses
+
+-   **Kruschke (2010)** argues we often want to evaluate **regions of practical equivalence**. That is, we don't test against a point null, but a null region. This makes sense from a Bayesian standpoint as we tend to like to incorporate uncertainty in our estimates.
+
+-   To do this, we get the prior and posterior probability in a given region and outside that region.
+
+-   In Morey et al. (2021) they deemed an effect of **50ms and below to be uninteresting and inconsistent with the ACE literature**. This means we might want to test a null interval rather than a point null.
+
+## Testing Interval Hypotheses
+
+Set our range to 50ms in either direction. This gives us a Bayes factor of .000629 against the null, or **over 1000 in support of the null**.
+
+```{r}
+bf_params_range <- bayesfactor_parameters(
+  bayes_mod, 
+  parameters = "b_sentence_direction1",
+  null = c(-50, 50)
+)
+bf_params_range
+```
+
+## Plotting Interval Hypotheses
+
+```{r}
+plot(bf_params_range)
+```
+
+## Interpreting the Bayes Factor
+
+If you need help interpreting the Bayes factor, you can rely on the `interpret_bf()` function from `effectsize`, a package in `easystats`.
+
+For the point null:
+
+```{r}
+effectsize::interpret_bf(exp(bf_params$log_BF), include_value = TRUE, exact = FALSE)
+```
+
+For the range null:
+
+```{r}
+effectsize::interpret_bf(exp(bf_params_range$log_BF), include_value = TRUE, exact = FALSE)
+```
+
+# Comparing Models
+
+## Comparing Models
+
+Refit the model, now only without the interaction.
+
+```{r}
+bayes_mod_0 <- brm(
+  rt ~ 1 + cue_direction + sentence_direction + 
+    (1 | participant) + (1 | item),
+  data = dat,
+  prior = c(
+    prior(normal(2000, 300), class = "Intercept"),
+    prior(normal(0, 150), class = "b"),
+    prior(normal(0, 300), class = "sd"),
+    prior(normal(0, 300), class = "sigma")
+  ),
+  cores = 4,
+  chains = 4,
+  iter = 4000,
+  backend = "rstan",
+  sample_prior = "yes",
+  save_pars = save_pars(all = TRUE)
+)
+```
+
+## Bridge Sampling
+
+This method involves **estimating marginal likelihoods** for each hypothesis by integrating the product of the likelihood and prior over the parameter space.
+
+-   Our aim is to compare the strength of evidence for two hypotheses.
+
+-   To compute the Bayes factor, we need the marginal likelihood. But we can't calculate it for complex models.
+
+-   So, we **estimate the marginal likelihoods** by introducing a **"bridge"** between the two hypotheses. This is a distribution which is a **combination of the priors and parameters from both hypotheses**.
+
+-   We draw **samples** from the **bridge distribution** and calculate the likelihood of the data under each hypothesis using the samples. Comparing these gives us the Bayes factor.
+
+## Bridge Sampling with `bayesfactor_models()`
+
+This restricted model compares $M_1$ with the interaction included against $M_0$ with no interaction. The Bayes factor is 5.35 times more likely under $M_0$ than $M_1$.
+
+```{r}
+bayesfactor_models(bayes_mod, bayes_mod_0)
+```
+
+## Considerations for Bridge Sampling
+
+Note that we used a nested model in the previous comparison, but we could equally use non-nested models. For example, we could compare one with just `cue_direction` against one with just `sentence_direction`. This isn't possible using the Savage-Dickey density ratio or under a frequentist model comparison framework.
+
+-   You need a lot of samples (easily 10x the amount you'd usually use).
+
+-   As with the Savage-Dickey density ratio, you need proper priors, so prior sensitivity checks are very important.
+
+# Considerations for Using Bayes Factors
+
+## The Impact of Improper Priors
+
+You need proper priors to use Bayes factors. Why? Let's see what happens when we have very broad priors.
+
+```{r}
+bayes_mod_improper <- brm(
+  rt ~ 1 + cue_direction * sentence_direction + 
+    (1 | participant) + (1 | item),
+  data = dat,
+  prior = c(
+    prior(normal(2000, 3000), class = "Intercept"),
+    prior(normal(0, 1500), class = "b"),
+    prior(normal(0, 3000), class = "sd"),
+    prior(normal(0, 3000), class = "sigma")
+  ),
+  cores = 4,
+  chains = 4,
+  iter = 4000,
+  backend = "rstan",
+  sample_prior = "yes",
+  save_pars = save_pars(all = TRUE)
+)
+```
+
+## Improper Priors
+
+::: r-fit-text
+
+-   What's happened to the Bayes factors? They are all more strongly in favour of the null.
+
+-   That's because our priors were so flat they communicated very little information about the effect size.
+
+-   This means no matter how much evidence you have, the null is always favoured.
+
+:::
+
+```{r}
+improper_bf <- bayesfactor_parameters(bayes_mod_improper)
+improper_bf
+```
+
+## Improper Priors
+
+```{r}
+plot(improper_bf)
+```
+
+## Improper Priors and Diverging Hypotheses
+
+We'll simulate some data where the alternative hypothesis should be favoured.
+
+```{r}
+set.seed(1892)
+
+sim_dat <- tibble(y = rnorm(n = 100, mean = 0.5, sd = 2))
+ggplot(sim_dat, aes(x = y)) +
+  geom_density() +
+  geom_vline(aes(xintercept = 0), linetype = "dashed")
+```
+
+## Fit the Models
+
+### Informative Priors
+
+These priors state we have a good idea about the parameters.
+
+```{r}
+proper_prior_sim <- brm(
+  y ~ 0 + Intercept, 
+  prior = c(
+    prior(normal(0, 1), class = "b", coef = "Intercept"),
+    prior(normal(0, 2), class = "sigma")
+  ),
+  backend = "cmdstanr",
+  cores = 4,
+  chains = 4,
+  data = sim_dat,
+  silent = 2,
+  refresh = 0
+)
+```
+
+## Hang on... 0 + Intercept?!
+
+::: callout-warning
+
+`brms` is very clever in that it automatically uses a centred parameterisation for your model, even if you didn't define your model using this parameterisation. This is because it's often more computationally efficient and leads to more stable estimates with fewer issues during fitting. However, this means that the prior you set on the intercept with `y ~ 1` is actually for the centred intercept, which you may not have used if you didn't use sum-coding! Using `y ~ 0 + Intercept` means you can set the prior on the scale your model has encoded, without forcing the centred parameterisation. In this case it doesn't matter, but it's an important point I've neglected until now.
+
+:::
+
+## Fit the Models
+
+### Uninformative, Flat Priors
+
+```{r}
+improper_prior_sim <- brm(
+  y ~ 0 + Intercept, 
+    prior = c(
+    prior(normal(0, 100), class = "b", coef = "Intercept"),
+    prior(normal(0, 500), class = "sigma")
+  ),
+  backend = "cmdstanr",
+  cores = 4,
+  chains = 4,
+  data = sim_dat,
+  silent = 2,
+  refresh = 0
+)
+```
+
+## The Impact of Improper Posteriors
+
+```{r}
+#| echo: false
+library(patchwork)
+
+proper_bf <- bayesfactor_parameters(proper_prior_sim, verbose = FALSE) |> 
+  plot() +
+  coord_cartesian(xlim = c(-1, 1)) +
+  labs(title = "Informative Priors: Alternative Favoured")
+  
+improper_bf <- bayesfactor_parameters(improper_prior_sim, verbose = FALSE) |> 
+  plot() +
+  coord_cartesian(xlim = c(-1, 1)) +
+  labs(title = "Improper Priors: Null Favoured")
+
+proper_bf + improper_bf
+```
+
+## Sufficient Samples
+
+Refit the model from before, but now increase the samples. Compare the Bayes factors with the default (4000) and increased (40,000) samples.
+
+```{r}
+sufficient_samples_sim <- brm(
+  y ~ 0 + Intercept, 
+  prior = c(
+    prior(normal(0, 1), class = "b", coef = "Intercept"),
+    prior(normal(0, 2), class = "sigma")
+  ),
+  backend = "cmdstanr",
+  cores = 4,
+  chains = 4,
+  iter = 40000,
+  data = sim_dat,
+  silent = 2,
+  refresh = 0
+)
+```
+
+## Sufficient Samples
+
+The estimates vary when you don't have sufficient samples. They converge on a stable estimate with more samples.
+
+```{r}
+set.seed(1892)
+bayesfactor_parameters(proper_prior_sim, verbose = FALSE)
+set.seed(1893) # note this differs
+bayesfactor_parameters(proper_prior_sim, verbose = FALSE)
+```
+
+## Sufficient Samples
+
+```{r}
+set.seed(1892)
+bayesfactor_parameters(sufficient_samples_sim, verbose = FALSE)
+set.seed(1893) # note this differs
+bayesfactor_parameters(sufficient_samples_sim, verbose = FALSE)
+```
+
+
+## Sensitivity Analysis
+
+As Bayes factors are sensitive to prior specification, a good analysis will perform a sensitivity analysis to see how the Bayes factors (and interpretations) change across a range of priors. This can be done manually, or with a function.
+
+```{r}
+fit_models <- function(sd_vector){
+  
+  # create data holder
+  models_list <- vector(mode = "list", length = length(sd_vector))
+  
+  # loop through all supplied sd_vector values and
+  # fit a model with that prior
+  for(i in seq_along(sd_vector)) {
+    
+    message(paste("Fitting model", i, "of", length(sd_vector)))
+    
+    # add the beta prior for each loop to the other priors
+    these_priors <- c(
+      set_prior(paste0("normal(0, ", sd_vector[[i]], ")"), class = "b", coef = "Intercept"),
+      prior(normal(0, 2), class = "sigma")
+    )
+    
+    # fit the models
+    models_list[[i]] <- brms::brm(
+      formula = y ~ 0 + Intercept, 
+      data = sim_dat,
+      prior = these_priors,
+      cores = 4,
+      chains = 4,
+      seed = 1892,
+      sample_prior = TRUE,
+      save_pars = save_pars(all = TRUE),
+      backend = "cmdstanr",
+      silent = 2,
+      refresh = 0
+    )
+  }
+  
+  # set names for models
+  names(models_list) <- paste0("sd_", sd_vector) # set names
+  models_list # return it
+}
+```
+
+## Conducting the Sensitivity Analysis
+
+```{r}
+sd_range <- 1:5
+list_of_mods <- fit_models(sd_range)
+```
+
+## Reporting the Uncertainty
+
+Map across the list and get the Bayes factors. With a larger SD on the prior, we have weaker evidence against the null hypothesis.
+
+```{r}
+bf_df <- map_dfr(
+  list_of_mods, 
+  bayesfactor_parameters, 
+  verbose = FALSE, 
+  .progress = TRUE
+)
+bf_df
+```
+
+## Visualising Uncertainty
+
+```{r}
+#| eval: false
+bf_df |> 
+  as_tibble() |> 
+  mutate(
+    SD = sd_range,
+    BF = exp(log_BF)
+  ) |> 
+  ggplot(aes(x = SD, y = BF)) +
+    geom_point(size = 2) +
+    theme_bw() +
+    annotate("rect", xmin = 0, xmax = 6, ymin = -3, ymax = 3, alpha = .2) + 
+    labs(
+      title = "Bayes Factor Sensitivity Check",
+      x = "Model", 
+      y = expression("BF"[1][0]),
+      caption = "Grey band indicates weak (Kass & Raftery, 1995) or anecdotal evidence (Jeffreys, 1961)."
+    )
+```
+
+## Visualising Uncertainty
+
+```{r}
+#| echo: false
+bf_df |> 
+  as_tibble() |> 
+  mutate(
+    SD = sd_range,
+    BF = exp(log_BF)
+  ) |> 
+  ggplot(aes(x = SD, y = BF)) +
+    geom_point(size = 2) +
+    theme_bw() +
+    annotate("rect", xmin = 0, xmax = 6, ymin = -3, ymax = 3, alpha = .2) + 
+    labs(
+      title = "Bayes Factor Sensitivity Check",
+      x = "Model", 
+      y = expression("BF"[1][0]),
+      caption = "Grey band indicates weak (Kass & Raftery, 1995) or anecdotal evidence (Jeffreys, 1961)."
+    )
+```
+
+# Regions of Practical Equivalence
+
+## Defining a Region of Practical Equivalence (ROPE)
+
+-   The ROPE is defined for the posterior. What is the most likely estimate for your model? What's it's uncertainty? **How much of it is in a ROPE?** This is different to defining an interval null for a Bayes factor.
+
+-   The ROPE should ideally be defined by an **a-priori** set of bounds defined by your domain expertise.
+
+-   This can be worked out by meta-analyses, prior studies, theoretical predictions, or just knowledge about what's the **smallest effect size of interest** (SESOI).
+
+-   Alternatively, there are some defaults built in to the functions we'll use. How appropriate these are is up to you to decide.
+
+## Bayesian ROPE
+
+`bayestestR` comes with handy functions like `describe_posterior()`. By default this calculates the ROPE with default bounds as suggested by Kruschke(2018). For a linear model this is defined by -0.1 \* $SD_y$ and 0.1 \* $SD_y$. But you can set this to a more informative range if you like:
+
+```{r}
+describe_posterior(bayes_mod, ci = .90, rope_range = c(-50, 50))
+```
+
+## Visualising the ROPE
+
+We can use `rope()` directly to look just at the ROPE range. We can then use the `plot()` function to visualise it. The 90% CI is entirely within the ROPE range for the two main effects but not the interaction.
+
+```{r}
+rope(bayes_mod, ci = .90, rope_range = c(-50, 50)) |> 
+  plot()
+```
+
+## Frequentist Equivalence Tests
+
+::: r-fit-text
+
+-   Traditionally, use of *p*-values means we could reject the null hypothesis, but state little else of value when we can't do that.
+
+-   Equivalence tests allow us to determine **if non-significant *p*-values support the null or are inconclusive**.
+
+-   Similarly to the Bayesian ROPE methods, we want to see if our estimates are entirely within a ROPE or not.
+
+-   There are a few methods to this, most relevant to us being the **Two One-Sided Test** method (TOST; Lakens, 2017) and the **Conditional Equivalence Testing** method (CET; Campbell & Gustafson, 2018).
+
+-   TOST assumes equivalence when the estimate is entirely within the bounds regardless of the main *p*-value, while CET only assumes equivalence if the main *p*-value is non-significant.
+
+:::
+
+## Equivalence Tests for Parameters
+
+The function `equivalence_test()` is exported from `easystats` to `parameters`. So, it's already installed, but we need to call it with the namespace or use `library(parameters)` first.
+
+```{r}
+parameters::equivalence_test(freq_mod, rule = "classic", range = c(-50, 50))
+```
+
+## Equivalence Tests for Parameters
+
+Try the CET rule instead of TOST (classic).
+
+```{r}
+equiv <- parameters::equivalence_test(freq_mod, rule = "cet", range = c(-50, 50))
+equiv
+```
+
+## Plotting Equivalence Tests
+
+```{r}
+plot(equiv)
+```
+
+## Equivalence Tests for Pairwise Contrasts
+
+Unsurprisingly, pairwise tests of the estimated marginal means are non-significant for each contrast. Though, how many of these have support for statistical equivalence?
+
+```{r}
+pairwise_freq <- emmeans(freq_mod, ~ cue_direction * sentence_direction) |> 
+  pairs()
+pairwise_freq
+```
+
+## Equivalence Tests for Pairwise Contrasts
+
+-   `emmeans` has a `delta` argument in `summary()` and `test()` allowing you to specify a threshold value for a test of equivalence.
+
+-   Here, significant effects are those where the estimates are sufficiently below the threshold of the difference in either direction. These are **statistically equivalent**.
+
+-   Any that are non-significant have **insufficient evidence** for either a significant or equivalent effect.
+
+```{r}
+test(pairwise_freq, delta = 50)
+```
+
+## When to Use BF, ROPE, & Equivalence Tests
+
+-   Bayes factors are appropriate when you want to test **different hypotheses** to **compare parameters and compare models**. They are only valid with **informative priors**. Prior elicitation is hard, and **sensitivity analyses are essential**. However, they let you reason about preferred models.
+
+-   Bayesian ROPE is appropriate if you want to characterise the shape and scale of the posterior for parameters or marginal/conditional estimates. Tests are **sensitive to ROPE specification**, so these should ideally be defined a-priori.
+
+-   Frequentist equivalence tests are **similar to Bayesian ROPE** and with the same considerations, but with a frequentist flavour.
+
+-   The choice between Bayesian and frequentist methods can be driven by pragmatism or **philosophy**. Think about what you want to know.
+
+# Exercises
+
+Please complete the exercises at <https://github.com/gpwilliams/ds-psych_course>.
